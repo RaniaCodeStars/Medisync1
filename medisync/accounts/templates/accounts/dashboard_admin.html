@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Pro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ApexCharts -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.js"></script>
+    <!-- DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <!-- Notyf (Notifications) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link rel="stylesheet" href="../../static/accounts/css/admin.css">
+    
+</head>
+<body>
+    <!-- Logout Modal -->
+    <div class="modal fade logout-modal" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Déconnexion</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <h4>Êtes-vous sûr de vouloir vous déconnecter ?</h4>
+                    <p class="text-muted">Vous devrez vous reconnecter pour accéder à nouveau au tableau de bord.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn logout-btn cancel" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn logout-btn confirm" id="confirmLogout">Déconnexion</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navbar -->
+    <nav class="top-navbar animate__animated animate__fadeInDown">
+        <div class="d-flex align-items-center">
+            <button class="mobile-menu-btn me-3" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="#" class="navbar-brand">
+                <img src="https://via.placeholder.com/40x40/7367f0/ffffff?text=AP" alt="Logo">
+                <span class="brand-text">AdminPro</span>
+            </a>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher médecins, patients, rendez-vous...">
+            </div>
+        </div>
+        <div class="user-actions">
+            <div class="dark-mode-toggle me-2">
+                <input type="checkbox" id="dark-mode-toggle">
+                <label class="dark-mode-slider" for="dark-mode-toggle"></label>
+            </div>
+            <div class="action-icon notification-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">5</span>
+                <div class="dropdown-menu dropdown-menu-end p-0">
+                    <div class="dropdown-header bg-primary text-white py-3 px-4">
+                        <h6 class="mb-0">Notifications (5)</h6>
+                    </div>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <a href="#" class="dropdown-item border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 bg-primary bg-opacity-10 p-2 rounded">
+                                    <i class="fas fa-user-md text-primary"></i>
+                                </div>
+                                <div>
+                                    <div>Nouveau médecin enregistré</div>
+                                    <small class="text-muted">Il y a 15 min</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 bg-success bg-opacity-10 p-2 rounded">
+                                    <i class="fas fa-calendar-check text-success"></i>
+                                </div>
+                                <div>
+                                    <div>Nouveau rendez-vous</div>
+                                    <small class="text-muted">Il y a 1 heure</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 bg-danger bg-opacity-10 p-2 rounded">
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                </div>
+                                <div>
+                                    <div>Problème signalé</div>
+                                    <small class="text-muted">Il y a 3 heures</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 bg-info bg-opacity-10 p-2 rounded">
+                                    <i class="fas fa-check-circle text-info"></i>
+                                </div>
+                                <div>
+                                    <div>Médecin validé</div>
+                                    <small class="text-muted">Aujourd'hui, 10:45</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="dropdown-footer text-center py-2">
+                        <a href="#" class="text-primary">Voir toutes les notifications</a>
+                    </div>
+                </div>
+            </div>
+            <div class="action-icon message-icon" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-envelope"></i>
+                <span class="message-badge">3</span>
+                <div class="dropdown-menu dropdown-menu-end p-0">
+                    <div class="dropdown-header bg-primary text-white py-3 px-4">
+                        <h6 class="mb-0">Messages (3)</h6>
+                    </div>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <a href="#" class="dropdown-item border-bottom">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/women/42.jpg" alt="User" class="rounded-circle me-3" width="40">
+                                <div>
+                                    <div>Dr. Sophie Martin</div>
+                                    <small class="text-muted">Besoin d'aide avec mon compte</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item border-bottom">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User" class="rounded-circle me-3" width="40">
+                                <div>
+                                    <div>Jean Dupont</div>
+                                    <small class="text-muted">Problème avec mon rendez-vous</small>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="rounded-circle me-3" width="40">
+                                <div>
+                                    <div>Marie Leroy</div>
+                                    <small class="text-muted">Demande d'information</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="dropdown-footer text-center py-2">
+                        <a href="#" class="text-primary">Voir tous les messages</a>
+                    </div>
+                </div>
+            </div>
+            <div class="user-profile dropdown">
+                <img src="../../static/accounts/images/admin.jpg" alt="User" class="user-avatar dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-info dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-name">Rania Guenif</div>
+                    <div class="user-role">Super Admin</div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mon Profil</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Paramètres</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-envelope me-2"></i> Messages <span class="badge bg-success float-end">3</span></a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-bell me-2"></i> Notifications <span class="badge bg-primary float-end">5</span></a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        <span class="menu-text">Tableau de Bord</span>
+                    </a>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-user-md"></i>
+                        <span class="menu-text">Gestion Médecins</span>
+                        <span class="menu-badge">3</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-user-clock"></i>
+                                <span class="menu-text">Validation</span>
+                                <span class="menu-badge">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-list"></i>
+                                <span class="menu-text">Liste des Médecins</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span class="menu-text">Disponibilités</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-bar"></i>
+                                <span class="menu-text">Statistiques</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span class="menu-text">Gestion Patients</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-list"></i>
+                                <span class="menu-text">Liste des Patients</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-bar"></i>
+                                <span class="menu-text">Statistiques</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-file-import"></i>
+                                <span class="menu-text">Import/Export</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="menu-text">Rendez-vous</span>
+                        <span class="menu-badge">12</span>
+                    </a>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="menu-text">Analytique</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-pie"></i>
+                                <span class="menu-text">Statistiques</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-bar"></i>
+                                <span class="menu-text">Rapports</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-file-export"></i>
+                                <span class="menu-text">Exports</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-comments"></i>
+                        <span class="menu-text">Messages</span>
+                        <span class="menu-badge">5</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-bell"></i>
+                        <span class="menu-text">Notifications</span>
+                        <span class="menu-badge">8</span>
+                    </a>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span class="menu-text">Paramètres</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-user-cog"></i>
+                                <span class="menu-text">Profil</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-lock"></i>
+                                <span class="menu-text">Sécurité</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-globe"></i>
+                                <span class="menu-text">Général</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-bell"></i>
+                                <span class="menu-text">Notifications</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Content -->
+        <div class="container-fluid">
+            <h4 class="mb-4 fade-in">Tableau de Bord Administrateur</h4>
+
+            <!-- Stats Cards -->
+            <div class="row fade-in delay-1">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-body">
+                            <div class="card-icon primary">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="card-value">154</div>
+                            <div class="card-title">Médecins Actifs</div>
+                            <div class="stats-chart">
+                                <canvas id="doctorsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <span class="text-success"><i class="fas fa-arrow-up me-1"></i> 12% ce mois</span>
+                            <a href="#" class="small text-primary">Voir détails <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-body">
+                            <div class="card-icon success">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="card-value">2,345</div>
+                            <div class="card-title">Patients Actifs</div>
+                            <div class="stats-chart">
+                                <canvas id="patientsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <span class="text-success"><i class="fas fa-arrow-up me-1"></i> 18% ce mois</span>
+                            <a href="#" class="small text-primary">Voir détails <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-body">
+                            <div class="card-icon warning">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="card-value">876</div>
+                            <div class="card-title">Rendez-vous</div>
+                            <div class="stats-chart">
+                                <canvas id="appointmentsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <span class="text-success"><i class="fas fa-arrow-up me-1"></i> 5% ce mois</span>
+                            <a href="#" class="small text-primary">Voir détails <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-body">
+                            <div class="card-icon danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="card-value">23</div>
+                            <div class="card-title">Problèmes Signalés</div>
+                            <div class="stats-chart">
+                                <canvas id="issuesChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <span class="text-danger"><i class="fas fa-arrow-down me-1"></i> 3% ce mois</span>
+                            <a href="#" class="small text-primary">Voir détails <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row fade-in delay-2">
+                <div class="col-lg-8 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <span>Statistiques des Rendez-vous</span>
+                            <div class="dropdown d-inline">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="appointmentsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Ce Mois
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="appointmentsDropdown">
+                                    <li><a class="dropdown-item" href="#">Aujourd'hui</a></li>
+                                    <li><a class="dropdown-item" href="#">Cette Semaine</a></li>
+                                    <li><a class="dropdown-item" href="#">Ce Mois</a></li>
+                                    <li><a class="dropdown-item" href="#">Cette Année</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="appointmentsStatsChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <span>Répartition des Spécialités</span>
+                            <div class="dropdown d-inline">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="specialtiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Par Médecins
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="specialtiesDropdown">
+                                    <li><a class="dropdown-item" href="#">Par Médecins</a></li>
+                                    <li><a class="dropdown-item" href="#">Par Rendez-vous</a></li>
+                                    <li><a class="dropdown-item" href="#">Par Revenus</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="specialtiesChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="row fade-in delay-3">
+                <div class="col-lg-6 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <span>Médecins à Valider</span>
+                            <a href="#" class="btn btn-sm btn-primary">Voir Tous <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table doctor-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Médecin</th>
+                                            <th>Spécialité</th>
+                                            <th>Date</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://randomuser.me/api/portraits/women/42.jpg" alt="Doctor">
+                                                    <div class="ms-3">
+                                                        <div class="fw-bold">Dr. Sophie Martin</div>
+                                                        <small class="text-muted">sophie.m@example.com</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Cardiologie</td>
+                                            <td>12/06/2023</td>
+                                            <td><span class="badge-pending">En Attente</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir profil"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Approuver"><i class="fas fa-check"></i></button>
+                                                    <button class="table-btn delete" title="Rejeter"><i class="fas fa-times"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Doctor">
+                                                    <div class="ms-3">
+                                                        <div class="fw-bold">Dr. Jean Dupont</div>
+                                                        <small class="text-muted">jean.d@example.com</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Neurologie</td>
+                                            <td>10/06/2023</td>
+                                            <td><span class="badge-pending">En Attente</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir profil"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Approuver"><i class="fas fa-check"></i></button>
+                                                    <button class="table-btn delete" title="Rejeter"><i class="fas fa-times"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Doctor">
+                                                    <div class="ms-3">
+                                                        <div class="fw-bold">Dr. Marie Leroy</div>
+                                                        <small class="text-muted">marie.l@example.com</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>Pédiatrie</td>
+                                            <td>08/06/2023</td>
+                                            <td><span class="badge-pending">En Attente</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir profil"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Approuver"><i class="fas fa-check"></i></button>
+                                                    <button class="table-btn delete" title="Rejeter"><i class="fas fa-times"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <span>Activité Récente</span>
+                            <a href="#" class="btn btn-sm btn-primary">Voir Tous <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-primary">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6 class="activity-title">Nouveau médecin enregistré</h6>
+                                        <p class="activity-desc">Dr. Sophie Martin a soumis sa demande d'inscription.</p>
+                                        <small class="activity-time"><i class="far fa-clock me-1"></i> Il y a 15 minutes</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-success">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6 class="activity-title">Nouveau rendez-vous</h6>
+                                        <p class="activity-desc">Jean Dupont a pris un rendez-vous avec Dr. Marie Leroy.</p>
+                                        <small class="activity-time"><i class="far fa-clock me-1"></i> Il y a 1 heure</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6 class="activity-title">Problème signalé</h6>
+                                        <p class="activity-desc">Un patient a signalé un problème avec son rendez-vous.</p>
+                                        <small class="activity-time"><i class="far fa-clock me-1"></i> Il y a 3 heures</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-info">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6 class="activity-title">Médecin validé</h6>
+                                        <p class="activity-desc">Vous avez approuvé la demande de Dr. Pierre Lambert.</p>
+                                        <small class="activity-time"><i class="far fa-clock me-1"></i> Aujourd'hui, 10:45</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Appointments -->
+            <div class="row fade-in delay-4">
+                <div class="col-12 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <span>Rendez-vous Récents</span>
+                            <div class="dropdown d-inline">
+                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="recentAppointmentsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Aujourd'hui
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="recentAppointmentsDropdown">
+                                    <li><a class="dropdown-item" href="#">Aujourd'hui</a></li>
+                                    <li><a class="dropdown-item" href="#">Cette Semaine</a></li>
+                                    <li><a class="dropdown-item" href="#">Ce Mois</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="recentAppointmentsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Patient</th>
+                                            <th>Médecin</th>
+                                            <th>Date/Heure</th>
+                                            <th>Spécialité</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#AP-1001</td>
+                                            <td>Jean Dupont</td>
+                                            <td>Dr. Marie Leroy</td>
+                                            <td>15/06/2023 10:30</td>
+                                            <td>Pédiatrie</td>
+                                            <td><span class="badge bg-success">Confirmé</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir détails"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Modifier"><i class="fas fa-edit"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#AP-1002</td>
+                                            <td>Sophie Martin</td>
+                                            <td>Dr. Pierre Lambert</td>
+                                            <td>15/06/2023 11:15</td>
+                                            <td>Cardiologie</td>
+                                            <td><span class="badge bg-warning">En Attente</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir détails"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Modifier"><i class="fas fa-edit"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#AP-1003</td>
+                                            <td>Lucie Bernard</td>
+                                            <td>Dr. Jean Dupont</td>
+                                            <td>15/06/2023 14:00</td>
+                                            <td>Neurologie</td>
+                                            <td><span class="badge bg-danger">Annulé</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir détails"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Modifier"><i class="fas fa-edit"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#AP-1004</td>
+                                            <td>Thomas Petit</td>
+                                            <td>Dr. Sophie Martin</td>
+                                            <td>16/06/2023 09:30</td>
+                                            <td>Dermatologie</td>
+                                            <td><span class="badge bg-success">Confirmé</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir détails"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Modifier"><i class="fas fa-edit"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#AP-1005</td>
+                                            <td>Emma Robert</td>
+                                            <td>Dr. Jacques Durand</td>
+                                            <td>16/06/2023 16:45</td>
+                                            <td>Gynécologie</td>
+                                            <td><span class="badge bg-warning">En Attente</span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir détails"><i class="fas fa-eye"></i></button>
+                                                    <button class="table-btn edit" title="Modifier"><i class="fas fa-edit"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Notyf (Notifications) -->
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    <script>
+      document.getElementById("confirmLogout").addEventListener("click", function() {
+          window.location.href = "{% url 'accounts:login' %}";
+      });
+  </script>
+  
+    <script src="../../static/accounts/js/admin.js"></script>
+   
+</body>
+</html>

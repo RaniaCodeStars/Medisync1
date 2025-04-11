@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Centre d'aide | Medisync</title>
+    <link rel="stylesheet" href="{% static 'css/help_center.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">Medisync</h2>
+            </a>
+            <ul class="nav-menu">
+                <button id="menu-close-button" class="fas fa-times" ></button>
+                <li class="nav-item">
+                    <a href="#home" class="nav-link2">Acceuil </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'help_center' %}" class="nav-link2">Centre d'aide</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link2">Mes document</a>
+                </li>
+                <li class="nav-item" >
+                    {% if clinic.photos %}
+                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
+                {% else %}
+                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
+                {% endif %} 
+                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                </li>
+            </ul>
+
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+        </nav>
+        </div>
+    </header>
+    <h1>Centre d'aide Medisync</h1>
+
+    <div class="help-section">
+        <h2>Patients</h2>
+        <ul>
+            <li><a href="#">Comment prendre un rendez-vous ?</a></li>
+            <li><a href="#">Comment annuler ou modifier un rendez-vous ?</a></li>
+            <li><a href="#">Je ne trouve pas mon médecin</a></li>
+            <li><a href="#">Comment créer mon compte Medisync ?</a></li>
+        </ul>
+    </div>
+
+    <div class="help-section">
+        <h2>Professionnels de santé</h2>
+        <ul>
+            <li><a href="#">Comment s'inscrire en tant que professionnel ?</a></li>
+            <li><a href="#">Comment gérer mes disponibilités ?</a></li>
+            <li><a href="#">Comment annuler un rendez-vous d’un patient ?</a></li>
+            <li><a href="#">Comment modifier les informations de mon établissement ?</a></li>
+        </ul>
+    </div>
+
+    <div class="help-section">
+        <h2>Sécurité et données personnelles</h2>
+        <ul>
+            <li><a href="#">Comment Medisync protège mes données ?</a></li>
+            <li><a href="#">Comment supprimer mon compte ?</a></li>
+            <li><a href="#">Mes informations sont-elles partagées avec des tiers ?</a></li>
+        </ul>
+    </div>
+
+    <div class="help-section">
+        <h2>Contact et assistance</h2>
+        <ul>
+            <li><a href="#">Contacter le support</a></li>
+            <li><a href="#">Signaler un bug ou une erreur</a></li>
+            <li><a href="#">Nous écrire</a></li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,606 @@
+
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Miniver&family=Nunito:wght@200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins&display=swap');
+*{
+    margin: 0;
+    padding: 0 ;
+    box-sizing: border-box;
+    font-family: "Poppins",sans-serif;
+    
+    
+    
+}
+body{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+:root{
+    --white-color: #ffffff;
+    --dark-color: #0b1e30; /* Bleu marine foncé */
+    --primary-color: #1a4d8f25; /* Bleu royal */
+    --secondary-color: #071e45b3; /* Bleu clair et énergique */
+    --light-blue-color: #d4eaf7; /* Bleu pastel doux */
+    --medium-gray-color: #7a8ca4;
+
+ --font-size-s:0.9rem;
+ --font-size-n:1rem;
+ --font-size-m:1.12rem;
+ --font-size-l:1.5rem;
+ --font-size-xl:2rem;
+ --font-size-xxl:2.3rem;
+
+ --font-weight-normal:400;
+ --font-weight-medium:500;
+ --font-weight-semibold:600;
+ --font-weight-bold:700;
+
+ --border-radius-s:8px;
+ --border-radius-m:30px;
+ --border-radius-circle:50%;
+
+ --site-max-width:1300px;
+
+}
+/*whole of site */
+ul{
+    list-style: none;
+}
+a{
+    text-decoration: none;
+}
+button{
+    margin-left: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+
+}
+img{
+    width: 100%;
+}
+nav .navbar .section-content{
+    margin: 0 auto;
+    padding:0 20px;
+    max-width: var(--site-max-width);
+}
+.section-title{
+    text-align: center;
+    padding: 60px 0 100px;
+    text-transform: uppercase;
+    font-size: var(--font-size-xl);
+}
+.section-title::after{
+    content: "";
+    width: 80px;
+    height: 5px;
+    display: block;
+    margin: 10px auto 0;
+    border-radius: var(--border-radius-s);
+    background: #030c60ae;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+}
+.connect{
+    padding: 10px 26px ;
+    border: 2px solid #fff;
+    color: var(--white-color);
+    border-radius: var(--border-radius-m);
+    background: var(--primary-color);
+    font-weight: var(--font-weight-medium);
+    transition: 0.3s ease;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+
+}
+
+.hero-image{
+    padding-top: 300px;
+}
+/*navbar*/
+nav .navbar .section-content{
+    margin: 0 auto;
+    padding:0 20px;
+    max-width: var(--site-max-width);
+}
+header{
+    width: 100%;
+    z-index: 5;
+
+    
+}
+
+header .navbar{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color:rgb(74 115 175 / 89%);    
+    display: flex;
+    padding: 14px;
+    align-items: center;
+    justify-content: space-between;
+
+}
+.navbar .nav-logo .logo-text{
+    color: var(--white-color);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+}
+.navbar .nav-menu{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar .nav-menu .nav-link2{
+    color: var(--white-color);
+    font-size: 15px;
+    border-radius: var(--border-radius-m);
+    transition: 0.3s ease;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    padding: 10px 18px;
+    
+}
+.navbar .nav-menu .nav-link2:hover{
+    color: var(--white-color);
+    background: var(--secondary-color);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+}
+.navbar :where(#menu-close-button, #menu-open-button){
+    display: none;
+}
+/*en tete*/
+.en_tete {
+    margin-top: 06px;
+    background: linear-gradient(to right, rgba(16, 54, 109, 0.803),rgba(16, 55, 109, 0.596), rgba(16, 55, 109, 0.393),#ffffff);
+    height: auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profil-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+    border: 3px solid #ffffff;
+}
+
+.clinic-info {
+    color: white;
+}
+
+.clinic-info h3 {
+    margin: 0;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.clinic-info p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+/*links*/
+/* Barre de navigation */
+.main-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.nav-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+}
+
+.nav-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.nav-link {
+    color: #4a5568;
+    font-size: 0.89rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 15px 12px;
+    white-space: nowrap;
+    position: relative;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+    color: #2b6cb0;
+}
+
+.nav-link.active {
+    color: #2b6cb0;
+    border-bottom: 2px solid #2b6cb0;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #2b6cb0;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+/* Ajoutez ceci à votre CSS existant */
+.show-mobile-menu .main-nav {
+    display: none !important;
+}
+
+/* Style pour le menu mobile */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    height: 100vh;
+    background: white;
+    transition: right 0.3s ease;
+    z-index: 1001; /* Au-dessus de la nav principale */
+}
+
+.show-mobile-menu .mobile-menu {
+    right: 0;
+}
+/* Animation du scroll horizontal */
+.nav-container {
+    scroll-behavior: smooth;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-link {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .nav-container {
+        padding: 0 15px;
+    }
+}
+
+
+
+
+.show-mobile-menu #map {
+    display: none !important;
+}
+
+
+
+
+
+
+/* Par défaut, cacher les boutons sur grand écran */
+#menu-close-button,
+#menu-open-button {
+    display: none;
+}
+
+/* Afficher les boutons sur mobile */
+@media (max-width: 768px) {
+    #menu-open-button {
+        display: block;
+    }
+
+    /* Quand le menu est affiché, montrer le bouton de fermeture */
+    .show-mobile-menu #menu-open-button {
+        display: none;
+    }
+
+    .show-mobile-menu #menu-close-button {
+        display: block;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
+
+html {
+    font-size: 14px;
+}
+
+
+/*** Sidebar ***/
+
+aside {
+    margin-top: 28.5px;
+    margin-bottom: 20px;
+    height: 100vh;
+    position: fixed;
+    width: 200px;
+    padding-left: 0;
+}
+
+aside .sidebar {
+    background: rgba(16, 55, 109, 0.596);
+    display: flex;
+    flex-direction: column;
+    height: 86vh;
+    position: relative;
+    top: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+aside h3 {
+
+    font-weight: 500;
+    font-size: 13px;
+}
+
+aside .sidebar a {
+    display: flex;
+    color: whitesmoke;
+    margin-left: 2rem;
+    gap: 1rem;
+    align-items: center;
+    position: relative;
+    height: 3.7rem;
+    transition: all 300ms ease;
+}
+
+aside .sidebar a span {
+    font-size: 1.6rem;
+    transition: all 300ms ease;
+}
+
+aside .sidebar a:last-child {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
+
+aside .sidebar a.active {
+    background: rgb(200 221 247);
+    color: rgb(79, 148, 239);
+    margin-left: 0;
+}
+
+aside .sidebar a.active:before {
+    content: '';
+    width: 6px;
+    height: 100%;
+    background: rgb(79, 148, 239);
+}
+
+aside .sidebar a.active span {
+    color:  rgb(62 117 191);
+    margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover {
+    color:  rgb(62 117 191);
+}
+
+aside .sidebar a:hover span {
+    margin-left: 1rem;
+}
+
+aside .sidebar .message-count {
+    background: rgb(253, 66, 66);
+    color: whitesmoke;
+    padding: 2px 10px;
+    font-size: 11px;
+    border-radius: 0.4rem;
+}
+
+
+
+/* Style Calendrier avec Conteneur Fixe et Défilement Interne - Disposition 3/3/1 */
+.container {
+    max-width: 1000px;
+    height: 80vh;
+    margin: 2rem auto;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 20px;
+    background: #a3aecb63;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-left: 220px;
+}
+
+.container h2 {
+    color: #2d3748;
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 15px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    border-bottom: 1px solid #edf2f7;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.scrollable-content {
+    overflow-y: auto;
+    padding: 10px 5px 20px 5px;
+    flex-grow: 1;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.scrollable-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 10px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 10px;
+}
+
+/* Modification clé pour la disposition 3/3/1 */
+#horaires-container {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Première ligne - 3 jours */
+#horaires-container:first-of-type {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Deuxième ligne - 3 jours */
+#horaires-container:nth-of-type(2) {
+    grid-template-columns: repeat(3, 0fr);
+}
+
+/* Troisième ligne - 1 jour centré */
+#horaires-container:last-of-type {
+    grid-template-columns: 1fr;
+    max-width: 33.333%;
+    margin: 0 auto;
+}
+
+.jour-container {
+    width: 220px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+}
+
+.jour-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.jour-container h4 {
+    text-align: center;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f4f8;
+    color: #4a5568;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.horaires-list {
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.horaire-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #4299e1;
+}
+
+.horaire-item input[type="time"] {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    width: 80px;
+}
+
+.form-footer {
+    width: 300px;
+    border-radius: 85px;
+    padding: 15px;
+    margin-left: 300px;
+    border-top: 1px solid #edf2f7;
+    flex-shrink: 0;
+    text-align: center;
+    background: white;
+    bottom: 0;
+    background-color:  rgba(16, 55, 109, 0.596);
+    color: #fff;
+}
+.form-footer button{
+    color: #fff;
+    font-weight: 400;
+}
+/* Responsive */
+@media (max-width: 900px) {
+    #horaires-container:first-of-type,
+    #horaires-container:nth-of-type(2) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    #horaires-container:last-of-type {
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 600px) {
+    #horaires-container:first-of-type,
+    #horaires-container:nth-of-type(2),
+    #horaires-container:last-of-type {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+    }
+    
+    .container {
+        height: 90vh;
+        padding: 15px;
+    }
+}

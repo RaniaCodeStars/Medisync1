@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/clinic_settings.css' %}?">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Tableau de bord</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body>
+<header>
+    <nav class="navbar section-content">
+        <a href="#" class="nav-logo">
+            <h2 class="logo-text">Medisync</h2>
+        </a>
+        <ul class="nav-menu">
+            <button id="menu-close-button" class="fas fa-times" ></button>
+            <li class="nav-item">
+                <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="nav-link2">Acceuil</a>
+            </li>
+            <li class="nav-item">
+                <a href="#about" class="nav-link2">Mes Messages</a>
+            </li>
+            <li class="nav-item">
+                <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+            </li>
+            <li class="nav-item">
+                <a href="#doctor" class="nav-link2">Mes document</a>
+            </li>
+            <li class="nav-item" >
+                {% if clinic.photos %}
+                <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
+            {% else %}
+                <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
+            {% endif %} 
+               <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+            </li>
+        </ul>
+
+        <button id="menu-open-button" class="fas fa-bars" ></button>
+    </nav>
+    </div>
+</header>
+<main class="settings-container">
+    <h2>Paramètres de la Clinique : {{ clinic.name }}</h2>
+    <div>
+        <p><strong style="    font-size: 19px;">Votre santé. Vos données.</strong> <br>
+            La confidentialité de vos informations personnelles est une priorité absolue pour Doctolib et guide notre action au quotidien.</p>
+        <button>Découvrir plus</button>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="settings-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save-button">Enregistrer</button>
+    </form>
+
+        <!-- Information Pays -->
+        <section class="setting-item">
+            <label>
+                <span class="material-icons">language</span> <strong>Pays</strong>
+            </label>
+            <span class="info-text">Algérie</span>
+        </section>
+    
+        <!-- Information Langue -->
+        <section class="setting-item">
+            <label>
+                <span class="material-icons">translate</span><strong>Langue</strong> 
+            </label>
+            <span class="info-text">Français</span>
+        </section>
+    
+        <!-- Autre Information -->
+        <section class="setting-item">
+            <label>
+                <span class="material-icons">settings_input_svideo</span><strong>Autre chose</strong> 
+            </label>
+            <span class="info-text">Information supplémentaire</span>
+        </section>
+
+    
+</main>
+
+</body>
+</html>

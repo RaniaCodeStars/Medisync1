@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prendre rendez-vous</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        
+        .speciality-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .speciality-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .speciality-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .time-slots-container {
+            display: none;
+            margin-top: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .time-slot {
+            background-color: #f1f1f1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .time-slot:hover {
+            background-color: #ddd;
+        }
+        
+        .time-slot.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #0b7dda;
+        }
+        
+        .btn-submit {
+            background-color: #4CAF50;
+        }
+        
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+        
+        #patient-info {
+            display: none;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .clinic-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .clinic-info {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="clinic-header">
+        <h1>Prendre rendez-vous</h1>
+    </div>
+    
+    <div class="clinic-info">
+        <h2>{{ clinic.name }}</h2>
+        <p>{{ clinic.address }}</p>
+        <p>Téléphone: {{ clinic.phone }}</p>
+    </div>
+
+    <h3>Choisissez une spécialité :</h3>
+    <ul class="speciality-list">
+        {% for speciality in specialties %}
+            <li>
+                <button class="speciality-btn" data-speciality="{{ speciality }}">
+                    {{ speciality }}
+                </button>
+            </li>
+        {% empty %}
+            <li>Aucune spécialité disponible pour le moment.</li>
+        {% endfor %}
+    </ul>
+
+    <div id="time-slots" class="time-slots-container">
+        <h3 id="selected-speciality"></h3>
+        <h4>Sélectionnez un créneau horaire :</h4>
+        <div class="time-slots-grid" id="available-slots"></div>
+        <button id="confirm-btn" class="btn">Confirmer le créneau</button>
+    </div>
+
+    <div id="patient-info">
+        <h3>Vos informations</h3>
+        <div class="form-group">
+            <label for="patient-name">Nom complet</label>
+            <input type="text" id="patient-name" placeholder="Votre nom complet" required 
+                   value="{{ request.user.get_full_name }}">
+        </div>
+        <div class="form-group">
+            <label for="patient-email">Email</label>
+            <input type="email" id="patient-email" placeholder="Votre email" required 
+                   value="{{ request.user.email }}">
+        </div>
+        <div class="form-group">
+            <label for="patient-phone">Téléphone</label>
+            <input type="tel" id="patient-phone" placeholder="Votre téléphone" required>
+        </div>
+        <button id="final-confirm-btn" class="btn btn-submit">Valider le rendez-vous</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Afficher les créneaux quand une spécialité est sélectionnée
+            document.querySelectorAll('.speciality-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const speciality = this.getAttribute('data-speciality');
+                    showTimeSlots(speciality);
+                });
+            });
+            
+            // Confirmation du créneau
+            document.getElementById('confirm-btn').addEventListener('click', function() {
+                const selectedSlot = document.querySelector('.time-slot.selected');
+                
+                if (!selectedSlot) {
+                    alert('Veuillez sélectionner un créneau horaire');
+                    return;
+                }
+                
+                document.getElementById('patient-info').style.display = 'block';
+                this.style.display = 'none';
+            });
+            
+            // Validation finale
+            document.getElementById('final-confirm-btn').addEventListener('click', async function() {
+                const speciality = document.getElementById('selected-speciality').textContent;
+                const selectedSlot = document.querySelector('.time-slot.selected').textContent;
+                const patientName = document.getElementById('patient-name').value;
+                const patientEmail = document.getElementById('patient-email').value;
+                const patientPhone = document.getElementById('patient-phone').value;
+                
+                // Validation des champs
+                if (!patientName || !patientEmail || !patientPhone) {
+                    alert('Veuillez remplir tous les champs obligatoires');
+                    return;
+                }
+                
+                // Validation du numéro de téléphone
+                if (!/^[0-9]{10}$/.test(patientPhone)) {
+                    alert('Veuillez entrer un numéro de téléphone valide (10 chiffres)');
+                    return;
+                }
+                
+                try {
+                    const today = new Date();
+                    const response = await fetch("{% url 'prendre_rdv' clinic.id %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            speciality: speciality,
+                            time_slot: selectedSlot,
+                            date: today.toISOString().split('T')[0],
+                            patient_phone: patientPhone
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        alert(`Rendez-vous confirmé!\n\nSpécialité: ${data.appointment.speciality}\nDate: ${data.appointment.date}\nHeure: ${data.appointment.time_slot}\nClinique: ${data.appointment.clinic}`);
+                        window.location.href = "{% url 'rendez_vous_succes' %}";
+                    } else {
+                        throw new Error(data.message || 'Erreur lors de la confirmation');
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la création du rendez-vous: ' + error.message);
+                }
+            });
+        });
+        
+        function showTimeSlots(speciality) {
+            document.getElementById('selected-speciality').textContent = speciality;
+            const slotsContainer = document.getElementById('available-slots');
+            slotsContainer.innerHTML = '';
+            
+            // Génération des créneaux horaires (8h-18h)
+            for (let hour = 8; hour < 18; hour++) {
+                // Créneau du type "HH:00 - HH:30"
+                const slot1 = document.createElement('div');
+                slot1.className = 'time-slot';
+                slot1.textContent = `${hour}:00 - ${hour}:30`;
+                
+                // Créneau du type "HH:30 - HH+1:00"
+                const slot2 = document.createElement('div');
+                slot2.className = 'time-slot';
+                slot2.textContent = `${hour}:30 - ${hour+1}:00`;
+                
+                // Gestion du clic sur un créneau
+                [slot1, slot2].forEach(slot => {
+                    slot.addEventListener('click', function() {
+                        document.querySelectorAll('.time-slot').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                        document.getElementById('confirm-btn').style.display = 'inline-block';
+                    });
+                    
+                    slotsContainer.appendChild(slot);
+                });
+            }
+            
+            document.getElementById('time-slots').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

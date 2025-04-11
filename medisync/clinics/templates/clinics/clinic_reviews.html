@@ -1,0 +1,27 @@
+<h2>Avis pour {{ clinic.name }}</h2>
+
+<ul>
+    {% for review in reviews %}
+        <li>
+            <strong>{{ review.user.email }}</strong> ({{ review.rating }}/5) - {{ review.comment }}
+
+            {% if review.reply %}
+                <p><strong>Réponse :</strong> {{ review.reply }}</p>
+            {% elif request.user.profile.role in 'MEDECIN,ADMIN' %}
+                <form method="post" action="{% url 'reply_review' review.id %}">
+                    {% csrf_token %}
+                    <textarea name="reply" placeholder="Répondre à cet avis"></textarea>
+                    <button type="submit">Envoyer</button>
+                </form>
+            {% endif %}
+
+            {% if request.user == review.user or request.user.profile.role == 'ADMIN' %}
+                <a href="{% url 'delete_review' review.id %}">🗑️ Supprimer</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+{% if request.user.profile.role == 'PATIENT' %}
+    <a href="{% url 'add_review' clinic.id %}">➕ Ajouter un avis</a>
+{% endif %}

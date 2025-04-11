@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Médecins</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/recherche_resultat.css' %}?v=1.1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- CSS de Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+<!-- JS de Leaflet -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+</head>
+<body>
+    <header>
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">Medisync</h2>
+            </a>
+            <ul class="nav-menu">
+                <button id="menu-close-button" class="fas fa-times" ></button>
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Centre d'aide </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">Mes messages</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link">Mes rendez-vous</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link">Mes document</a>
+                </li>
+                <li class="nav-item">
+                    <p>Hilem sirine</p>
+                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                </li>
+            </ul>
+
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+        </nav>
+        <div class="buttons">
+            <form method="GET" action="{% url 'doctor_list' %}" class="search-container">
+                <div class="search-box">
+                    <input type="text" name="recherche" placeholder="Rechercher médecin" class="search-input" >
+                    <button type="submit" class="search-button"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="search-box">
+                    <input type="text" name="location" placeholder="Localisation..." class="location-input" >
+                    <button type="submit" class="location-button">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </button>
+                </div>
+                
+                <button type="submit" class="button_recherche">Rechercher</button>
+            </form>
+    
+        </div>
+        </div>
+    </header>
+    <main>
+        <section class="search-results-section">
+            <div class="section-title">
+                <a class="doct"><i class="fas fa-stethoscope"></i><!--{{ doctors.count }}--> médecins </a> <a class="clin"> <!--{{ clinics.count }} --><i class="fas fa-clinic-medical"></i> cliniques</a>
+            </div>
+            <div class="partieAB" >
+                <div class="partieA">
+                <div class="section-content">
+                    <div class="list-doctor">   
+                        {% if doctors %}
+                            <div class="doctor-cards-container">
+                                {% for doctor in doctors %}
+    
+                                    <div class="doctor-card" data-lat="48.8566" data-lng="2.3522" data-name="{{ doctor.name }}">
+                                        <div class="doctor-info" onmouseenter="showDoctorLocation(this)" 
+                                        data-lat="{{ doctor.latitude }}" 
+                                        data-lng="{{ doctor.longitude }}" 
+                                        data-name="{{ doctor.name }}" >
+                                            <div style="display: flex;">
+                                                <div>
+                                                    <img src="{% static 'image/profil-inicial.jpg' %}" class="doctor-photo" alt="Photo du médecin">
+                                                </div>                                                
+                                                <div>
+                                                    <h3 style="cursor: pointer;">Dr.{{ doctor.nom }} {{doctor.prenom}}</h3>
+                                                </div>
+                                            </div>
+                                            <p class="address">{{ doctor.location }}</p>
+                                            <p class="specialty">{{ doctor.specialty }}</p><br>
+                                            <p class="rating">⭐️ 4.8 (120 avis)</p>
+                                            <a href="#" class="btn">Prendre rendez-vous</a>
+                                        </div>
+                                        <div class="doctor-calendar">
+                                            <h4>Calendrier de disponibilités</h4>
+                                            <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
+                                            <div class="week-container">
+                                                <div class="day-box">Lundi</div>
+                                                <div class="day-box">Mardi</div>
+                                                <div class="day-box">Mercredi</div>
+                                                <div class="day-box">Jeudi</div>
+                                                <div class="day-box">Vendredi</div>
+                                                <div class="day-box">Samedi</div>
+                                                <div class="day-box">Dimanche</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p>Aucune méedcin trouvée pour cette recherche.</p>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+                <div class="section-content">
+                    <div class="list-clinic">
+                        {% if clinics %}
+                            <div class="clinic-cards-container">
+                                {% for clinic in clinics %}
+                               
+                                    <div class="clinic-card" data-lat="48.8566" data-lng="2.3522" data-name="{{ clinic.name }}">
+                                        <div class="clinic-info" onmouseenter="showDoctorLocation(this)" 
+                                        data-lat="{{ clinic.latitude }}" 
+                                        data-lng="{{ clinic.longitude }}" 
+                                        data-name="{{ clinic.name }}">
+                                        <div style="display: flex;">
+                                            <div>
+                                                <img src="{% static 'image/profil-inicial.jpg' %}" class="doctor-photo" alt="Photo du médecin">
+                                            </div> 
+                                            <div>
+                                                <h3 style="cursor: pointer;">{{ clinic.name }}</h3>
+                                            </div>
+                                        </div>
+                                            
+                                            <p class="address">{{ clinic.location }}  </p>
+                                            <p class="phone">{{ clinic.phone }}</p>
+                                            <p class="address">{{ doctor.location }}</p>
+                                            <p class="rating">⭐️ 4.8 (120 avis)</p>
+                                            <a href="#" class="btn">Prendre rendez-vous</a>
+                                        </div>
+                                        <div class="doctor-calendar">
+                                            <h4>Calendrier de disponibilités</h4>
+                                            <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
+                                            <div class="week-container">
+                                                <div class="day-box">Lundi</div>
+                                                <div class="day-box">Mardi</div>
+                                                <div class="day-box">Mercredi</div>
+                                                <div class="day-box">Jeudi</div>
+                                                <div class="day-box">Vendredi</div>
+                                                <div class="day-box">Samedi</div>
+                                                <div class="day-box">Dimanche</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        {% empty %}
+                                        <p>Aucune clinique trouvée.</p>
+                                    
+                                {% endfor %}
+
+                            </div>
+                        {% else %}
+                            <p>Aucune clinique trouvée pour cette recherche.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                </div>
+                <div class="partieB" >
+                <div id="map" ></div>
+                </div>
+            </div>    
+        </section>
+    </main>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=TA_CLE_API&callback=initMap"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/recherche_resultat.js' %}"></script>
+</body>
+</html>

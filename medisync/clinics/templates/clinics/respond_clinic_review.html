@@ -1,0 +1,7 @@
+<h2>Répondre à un avis</h2>
+<p><strong>Avis :</strong> {{ review.comment }}</p>
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="response" required>{{ review.response }}</textarea>
+    <button type="submit">Envoyer</button>
+</form>

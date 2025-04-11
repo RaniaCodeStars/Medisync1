@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil_clinic</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/clinic_profil.css' %}?v=1.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    
+    <header>
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">Medisync</h2>
+            </a>
+            <ul class="nav-menu">
+                <button id="menu-close-button" class="fas fa-times" ></button>
+                <li class="nav-item">
+                    <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="nav-link2">Acceuil</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#home" class="nav-link2">Centre d'aide </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link2">Mes messages</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link2">Mes document</a>
+                </li>
+                <li class="nav-item" >
+                    {% if clinic.photos %}
+                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
+                {% else %}
+                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
+                {% endif %} 
+                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                </li>
+            </ul>
+
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+        </nav>
+        </div>
+    </header>
+    <section class="en_tete">
+        <div style="display: flex; align-items: center;">
+            {% if clinic.photos %}
+            <img src="{{ clinic.photos.url }}" class="profil-photo" alt="Photo de la clinique">
+        {% else %}
+            <img src="{% static 'image/profil-inicial.jpg' %}" class="profil-photo" alt="Photo de la clinique">
+        {% endif %}                                                 
+            <div class="clinic-info">
+                <h3><strong>{{ clinic.name }}</strong> </h3>
+                <p><strong>Localisation :</strong> {{ clinic.location }}</p>
+            </div>
+        </div>
+    </section>
+
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="#information-clinic" class="nav-link active">À propos</a>
+            <a href="#lieu" class="nav-link">Localisation</a>
+            <a href="#information-clinic" class="nav-link">info</a>
+            <a href="#description" class="nav-link">Description</a>
+            <a href="#horaire" class="nav-link">Horaires</a>
+            <a href="#Nos-Medcins" class="nav-link">Médecins</a>
+            <a href="#Avis" class="nav-link">Avis</a>
+            <a href="#footer" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <section class="container">
+        <div class="left-part">
+            <!--teleconsultation-->
+            <div id="teleconsultation">
+                <p style="color: #2a2929; font-size: 15px; margin-bottom: 5px;"><strong>Notre Clinic vous propose la consultation vidéo</strong></p>
+                <div class="teleconsultation-item">
+                    <i class="fas fa-video"></i>
+                    <p>Votre clinique propose la consultation vidéo</p>
+                </div>
+            
+                <div class="teleconsultation-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>Obtenez un rendez-vous plus rapidement</p>
+                </div>
+            
+                <div class="teleconsultation-item">
+                    <i class="fas fa-user-md"></i>
+                    <p>Consultez votre soignant de chez vous</p>
+                </div>
+            
+                <div class="teleconsultation-item">
+                    <i class="fas fa-file-alt"></i>
+                    <p>Échangez des documents en toute sécurité</p>
+                </div>
+            </div>
+            <div id="lieu">
+                <div class="location-item">
+                    <button class="btn-lieu"><i class="fas fa-map-marker-alt"></i>Lieu </button>
+                </div>
+                <hr style="color:gray ;margin-bottom:10px;margin-top: 8px;width: 100%;">
+                <div class="location-item clinic">
+                    <p style="font-size: 14px;color:#413c3c;"><strong>{{ clinic.name }}</strong>  <br>{{clinic.adresse}}</p>
+                </div>
+            </div>
+            <!--info-->
+            <div id="information-clinic">
+                <div class="clinic-card">
+                    <h2 class="clinic-name">{{clinic.name}}</h2>
+                    
+                    <p class="clinic-detail"><i class="fas fa-phone"></i> <strong>Téléphone :</strong>+{{ clinic.phone }}</p>
+                    <p class="clinic-detail"><i class="fas fa-wheelchair"></i> <strong>Accessibilité :</strong> Accès PMR, parking privé</p>
+                    <p class="clinic-detail"><i class="fas fa-globe"></i> <strong>Site Web :</strong> <a href="#">{{clinic.site_web}}</a></p>
+                    <p class="clinic-detail"><i class="fas fa-clock"></i> <strong>Service d'urgences :</strong> 24h/24 - 7j/7 </p>
+                    
+                </div>
+                <!-- Google Maps -->
+                 
+                <div class="map" style="margin-left: 100px;">
+                <iframe src="https://www.google.com/maps/embed?..." width="100%" height="250" style="border:0;" allowfullscreen></iframe>
+                </div>
+            </div>
+            <!--description-->
+            <div id="description">
+                <h3>À propos de la clinique</h3><br><hr>
+                <p id="text">
+                    <span id="short-text">{{ clinic.description|slice:":200" }}...</span>
+                    <span id="more-text" style="display: none;">{{ clinic.description|slice:"200:" }}</span>
+                    <button id="toggle-btn">▾ Voir plus</button>
+                </p>
+                
+                                      
+                <div class="gallery">
+                    <img src="{% static 'image/m2.webp' %}" alt="Salle d’attente">
+                    <img src="{% static 'image/cl1.jpeg' %}" alt="Bloc opératoire">
+                    <img src="{% static 'image/cl3.jpg' %}" alt="Salle de consultation">
+                </div>
+                <br>
+                <hr>
+
+                <div id="barre">
+                    <div class="info-item">
+                        <h4>Site web</h4>
+                        <a href="https://www.capclinic.com" target="_blank">Visitez le site</a>
+                    </div>
+                    <div class="info-item">
+                        <h4>Langues parlées</h4>
+                        <p> Français,  Arabe</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Horaires d’ouverture -->
+            <div id="horaire">
+                <h4>Horaires et coordonnées </h4>
+                <div class="clinic-calendar">
+                    <p>horaires d'ouverture d'Aujourd'hui</p>
+                    <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
+                    {% now "l" as today_en %}
+                    <div class="week-container" id="today-schedule">
+                        <!-- Le contenu sera rempli par JavaScript -->
+                    </div>
+                    
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Correspondance des jours (JS: 0=Dimanche, 1=Lundi...)
+                        const joursSemaine = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                        const aujourdhui = new Date();
+                        const jourActuel = joursSemaine[aujourdhui.getDay()];
+                        
+                        // Trouver l'élément correspondant dans le bloc more-text2
+                        const horairesContainer = document.getElementById('more-text2');
+                        const horairesItems = horairesContainer.querySelectorAll('.horaire-item');
+                        
+                        let horairesTrouves = null;
+                        
+                        horairesItems.forEach(item => {
+                            const label = item.querySelector('label');
+                            if (label && label.textContent.includes(jourActuel)) {
+                                horairesTrouves = item.cloneNode(true);
+                                // Mettre à jour le label pour "Aujourd'hui"
+                                const newLabel = horairesTrouves.querySelector('label');
+                            }
+                        });
+                        
+                        // Afficher dans le conteneur
+                        const todayContainer = document.getElementById('today-schedule');
+                        todayContainer.style="    font-size: 13px;color: #4e759c;font-weight: 600;"
+                        if (horairesTrouves) {
+                            todayContainer.appendChild(horairesTrouves);
+                        } else {
+                            todayContainer.innerHTML = `<div class="today-horaire">
+                                
+                                <span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">
+                                    Pas d'horaire disponible
+                                </span>
+                            </div>`;
+                        }
+                    });
+                    </script>
+                    
+                    
+                    
+                    
+                    
+
+                    <p>horaires d'ouverture pour les autres jours:</p> <button onclick="toggleText2()" class="voir-plus">▾ Voir plus</button><br>
+                    <div id="more-text2" style="display:none;">
+                        {% if clinic.horaires %}
+                            {% for day, slots in clinic.horaires.items %}
+                                <div class="horaire-item" >
+                                    <label>⮚ {{ day|capfirst }} :</label>
+                                    {% if slots %}
+                                        {% for slot in slots %}
+                                            <span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">
+                                                {{ slot.ouverture }} - {{ slot.fermeture }}
+                                            </span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">Fermé</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Aucun horaire disponible pour cette clinique.</p>
+                        {% endif %}
+                        <a href="{% url 'edit_horaires' clinic.id %}" class="btn btn-warning">Modifier les horaires</a>
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                    
+            </div>
+            
+            </div>
+
+             <!-- nos medcins -->
+             <div id="Nos-Medcins">
+                <h4 style="margin-bottom: 15px; color: #333;">Nos Médecins</h4>
+                <hr><br>
+                <div class="doctor-list">
+                    {% for doctor in doctors %}
+                    <div class="doctor-card">
+                        <img src="{{ doctor.profile_image.url }}" alt="Photo de {{ doctor.name }}" >
+                        <h3>{{ doctor.name }}</h3><br>
+                        <p>Spécialité : {{ doctor.speciality }}</p>
+                    </div>
+                    {% empty %}
+                        <p>Aucun médecin enregistré pour cette clinique.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            
+            <!-- Avis des patients -->
+<!-- templates/clinics/clinic_profile.html -->
+<div id="Avis">
+    <h3>Avis des patients</h3> 
+    <hr><br>
+    <div class="review-container">
+        {% for review in reviews %}
+            <div class="review">
+                <p><strong>
+                    {% if review.user %}
+                        {{ review.user.email }}
+                    {% else %}
+                        Anonyme
+                    {% endif %}
+                </strong><br> 
+                <span class="stars">
+                    {% for _ in "12345"|slice:review.rating %}
+                        ⭐
+                    {% endfor %}
+                </span>
+                </p>
+                <p>{{ review.comment }}</p>
+            </div>
+        {% empty %}
+            <p>Aucun avis pour cette clinique.</p>
+        {% endfor %}
+    </div>
+
+    <hr>
+    <h4>Ajouter un avis</h4>
+    <form method="post" style="display:flex;">
+        {% csrf_token %}
+        <label for="rating">Note :</label>
+        <select name="rating" required>
+            <option value="5">⭐⭐⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐</option>
+        </select>
+        <br>
+        <label for="comment">Commentaire :</label>
+        <input name="comment" required></input>
+        <br>
+        <button type="submit">Envoyer</button>
+    </form>
+</div>
+
+
+            
+            
+            
+</div>
+        <div class="right-part">
+            <section class="clinic-summary">
+                <div class="summary-container">
+                    <h4 class="summary-title">En Résumé</h4>
+                    <div class="divider"></div>
+                    
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <i class="fas fa-award feature-icon"></i>
+                            <span>Agréée par le ministère de la santé</span>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <i class="fas fa-map-marker-alt feature-icon"></i>
+                            <span>{{clinic.adresse}}</span>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <i class="fas fa-video feature-icon"></i>
+                            <span>Consultation vidéo disponible</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'prendre_rdv' clinic_id=clinic.id %}">
+                        Prendre un rendez-vous
+                    </a>
+                    
+                    
+                    
+                    
+                      
+                    <div class="feature-item">
+                        <i class="fas fa-user-md" style="color:#4299e1;"></i>
+                        <span>si vous voulez inscrire comme soignant  </span>
+                    </div>
+                    
+                    <button class="appointment-btn" id="inscrire-btn"><a href="{% url 'add_clinic_doctor' clinic.id %} " style="color: #fff;">Inscrire Soignant</a></button>
+
+                    <!-- Formulaire caché initialement -->
+                                    
+                </div>
+            </section>
+        </div>    
+    </section>
+    
+    <footer class="footer" id="footer">
+            <div class="footer-container">
+                <div class="row">
+                    <div class="footer-col">
+                        <h4>Entreprise</h4>
+                        <ul>
+                            <li><a href="#">À propos de nous</a></li>
+                            <li><a href="#">Nos services</a></li>
+                            <li><a href="#">Politique de confidentialité</a></li>
+                            <li><a href="#">Programme d'affiliation</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Aide</h4>
+                        <ul>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Expédition</a></li>
+                            <li><a href="#">Retours</a></li>
+                            <li><a href="#">Statut de commande</a></li>
+                            <li><a href="#">Options de paiement</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Boutique en ligne</h4>
+                        <ul>
+                            <li><a href="#">Montres</a></li>
+                            <li><a href="#">Sacs</a></li>
+                            <li><a href="#">Chaussures</a></li>
+                            <li><a href="#">Robes</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Suivez-nous</h4>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </footer>
+
+    <script src="{% static 'js/clinic_profil.js' %}" defer></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+                <div id="services-container">
+                <h3>Nos Services</h3> <hr><br> <br>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <i class="fas fa-user-md"></i>
+                        <p>Consultations médicales</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-vials"></i>
+                        <p>Analyses de laboratoire</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-procedures"></i>
+                        <p>Chirurgie ambulatoire</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-x-ray"></i>
+                        <p>Radiologie et imagerie</p>
+                    </div>
+                    <div class="service-card">
+                        <i class="fas fa-ambulance"></i>
+                        <p>Urgences 24h/24</p>
+                    </div>
+                </div>
+            </div>        
+-->
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<div></div>
+        <h1>{{ clinic.name }}</h1>
+        <p><strong>Téléphone :</strong> {{ clinic.phone }}</p>
+    <p><strong>Localisation :</strong> {{ clinic.location }}</p>
+
+    <h3>Coordonnées GPS :</h3>
+    <p>Latitude : {{ clinic.latitude }}</p>
+    <p>Longitude : {{ clinic.longitude }}</p>
+
+    <h3>Adresse :</h3>{{ clinic.email }}
+    <p>{{ clinic.address }}</p>
+
+    <a href="{% url 'doctor_list' %}">Retour à la liste des médecins</a>
+
+-->

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Mes Disponibilités</title>
+    <!-- Inclure Bootstrap CSS (ici Bootstrap 5) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        outline: 0;
+        appearance: none;
+        border: 0;
+        text-decoration: none;
+        list-style: none;
+        box-sizing: border-box;
+    }
+
+    html {
+        font-size: 14px;
+    }
+
+    body {
+        width: 100vw;
+        height: 100vh;
+        font-family: poppins, sans-serif;
+        font-size: 0.88rem;
+        background: #f6f6f9;
+        user-select: none;
+        display: flex;
+        width: 96%;
+        margin: 0 auto;
+        gap: 1.8rem;
+        grid-template-columns: 14rem auto 23rem;
+        margin-left: 5px;
+    }
+
+
+    a {
+        color: white;
+    }
+
+    h1 {
+        font-weight: 800;
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    h3 {
+        font-size: 0.87rem;
+    }
+
+    h4 {
+        font-size: 0.8rem;
+    }
+
+    h5 {
+        font-size: 0.77rem;
+    }
+
+    /*** Sidebar ***/
+
+    aside {
+        margin-top: 28.5px;
+        margin-bottom: 20px;
+        height: 100vh;
+        position: fixed;
+        width: 200px;
+        padding-left: 0;
+    }
+
+    aside .sidebar {
+        background: rgb(146, 188, 242);
+        display: flex;
+        flex-direction: column;
+        height: 86vh;
+        position: relative;
+        top: 3rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    aside h3 {
+        font-weight: 500;
+        font-size: 13.3px;
+        margin-top: 8px;
+    }
+
+    aside .sidebar a {
+        display: flex;
+        color: whitesmoke;
+        margin-left: 2rem;
+        gap: 1rem;
+        align-items: center;
+        position: relative;
+        height: 3.7rem;
+        transition: all 300ms ease;
+    }
+
+    aside .sidebar a span {
+        font-size: 1.6rem;
+        transition: all 300ms ease;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+    }
+
+    aside .sidebar a.active {
+        background: rgb(131, 179, 241);
+        color: rgb(79, 148, 239);
+        margin-left: 0;
+    }
+
+    aside .sidebar a.active:before {
+        content: '';
+        width: 6px;
+        height: 100%;
+        background: rgb(79, 148, 239);
+    }
+
+    aside .sidebar a.active span {
+        color: rgb(79, 148, 239);
+        margin-left: calc(1rem - 3px);
+    }
+
+    aside .sidebar a:hover {
+        color: rgb(79, 148, 239);
+    }
+
+    aside .sidebar a:hover span {
+        margin-left: 1rem;
+    }
+
+    aside .sidebar .message-count {
+        background: rgb(253, 66, 66);
+        color: whitesmoke;
+        padding: 2px 10px;
+        font-size: 11px;
+        border-radius: 0.4rem;
+    }
+
+    .navbar {
+        background-color: white;
+        padding: 7px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        margin-top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    nav .top {
+        background: white;
+        display: flex;
+        align-items: center;
+    }
+
+    nav .logo {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .logo-text {
+        color: white;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        font-size: 30px;
+        margin-top: 2px;
+        margin-bottom: 0px;
+        font-weight: 600;
+    }
+
+    .navbar-links a {
+        color: rgb(79, 141, 208);
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 14px;
+        text-shadow: 2px 2px 5px rgba(99, 96, 96, 0.5)
+    }
+
+    .navbar-links a:hover {
+        background-color: rgb(160, 197, 237);
+        color: white;
+        border-radius: 10px;
+        height: 50px;
+        width: 300px;
+        text-shadow: 2px 2px 5px rgba(99, 96, 96, 0.5);
+        padding: 7px 15px;
+        font-size: 15px;
+        transition: 0.3s ease;
+        margin-left: 20px;
+    }
+
+    .navbar-profile {
+        display: flex;
+        align-items: center;
+        /* Aligner verticalement le texte et l'image */
+        gap: 10px;
+        /* Espace entre le texte et l'image */
+    }
+
+    .profile-name {
+        font-size: 14px;
+        color: #363949;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    aside .sidebar a {
+        text-decoration: none;
+        /* Enlève le soulignement des liens */
+    }
+
+    .main {
+        display: flex;
+        flex-direction: row;
+        /* Les deux dernières cases sont empilées horizontalement */
+        margin-left: 230px;
+        /* Largeur de la sidebar (200px) + espace supplémentaire (20px) */
+        margin-top: 40px;
+        /* Hauteur de la navbar */
+        width: 1700px;
+        font-size: 13px;
+    }
+
+    .mb-4 {
+        color: rgb(146, 188, 242);
+        font-weight: 600;
+        text-shadow: 2px 2px 5px rgba(165, 162, 162, 0.5);
+    }
+
+
+    .table {
+        font-size: 0.9rem;
+        border-collapse: collapse;
+        /* Supprime les espaces entre les cellules */
+        width: 550px;
+        background-color: white;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table thead {
+        background-color: #f6f6f9;
+        /* Arrière-plan gris clair */
+        color: #000;
+        /* Texte noir */
+        font-weight: bold;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #7d8da1;
+        ;
+        /* Ligne séparatrice */
+    }
+
+    .table th,
+    .table td {
+        text-align: left;
+        /* Aligne les cellules à gauche */
+        padding: 12px 15px;
+        /* Espacement dans les cellules */
+    }
+
+    .table td {
+        border-bottom: 1px solid #ddd;
+        /* Ligne fine entre les cellules */
+    }
+
+    .btn-detail {
+        background-color: rgb(146, 188, 242);
+        /* Couleur du bouton */
+        color: white;
+        /* Texte blanc */
+        border: none;
+        /* Supprime la bordure */
+        font-size: 0.8rem;
+        /* Taille de la police */
+        padding: 6px 12px;
+        /* Espacement interne */
+        border-radius: 4px;
+        /* Coins arrondis */
+        cursor: pointer;
+        /* Curseur */
+        transition: all 0.3s ease;
+        /* Effet de transition */
+        height: 40px;
+        font-weight: 500;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-detail:hover {
+        background-color: rgb(99, 162, 245);
+        /* Couleur au survol (légèrement plus foncée) */
+        color: white;
+    }
+
+    .btn-modify {
+        background-color: #efa030;
+        /* Couleur du bouton Modifier */
+        color: white;
+        /* Texte blanc */
+        border: none;
+        /* Supprime la bordure */
+        font-size: 0.8rem;
+        /* Taille de la police */
+        padding: 6px 12px;
+        /* Espacement interne */
+        border-radius: 4px;
+        /* Coins arrondis */
+        cursor: pointer;
+        /* Curseur */
+        transition: all 0.3s ease;
+        /* Effet de transition */
+    }
+
+    .btn-modify:hover {
+        background-color: #e88700;
+        /* Couleur au survol */
+        color: white;
+    }
+
+
+    /* Style pour la boîte de recherche */
+    .search-box {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 980px;
+        /* Ajustez la largeur si nécessaire */
+    }
+
+    #searchInput {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+
+    #searchButton {
+        background-color: #92bcf2;
+        /* Couleur bleue comme la sidebar */
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #searchButton:hover {
+        background-color: #7fa8d1;
+        /* Une nuance plus foncée au survol */
+    }
+
+    #searchButton .material-icons {
+        font-size: 20px;
+    }
+
+    .no-results {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: #666;
+    }
+
+
+    .profile-picture-detail {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-bottom: 1px;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        width: 400px;
+    }
+
+    .card-header- {
+        background-color: white;
+        /* Arrière-plan gris clair */
+        color: #000;
+        /* Texte noir */
+        font-weight: bold;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #7d8da1;
+        height: 30px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+
+    }
+
+    .card-header- h4 {
+        margin-top: 7px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-left: 15px;
+    }
+
+    .urgence {
+        margin-left: 20px;
+        margin-top: 120px;
+    }
+
+    .alert-container {
+        margin: 20px 0;
+    }
+
+    .alert {
+        padding: 15px;
+        background-color: #f8d7da;
+        /* Couleur rouge pâle pour les erreurs */
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        /* Couleur bleue pâle pour les succès */
+        border: 1px solid #bee5eb;
+        border-radius: 5px;
+    }
+</style>
+
+<body>
+    <nav class="navbar">
+        <div class="top">
+            <div class="logo">
+                <h2 class="logo-text">Medisync</h2>
+            </div>
+        </div>
+        <div class="navbar-links">
+            <a href="http://127.0.0.1:8000/medecins/medecins/doctor_list/">Prendre un rendez-vous</a>
+        </div>
+        <div class="navbar-profile">
+            {% if profile_picture %}
+            <img src="{{ profile_picture }}" alt="Photo de profil" class="profile-picture">
+            {% else %}
+            <img src="{% static 'images/default_profile.png' %}" alt="Photo de profil" class="profile-picture">
+            {% endif %}
+            <span class="profile-name">{{ doctor_name }}</span>
+        </div>
+    </nav>
+    <aside>
+        <div class="sidebar">
+            <a href="#">
+                <span class="material-icons">dashboard</span>
+                <h3>Tableau de bord</h3>
+            </a>
+            <a href="{% url 'appointments:medcin_appointments' %}">
+                <span class="material-icons">calendar_month</span>
+                <h3>Mes rendez-vous</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons">description</span>
+                <h3>Documents</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons">sms</span>
+                <h3>Messages</h3>
+                <!-- <span class="message-count">26</span> -->
+            </a>
+            <a href="{% url 'appointments:medcin_teleconsultations' %}">
+                <span class="material-icons">videocam</span>
+                <h3>Téléconsultation</h3>
+            </a>
+            <a href="{% url 'appointments:manage_availability' %}" class="active">
+                <span class="material-icons">timelapse</span>
+                <h3>Disponibilités</h3>
+            </a>
+            <a href="{% url 'appointments:manage_consultation_reasons' %}">
+                <span class="material-icons">monitor_heart</span>
+                <h3>Raisons de Consultation</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons">logout</span>
+                <h3>Déconnexion</h3>
+            </a>
+        </div>
+    </aside>
+    <div class="main">
+        <div>
+            <br>
+            <br>
+
+            <h1 class="mb-4">Gérer Mes Disponibilités</h1>
+            {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                <div class="alert alert-info">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div id="availabilityTable" class="availability-section">
+                <h2>Disponibilités Hebdomadaires</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Jour</th>
+                            <th>Heure de Début</th>
+                            <th>Heure de Fin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for availability in weekly_availabilities %}
+                        <tr>
+                            <td>{{ availability.get_day_display }}</td>
+                            <td>{{ availability.start_time }}</td>
+                            <td>{{ availability.end_time }}</td>
+
+                            <td>
+                                <a href="{% url 'appointments:edit_weekly_availability' availability.id %}"
+                                    class="btn btn-modify">Modifier</a>
+                                <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                    data-target="#confirmDeleteModal"
+                                    onclick="setDeleteFormAction('{{ availability.id }}')">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Boîte modale de confirmation -->
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog"
+                aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmer la suppression</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Êtes-vous sûr de vouloir supprimer cette disponibilité ?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <form method="post" id="deleteForm">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Bouton pour ouvrir la fenêtre modale -->
+            <button class="btn btn-detail" data-toggle="modal" data-target="#addFormModal">
+                Ajouter Disponibilité Hebdomadaire</button>
+
+            <br><br>
+            <!-- Fenêtre modale -->
+            <div class="modal fade" id="addFormModal" tabindex="-1" role="dialog" aria-labelledby="addFormModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addFormModalLabel">Ajouter une Disponibilité</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Formulaire -->
+                            <form method="post" id="addAvailabilityForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="weekly">
+                                {{ form_weekly.as_p }}
+                                <button type="submit" class="btn btn-primary">Ajouter</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="specificAvailabilityTable" class="availability-section">
+                <h2>Disponibilités Spécifiques</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Heure de Début</th>
+                            <th>Heure de Fin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for availability in specific_availabilities %}
+                        <tr>
+                            <td>{{ availability.date|date:'d/m/Y' }}</td>
+                            <td>{{ availability.start_time }}</td>
+                            <td>{{ availability.end_time }}</td>
+                            <td>
+                                <a href="{% url 'appointments:edit_specific_availability' availability.id %}"
+                                    class="btn btn-modify">Modifier</a>
+                                <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                    data-target="#confirmDeleteSpecificModal"
+                                    onclick="setDeleteSpecificFormAction('{{ availability.id }}')">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-detail" data-toggle="modal" data-target="#addSpecificFormModal">
+                Ajouter Disponibilité Spécifique
+            </button>
+            <div class="modal fade" id="addSpecificFormModal" tabindex="-1" role="dialog"
+                aria-labelledby="addSpecificFormModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addSpecificFormModalLabel">Ajouter une Disponibilité
+                                Spécifique
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Formulaire -->
+                            <form method="post" id="addSpecificAvailabilityForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="specific">
+                                {{ form_specific.as_p }}
+                                <button type="submit" class="btn btn-primary">Ajouter</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="confirmDeleteSpecificModal" tabindex="-1" role="dialog"
+                aria-labelledby="confirmDeleteSpecificModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmDeleteSpecificModalLabel">Confirmer la suppression
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Êtes-vous sûr de vouloir supprimer cette disponibilité spécifique ?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <form method="post" id="deleteSpecificForm">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+        </div>
+
+
+        <div class="urgence">
+            <div class="card">
+                <div class="card-header-">
+                    <h4>Horaires d'Urgence</h4>
+                </div>
+                <div class="card-body">
+
+                    <!-- Liste des horaires d'urgence -->
+                    <ul class="list-group mt-3">
+                        {% if emergency_hours %}
+                        {% for emergency in emergency_hours %}
+                        <li class="list-group-item">
+                            <strong>{{ emergency.get_day_display }}</strong> :
+                            {{ emergency.start_time }} - {{ emergency.end_time }}
+                            <button class="btn btn-danger btn-sm float-right" style="margin-left: 4px;" data-toggle="modal"
+                                data-target="#confirmDeleteEmergencyModal"
+                                onclick="setDeleteEmergencyFormAction('{{ emergency.id }}')">
+                                Supprimer
+                            </button>
+                            <a href="#" class="btn btn-modify btn-sm float-right">Modifier</a>
+
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        <li class="list-group-item">Aucun horaire d'urgence.</li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- Bouton pour ouvrir la fenêtre modale -->
+                    <button class="btn btn-detail mt-3" data-toggle="modal" data-target="#emergencyModal">
+                        Ajouter Horaire d'Urgence
+                    </button>
+                    <div class="modal fade" id="confirmDeleteEmergencyModal" tabindex="-1" role="dialog"
+                        aria-labelledby="confirmDeleteEmergencyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteEmergencyModalLabel">Confirmer la
+                                        suppression</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cet horaire d'urgence ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-dismiss="modal">Annuler</button>
+                                    <form method="post" id="deleteEmergencyForm">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Fenêtre modale -->
+                    <div class="modal fade" id="emergencyModal" tabindex="-1" role="dialog"
+                        aria-labelledby="emergencyModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="emergencyModalLabel">Ajouter Horaire d'Urgence</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Formulaire -->
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="emergency">
+                                        {{ form_emergency.as_p }}
+                                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Annuler</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div><br><br>
+
+    </div>
+
+    </div>
+
+    <script>
+        function setDeleteFormAction(id) {
+            const form = document.getElementById('deleteForm'); // Formulaire de la modale
+            form.action = `/appointments/availability/weekly/delete/${id}/`; // Met à jour l'action avec l'ID
+        }
+
+        $(document).ready(function () {
+            $('#emergencyForm').on('submit', function (event) {
+                event.preventDefault(); // Empêche le rechargement de la page
+                $.ajax({
+                    url: "{% url 'appointments:manage_availability' %}", // URL de la vue
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        location.reload(); // Recharge la page pour actualiser la liste
+                    },
+                    error: function (xhr) {
+                        alert("Une erreur est survenue. Veuillez réessayer.");
+                    }
+                });
+            });
+        });
+        function showForm() {
+            // Afficher le formulaire et masquer le tableau
+            document.getElementById('availabilityTable').style.display = 'none';
+            document.getElementById('addForm').style.display = 'block';
+        }
+        function setDeleteSpecificFormAction(id) {
+            const form = document.getElementById('deleteSpecificForm');
+            form.action = `/appointments/availability/specific/${id}/delete/`; // Remplace par l'URL appropriée
+        }
+        function setDeleteEmergencyFormAction(emergencyId) {
+        const form = document.getElementById('deleteEmergencyForm');
+        form.action = `/appointments/availability/emergency/delete/${emergencyId}/`; // URL pour la suppression
+    }
+    </script>
+
+</body>
+
+</html>

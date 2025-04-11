@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/clinic_dashboard.css' %}?">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Tableau de bord</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">Medisync</h2>
+            </a>
+            <ul class="nav-menu">
+                <button id="menu-close-button" class="fas fa-times" ></button>
+                <li class="nav-item">
+                    <a href="#home" class="nav-link2">Acceuil </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link2">Mes Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link2">Mes document</a>
+                </li>
+                <li class="nav-item" >
+                    {% if clinic.photos %}
+                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
+                {% else %}
+                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
+                {% endif %} 
+                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                </li>
+            </ul>
+
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+        </nav>
+        </div>
+    </header>
+    <aside>
+        <div class="sidebar">
+            <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="active">
+                <span class="material-icons">dashboard</span>
+                <h3>Tableau de bord</h3>
+            </a>   
+            
+            <a href="#">
+                <span class="material-icons">calendar_month</span>
+                <h3>Mes rendez-vous</h3>
+            </a>
+            <a href="{% url 'confirm_doctor' clinic_id=clinic.id %}">
+                <span class="material-icons">description</span>
+                <h3>Gérer Médecins</h3>
+            </a>
+            
+            
+            <a href="#">
+                <span class="material-icons">sms</span>
+                <h3>Messages</h3>
+                <!-- <span class="message-count">26</span> -->
+            </a>
+            <a href="#">
+                <span class="material-icons">videocam</span>
+                <h3>Téléconsultation</h3>
+            </a>
+            <a href="{% url 'manage_doctors' clinic_id=clinic.id %}">
+                <span class="material-icons">bar_chart</span> <!-- Icône Statistiques -->
+                <h3>Nos médecins</h3>
+            </a>
+            <a href="{% url 'clinic_profile' clinic_id=clinic.id %}">
+                <span class="material-icons">person</span> <!-- Icône de profil -->
+                <h3>Profil</h3> 
+            </a>
+            <a href="{% url 'clinic_edit' clinic_id=clinic.id %}">
+                <span class="material-icons">edit</span> <!-- Icône de modification -->
+                <h3>Modifier Profil</h3> 
+            </a> 
+
+            {% if clinic %}
+            <a href="{% url 'edit_horaires' clinic.id %}">
+                <span class="material-icons">schedule</span>
+                <h3>Modifier Horaires</h3>
+            </a>
+        {% else %}
+            <p>Aucune clinique sélectionnée.</p>
+        {% endif %} 
+        <a href="{% url 'clinic_settings' clinic.id %}">
+            <span class="material-icons">settings</span>
+            <h3>Paramètres</h3>
+        </a>
+        <br><br><br>
+            
+        <a href="#">
+            <span class="material-icons">logout</span>
+            <h3>Déconnexion</h3>
+        </a>
+        </div>
+    </aside>
+        <!-- fin de sidbar et navbar -->
+       
+</body>
+</html>

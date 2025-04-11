@@ -1,0 +1,8 @@
+<h2>Répondre à l'avis de {{ review.user.email }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Réponse :</label>
+    <textarea name="reply">{{ review.reply }}</textarea>
+    <button type="submit">Envoyer</button>
+</form>

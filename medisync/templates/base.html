@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediSync{% endblock %}</title>
+    <!-- Liens vers les fichiers CSS et les polices -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+    <!-- En-tête / Barre de navigation -->
+    <header>
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">MediSync</h2>
+            </a>
+            <ul class="nav-menu">
+                <button id="menu-close-button" class="fas fa-times"></button>
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">À propos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link">Patients</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link">Soignants</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#teleconsultation" class="nav-link">Téléconsultation</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#footer" class="nav-link">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'accounts:login' %}" class="nav-link connect">Se connecter</a>   </li>
+            </ul>
+            <button id="menu-open-button" class="fas fa-bars"></button>
+        </nav>
+    </header>
+
+    <!-- Contenu principal -->
+    <main>
+        {% block content %}
+        <!-- Le contenu spécifique à chaque page sera inséré ici -->
+        {% endblock %}
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <div class="row">
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="#">À propos de nous</a></li>
+                        <li><a href="#">Nos services</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Programme d'affiliation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Aide</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Expédition</a></li>
+                        <li><a href="#">Retours</a></li>
+                        <li><a href="#">Statut de commande</a></li>
+                        <li><a href="#">Options de paiement</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Boutique en ligne</h4>
+                    <ul>
+                        <li><a href="#">Montres</a></li>
+                        <li><a href="#">Sacs</a></li>
+                        <li><a href="#">Chaussures</a></li>
+                        <li><a href="#">Robes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Suivez-nous</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script src="{% static 'js/script.js' %}" ></script>
+</body>
+</html>

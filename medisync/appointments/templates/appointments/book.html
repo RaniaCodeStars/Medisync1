@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prise de Rendez-Vous</title>
+    <link rel="stylesheet" href="{% static 'css/Rv.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <!-- header / navbar -->
+    <header>
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">Medisync</h2>
+            </a>
+            <ul class="nav-menu">
+                <!-- <button id="menu-close-button" class="fas fa-times"></button>
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Centre d'aide</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">Mes messages</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link">Mes rendez-vous</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link">Mes documents</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html" class="nav-link connect">PRENOM NOM</a>
+                </li> -->
+                <li class="nav-item">
+                    <a href="http://127.0.0.1:8000/" class="nav-link">Accueil</a>
+                </li>
+                {% if request.user.is_authenticated and user_nom and user_prenom %}
+                    <li class="nav-item">
+                        <a href="#" class="nav-link connect">{{ user_nom }} {{ user_prenom }}</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'accounts:login' %}" class="nav-link connect">Se connecter</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <button id="menu-open-button" class="fas fa-bars"></button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Quiz Section -->
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-header">
+                <p id="question">Quel est le motif principal de votre consultation ?</p>
+                <ul id="quiz-options">
+                    <!-- Options insérées dynamiquement ici -->
+                </ul>
+            </div>
+            <button id="submit">Envoyer</button>
+        </div>
+
+        <!-- Calendrier Section -->
+        <div class="calendrier-container" style="display: none;">
+            <h2 class="call-title">Calendrier du Médecin !</h2>
+            <div class="calendar" id="calendar"></div>
+            
+        </div>
+        <div class="calendar-navigation">
+            <button id="prev-btn" class="btn-p"><span class="material-icons">keyboard_double_arrow_left</span></button>
+            <button id="next-btn" class="btn-s"><span class="material-icons">keyboard_double_arrow_right</span></button>
+        </div>
+        <!-- Section pour les heures -->
+        <div class="hours" id="hours"></div> 
+
+        <!-- Confirmation Section -->
+        <div class="heure-confirm">
+            <div id="selected-slot"></div> <!-- Créneau sélectionné -->
+            <br>
+            <button id="confirm-slot-btn" style="display: none;" onclick="afficherFormulaireRendezVous()">Confirmer mon créneau</button>
+        </div>
+
+        <!-- Formulaire Modal -->
+        <div id="modal-rdv" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="fermerFormulaire()">&times;</span>
+                <h2 class="modal-title">Confirmer votre Rendez-vous</h2>
+                <form id="rdv-form" class="rdv-form">
+                    <div class="form-group">
+                        <label for="nom" class="form-label">Nom complet :</label>
+                        <input type="text" id="nom" name="nom" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email :</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn-submit" id="confirm-btn">Confirmer rendez-vous</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/bo_ok.js' %}"></script>
+</body>
+</html>

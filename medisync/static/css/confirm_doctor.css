@@ -1,0 +1,695 @@
+
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Miniver&family=Nunito:wght@200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins&display=swap');
+*{
+    margin: 0;
+    padding: 0 ;
+    box-sizing: border-box;
+    font-family: "Poppins",sans-serif;
+    
+    
+    
+}
+body{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+:root{
+    --white-color: #ffffff;
+    --dark-color: #0b1e30; /* Bleu marine foncé */
+    --primary-color: #1a4d8f25; /* Bleu royal */
+    --secondary-color: #071e45b3; /* Bleu clair et énergique */
+    --light-blue-color: #d4eaf7; /* Bleu pastel doux */
+    --medium-gray-color: #7a8ca4;
+
+ --font-size-s:0.9rem;
+ --font-size-n:1rem;
+ --font-size-m:1.12rem;
+ --font-size-l:1.5rem;
+ --font-size-xl:2rem;
+ --font-size-xxl:2.3rem;
+
+ --font-weight-normal:400;
+ --font-weight-medium:500;
+ --font-weight-semibold:600;
+ --font-weight-bold:700;
+
+ --border-radius-s:8px;
+ --border-radius-m:30px;
+ --border-radius-circle:50%;
+
+ --site-max-width:1300px;
+
+}
+/*whole of site */
+ul{
+    list-style: none;
+}
+a{
+    text-decoration: none;
+}
+button{
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+img{
+    width: 100%;
+}
+nav .navbar .section-content{
+    margin: 0 auto;
+    padding:0 20px;
+    max-width: var(--site-max-width);
+}
+.section-title{
+    text-align: center;
+    padding: 60px 0 100px;
+    text-transform: uppercase;
+    font-size: var(--font-size-xl);
+}
+.section-title::after{
+    content: "";
+    width: 80px;
+    height: 5px;
+    display: block;
+    margin: 10px auto 0;
+    border-radius: var(--border-radius-s);
+    background: #030c60ae;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+}
+.connect{
+    padding: 10px 26px ;
+    border: 2px solid #fff;
+    color: var(--white-color);
+    border-radius: var(--border-radius-m);
+    background: var(--primary-color);
+    font-weight: var(--font-weight-medium);
+    transition: 0.3s ease;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+
+}
+
+.hero-image{
+    padding-top: 300px;
+}
+/*navbar*/
+nav .navbar .section-content{
+    margin: 0 auto;
+    padding:0 20px;
+    max-width: var(--site-max-width);
+}
+header{
+    width: 100%;
+    z-index: 5;
+
+    
+}
+
+header .navbar{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color:rgb(74 115 175 / 89%);    
+    display: flex;
+    padding: 14px;
+    align-items: center;
+    justify-content: space-between;
+
+}
+.navbar .nav-logo .logo-text{
+    color: var(--white-color);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+}
+.navbar .nav-menu{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar .nav-menu .nav-link2{
+    color: var(--white-color);
+    font-size: 15px;
+    border-radius: var(--border-radius-m);
+    transition: 0.3s ease;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    padding: 10px 18px;
+    
+}
+.navbar .nav-menu .nav-link2:hover{
+    color: var(--white-color);
+    background: var(--secondary-color);
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5)
+}
+.navbar :where(#menu-close-button, #menu-open-button){
+    display: none;
+}
+/*en tete*/
+.en_tete {
+    margin-top: 06px;
+    background: linear-gradient(to right, rgba(16, 54, 109, 0.803),rgba(16, 55, 109, 0.596), rgba(16, 55, 109, 0.393),#ffffff);
+    height: auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profil-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+    border: 3px solid #ffffff;
+}
+
+.clinic-info {
+    color: white;
+}
+
+.clinic-info h3 {
+    margin: 0;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.clinic-info p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+/*links*/
+/* Barre de navigation */
+.main-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.nav-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+}
+
+.nav-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.nav-link {
+    color: #4a5568;
+    font-size: 0.89rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 15px 12px;
+    white-space: nowrap;
+    position: relative;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+    color: #2b6cb0;
+}
+
+.nav-link.active {
+    color: #2b6cb0;
+    border-bottom: 2px solid #2b6cb0;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #2b6cb0;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+/* Ajoutez ceci à votre CSS existant */
+.show-mobile-menu .main-nav {
+    display: none !important;
+}
+
+/* Style pour le menu mobile */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    height: 100vh;
+    background: white;
+    transition: right 0.3s ease;
+    z-index: 1001; /* Au-dessus de la nav principale */
+}
+
+.show-mobile-menu .mobile-menu {
+    right: 0;
+}
+/* Animation du scroll horizontal */
+.nav-container {
+    scroll-behavior: smooth;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-link {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .nav-container {
+        padding: 0 15px;
+    }
+}
+
+
+
+
+.show-mobile-menu #map {
+    display: none !important;
+}
+
+
+
+
+
+
+/* Par défaut, cacher les boutons sur grand écran */
+#menu-close-button,
+#menu-open-button {
+    display: none;
+}
+
+/* Afficher les boutons sur mobile */
+@media (max-width: 768px) {
+    #menu-open-button {
+        display: block;
+    }
+
+    /* Quand le menu est affiché, montrer le bouton de fermeture */
+    .show-mobile-menu #menu-open-button {
+        display: none;
+    }
+
+    .show-mobile-menu #menu-close-button {
+        display: block;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
+
+html {
+    font-size: 14px;
+}
+
+
+/*** Sidebar ***/
+
+aside {
+    margin-top: 28.5px;
+    margin-bottom: 20px;
+    height: 100vh;
+    position: fixed;
+    width: 200px;
+    padding-left: 0;
+}
+
+aside .sidebar {
+    background: rgba(16, 55, 109, 0.596);
+    display: flex;
+    flex-direction: column;
+    height: 86vh;
+    position: relative;
+    top: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+aside h3 {
+
+    font-weight: 500;
+    font-size: 13px;
+}
+
+aside .sidebar a {
+    display: flex;
+    color: whitesmoke;
+    margin-left: 2rem;
+    gap: 1rem;
+    align-items: center;
+    position: relative;
+    height: 3.7rem;
+    transition: all 300ms ease;
+}
+
+aside .sidebar a span {
+    font-size: 1.6rem;
+    transition: all 300ms ease;
+}
+
+aside .sidebar a:last-child {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
+
+aside .sidebar a.active {
+    background: rgb(200 221 247);
+    color: rgb(79, 148, 239);
+    margin-left: 0;
+}
+
+aside .sidebar a.active:before {
+    content: '';
+    width: 6px;
+    height: 100%;
+    background: rgb(79, 148, 239);
+}
+
+aside .sidebar a.active span {
+    color:  rgb(62 117 191);
+    margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover {
+    color:  rgb(62 117 191);
+}
+
+aside .sidebar a:hover span {
+    margin-left: 1rem;
+}
+
+aside .sidebar .message-count {
+    background: rgb(253, 66, 66);
+    color: whitesmoke;
+    padding: 2px 10px;
+    font-size: 11px;
+    border-radius: 0.4rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Conteneur principal fixe */
+.container {
+    position: fixed;
+    top: 14%;
+    right: 3%;
+    width: 1000px;   /* Largeur fixe pour le conteneur */
+    height: 80%;    /* Hauteur fixe du conteneur */
+    background: rgba(255, 255, 255, 0.9);  /* Fond avec transparence */
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+    padding: 1rem;
+    overflow-y: auto;  /* Permet le défilement vertical */
+    z-index: 100;      /* Assure que le conteneur est au-dessus d'autres éléments */
+}
+
+/* Cartes Médecins - Style Glassmorphism */
+.doctor-card {
+    background: rgb(74 115 175 / 32%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Photo de profil */
+.doctor-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.doctor-card:hover img {
+    transform: scale(1.15);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Détails */
+.doctor-details {
+    flex: 1;
+    min-width: 280px;
+    text-align: left;
+}
+
+.doctor-card p {
+    margin: 0.8rem 0;
+    position: relative;
+    padding-left: 0.7rem;
+    color: #555;
+}
+
+
+
+.doctor-card p strong {
+    color: rgb(74 115 175 / 89%);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Boutons - Style Neon */
+form {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: flex-end;  /* Aligne les boutons à droite */
+    margin-left: 0;
+}
+
+button {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease-in-out;
+    z-index: -1;
+}
+
+button:hover::before {
+    transform: translateX(100%);
+}
+
+button[value="confirmer"] {
+    background:linear-gradient(45deg, rgb(74 115 175 / 89%), rgb(54 89 142));
+    color: white;
+    box-shadow: 0 4px 25px rgba(0, 101, 184, 0.4);
+}
+
+button[value="refuser"] {
+    background: linear-gradient(45deg, #d63031, #ff7675);
+    color: white;
+    box-shadow: 0 4px 25px rgba(214, 48, 49, 0.4);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation Entrée */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(60px) rotate(5deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotate(0);
+    }
+}
+
+.doctor-card {
+    animation: cardEntrance 0.8s ease-out forwards;
+    animation-delay: calc(var(--order) * 0.1s);
+}
+
+/* Séparateur Créatif */
+hr {
+    border: 0;
+    height: 2px;
+    background: linear-gradient(to right, 
+        transparent, 
+        rgba(108, 92, 231, 0.5), 
+        transparent);
+    margin: 3rem auto;
+    max-width: 800px;
+    position: relative;
+}
+
+hr::after {
+    content: '✧';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f8f9fa;
+    padding: 0 1rem;
+    color: #6c5ce7;
+    font-size: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .doctor-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.8rem;
+    }
+    
+    .doctor-card p::before {
+        display: none;
+    }
+    
+    form {
+        justify-content: center;
+    }
+    
+    button {
+        padding: 0.8rem 1.5rem;
+    }
+}

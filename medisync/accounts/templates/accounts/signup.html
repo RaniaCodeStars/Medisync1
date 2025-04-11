@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inscription Sécurisée - Medisync</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+            }
+        }
+
+        header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .logo h1 {
+            color: var(--primary);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .logo h1:hover {
+            transform: scale(1.05);
+            text-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .logo h1::after {
+            content: "";
+            display: block;
+            width: 40px;
+            height: 4px;
+            background: var(--success);
+            margin-top: 5px;
+            border-radius: 2px;
+        }
+
+        .container {
+            background-color: white;
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(67, 97, 238, 0.1) 0%,
+                rgba(72, 149, 239, 0.2) 50%,
+                rgba(76, 201, 240, 0.1) 100%
+            );
+            transform: rotate(30deg);
+            z-index: -1;
+            animation: shine 6s infinite linear;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: rotate(30deg) translate(-30%, -30%);
+            }
+            100% {
+                transform: rotate(30deg) translate(30%, 30%);
+            }
+        }
+
+        h2 {
+            margin-bottom: clamp(20px, 5vw, 30px);
+            color: var(--dark);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: clamp(15px, 3vw, 20px);
+            text-align: left;
+            position: relative;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--dark);
+            display: block;
+            margin-bottom: 8px;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"], 
+        input[type="email"], 
+        input[type="password"], 
+        select {
+            width: 100%;
+            padding: clamp(10px, 3vw, 12px) 15px;
+            margin-top: 5px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        input[type="text"]:focus, 
+        input[type="email"]:focus, 
+        input[type="password"]:focus, 
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            outline: none;
+            background-color: white;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: clamp(12px, 3vw, 15px) 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            font-weight: 500;
+            margin-top: clamp(15px, 3vw, 20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            transform: rotate(30deg);
+            transition: all 0.3s ease;
+        }
+
+        button:hover::after {
+            animation: shine 1.5s infinite;
+        }
+
+        .form-group p {
+            margin-top: clamp(10px, 3vw, 15px);
+            color: #666;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            text-align: center;
+        }
+
+        .form-group a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-group a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        footer {
+            position: absolute;
+            bottom: clamp(10px, 3vw, 20px);
+            font-size: clamp(0.7rem, 3vw, 0.8rem);
+            color: #777;
+            z-index: 10;
+            width: 100%;
+            text-align: center;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s ease;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%234361ee" opacity=".1"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="%234361ee" opacity=".1"/></svg>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
+
+        /* Styles pour les messages d'erreur */
+        .error-message {
+            color: var(--danger);
+            font-size: clamp(0.65rem, 3vw, 0.75rem);
+            margin-top: 5px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .error-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--danger);
+            display: none;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+        }
+
+        .success-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--success);
+            display: none;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+        }
+
+        /* Styles pour les indicateurs de force du mot de passe */
+        .password-strength {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            background: var(--danger);
+            transition: all 0.3s ease;
+        }
+
+        .password-strength-text {
+            font-size: clamp(0.6rem, 3vw, 0.7rem);
+            margin-top: 3px;
+            text-align: right;
+            color: #666;
+        }
+
+        /* Styles pour les champs invalides */
+        input.invalid {
+            border-color: var(--danger) !important;
+            animation: shake 0.5s;
+        }
+
+        input.valid {
+            border-color: var(--success) !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Tooltip pour les exigences de mot de passe */
+        .password-requirements {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 10px;
+            text-align: left;
+            display: none;
+        }
+
+        .password-requirements h4 {
+            margin-bottom: 8px;
+            font-size: clamp(0.75rem, 3vw, 0.85rem);
+            color: var(--dark);
+        }
+
+        .password-requirements ul {
+            list-style: none;
+            padding-left: 5px;
+        }
+
+        .password-requirements li {
+            font-size: clamp(0.65rem, 3vw, 0.75rem);
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .password-requirements li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #ccc;
+        }
+
+        .password-requirements li.valid {
+            color: var(--success);
+        }
+
+        .password-requirements li.valid::before {
+            content: "✓";
+            color: var(--success);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 20px 15px;
+            }
+            
+            header {
+                top: 15px;
+                left: 15px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .logo h1::after {
+                width: 30px;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .container {
+                padding: 15px 10px;
+            }
+            
+            input[type="text"], 
+            input[type="email"], 
+            input[type="password"], 
+            select {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <header>
+        <div class="logo">
+            <h1>Medisync</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Inscription Sécurisée</h2>
+        <form id="registerForm" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" name="username" id="username" required placeholder="Entre 3 et 20 caractères">
+                <i class="fas fa-exclamation-circle error-icon" id="username-error-icon"></i>
+                <i class="fas fa-check-circle success-icon" id="username-success-icon"></i>
+                <div class="error-message" id="username-error">Le nom d'utilisateur doit contenir entre 3 et 20 caractères</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required placeholder="exemple@medisync.com">
+                <i class="fas fa-exclamation-circle error-icon" id="email-error-icon"></i>
+                <i class="fas fa-check-circle success-icon" id="email-success-icon"></i>
+                <div class="error-message" id="email-error">Veuillez entrer une adresse email valide</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="password-container">
+                    <input type="password" name="password" id="password" required placeholder="Minimum 8 caractères">
+                    <i class="toggle-password fas fa-eye-slash" id="togglePassword"></i>
+                    <i class="fas fa-exclamation-circle error-icon" id="password-error-icon"></i>
+                    <i class="fas fa-check-circle success-icon" id="password-success-icon"></i>
+                </div>
+                <div class="error-message" id="password-error">Le mot de passe doit contenir au moins 8 caractères</div>
+                
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="password-strength-bar"></div>
+                </div>
+                <div class="password-strength-text" id="password-strength-text">Faible</div>
+                
+                <div class="password-requirements" id="password-requirements">
+                    <h4>Exigences de sécurité:</h4>
+                    <ul>
+                        <li id="req-length">Minimum 8 caractères</li>
+                        <li id="req-uppercase">Au moins une majuscule</li>
+                        <li id="req-number">Au moins un chiffre</li>
+                        <li id="req-special">Au moins un caractère spécial</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirmer le mot de passe</label>
+                <input type="password" name="confirm-password" id="confirm-password" required placeholder="Retapez votre mot de passe">
+                <i class="fas fa-exclamation-circle error-icon" id="confirm-error-icon"></i>
+                <i class="fas fa-check-circle success-icon" id="confirm-success-icon"></i>
+                <div class="error-message" id="confirm-error">Les mots de passe ne correspondent pas</div>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Rôle</label>
+                <select name="role" id="role" required>
+                    <option value="" disabled selected>Sélectionnez votre rôle</option>
+                    <option value="MEDECIN">Médecin</option>
+                    <option value="PATIENT">Patient</option>
+                    <option value="PHARMACIEN">Pharmacien</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+                <i class="fas fa-exclamation-circle error-icon" id="role-error-icon"></i>
+                <i class="fas fa-check-circle success-icon" id="role-success-icon"></i>
+                <div class="error-message" id="role-error">Veuillez sélectionner un rôle</div>
+            </div>
+
+            <button type="submit" id="submitBtn">
+                <span>S'inscrire</span>
+            </button>
+            
+            <div class="form-group">
+                <p>Déjà un compte ? <a href="{% url 'accounts:login' %}">Se connecter</a></p>
+            </div>
+        </form>
+    </div>
+
+    <div class="wave"></div>
+
+    <footer>
+        <p>&copy; 2025 Medisync. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Création des particules animées
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = Math.min(Math.floor(window.innerWidth / 10), 90);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 10 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
+                
+                particle.style.opacity = Math.random() * 0.4 + 0.1;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+        // Validation en temps réel
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            const form = document.getElementById('registerForm');
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm-password');
+            const role = document.getElementById('role');
+            
+            // Afficher les exigences de mot de passe au focus
+            password.addEventListener('focus', function() {
+                document.getElementById('password-requirements').style.display = 'block';
+            });
+            
+            password.addEventListener('blur', function() {
+                if (!this.value) {
+                    document.getElementById('password-requirements').style.display = 'none';
+                }
+            });
+            
+            // Validation du nom d'utilisateur
+            username.addEventListener('input', function() {
+                const value = this.value.trim();
+                const errorElement = document.getElementById('username-error');
+                const errorIcon = document.getElementById('username-error-icon');
+                const successIcon = document.getElementById('username-success-icon');
+                
+                if (value.length < 3 || value.length > 20) {
+                    showError(this, errorElement, errorIcon, successIcon, 
+                             'Le nom d\'utilisateur doit contenir entre 3 et 20 caractères');
+                } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+                    showError(this, errorElement, errorIcon, successIcon, 
+                             'Seuls les lettres, chiffres et underscores sont autorisés');
+                } else {
+                    showSuccess(this, errorElement, errorIcon, successIcon);
+                }
+            });
+            
+            // Validation de l'email
+            email.addEventListener('input', function() {
+                const value = this.value.trim();
+                const errorElement = document.getElementById('email-error');
+                const errorIcon = document.getElementById('email-error-icon');
+                const successIcon = document.getElementById('email-success-icon');
+                
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    showError(this, errorElement, errorIcon, successIcon, 
+                             'Veuillez entrer une adresse email valide');
+                } else {
+                    showSuccess(this, errorElement, errorIcon, successIcon);
+                }
+            });
+            
+            // Validation du mot de passe
+            password.addEventListener('input', function() {
+                const value = this.value;
+                const errorElement = document.getElementById('password-error');
+                const errorIcon = document.getElementById('password-error-icon');
+                const successIcon = document.getElementById('password-success-icon');
+                
+                // Vérifier la force du mot de passe
+                checkPasswordStrength(value);
+                
+                // Vérifier les exigences
+                checkPasswordRequirements(value);
+                
+                if (value.length < 8) {
+                    showError(this, errorElement, errorIcon, successIcon, 
+                             'Le mot de passe doit contenir au moins 8 caractères');
+                } else {
+                    showSuccess(this, errorElement, errorIcon, successIcon);
+                    
+                    // Vérifier aussi la confirmation si déjà remplie
+                    if (confirmPassword.value) {
+                        confirmPassword.dispatchEvent(new Event('input'));
+                    }
+                }
+            });
+            
+            // Validation de la confirmation du mot de passe
+            confirmPassword.addEventListener('input', function() {
+                const value = this.value;
+                const errorElement = document.getElementById('confirm-error');
+                const errorIcon = document.getElementById('confirm-error-icon');
+                const successIcon = document.getElementById('confirm-success-icon');
+                
+                if (value !== password.value) {
+                    showError(this, errorElement, errorIcon, successIcon, 
+                             'Les mots de passe ne correspondent pas');
+                } else {
+                    showSuccess(this, errorElement, errorIcon, successIcon);
+                }
+            });
+            
+            // Validation du rôle
+            role.addEventListener('change', function() {
+                const value = this.value;
+                const errorElement = document.getElementById('role-error');
+                const errorIcon = document.getElementById('role-error-icon');
+                const successIcon = document.getElementById('role-success-icon');
+                
+                if (!value) {
+                    showError(this, errorElement, errorIcon, successIcon, 
+                             'Veuillez sélectionner un rôle');
+                } else {
+                    showSuccess(this, errorElement, errorIcon, successIcon);
+                }
+            });
+            
+            // Validation du formulaire avant soumission
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                // Forcer la validation de tous les champs
+                username.dispatchEvent(new Event('input'));
+                email.dispatchEvent(new Event('input'));
+                password.dispatchEvent(new Event('input'));
+                confirmPassword.dispatchEvent(new Event('input'));
+                role.dispatchEvent(new Event('change'));
+                
+                // Vérifier s'il y a des erreurs
+                document.querySelectorAll('.error-message').forEach(el => {
+                    if (el.style.display === 'block') {
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    // Animation pour montrer qu'il y a des erreurs
+                    document.querySelectorAll('input.invalid').forEach(input => {
+                        input.style.animation = 'shake 0.5s';
+                        setTimeout(() => {
+                            input.style.animation = '';
+                        }, 500);
+                    });
+                    
+                    // Faire défiler jusqu'à la première erreur
+                    const firstError = document.querySelector('.error-message[style="display: block;"]');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+            
+            // Ajustement pour très petits écrans
+            function adjustLayout() {
+                const container = document.querySelector('.container');
+                const windowWidth = window.innerWidth;
+                
+                if (windowWidth < 350) {
+                    const scale = Math.min(1, windowWidth / 350);
+                    container.style.transform = `scale(${scale})`;
+                    container.style.transformOrigin = 'top center';
+                } else {
+                    container.style.transform = 'none';
+                }
+            }
+            
+            window.addEventListener('resize', adjustLayout);
+            adjustLayout();
+        });
+        
+        // Fonction pour afficher une erreur
+        function showError(input, errorElement, errorIcon, successIcon, message) {
+            input.classList.add('invalid');
+            input.classList.remove('valid');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            errorIcon.style.display = 'block';
+            successIcon.style.display = 'none';
+        }
+        
+        // Fonction pour afficher un succès
+        function showSuccess(input, errorElement, errorIcon, successIcon) {
+            input.classList.remove('invalid');
+            input.classList.add('valid');
+            errorElement.style.display = 'none';
+            errorIcon.style.display = 'none';
+            successIcon.style.display = 'block';
+        }
+        
+        // Fonction pour vérifier la force du mot de passe
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const strengthBar = document.getElementById('password-strength-bar');
+            const strengthText = document.getElementById('password-strength-text');
+            
+            // Longueur minimale
+            if (password.length >= 8) strength += 1;
+            if (password.length >= 12) strength += 1;
+            
+            // Contient des majuscules
+            if (/[A-Z]/.test(password)) strength += 1;
+            
+            // Contient des chiffres
+            if (/[0-9]/.test(password)) strength += 1;
+            
+            // Contient des caractères spéciaux
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            // Mettre à jour la barre de force
+            const width = strength * 20;
+            strengthBar.style.width = `${width}%`;
+            
+            // Changer la couleur et le texte selon la force
+            if (strength <= 1) {
+                strengthBar.style.backgroundColor = 'var(--danger)';
+                strengthText.textContent = 'Faible';
+                strengthText.style.color = 'var(--danger)';
+            } else if (strength <= 3) {
+                strengthBar.style.backgroundColor = 'var(--warning)';
+                strengthText.textContent = 'Moyen';
+                strengthText.style.color = 'var(--warning)';
+            } else {
+                strengthBar.style.backgroundColor = 'var(--success)';
+                strengthText.textContent = 'Fort';
+                strengthText.style.color = 'var(--success)';
+            }
+        }
+        
+        // Fonction pour vérifier les exigences du mot de passe
+        function checkPasswordRequirements(password) {
+            const reqLength = document.getElementById('req-length');
+            const reqUppercase = document.getElementById('req-uppercase');
+            const reqNumber = document.getElementById('req-number');
+            const reqSpecial = document.getElementById('req-special');
+            
+            // Longueur
+            if (password.length >= 8) {
+                reqLength.classList.add('valid');
+            } else {
+                reqLength.classList.remove('valid');
+            }
+            
+            // Majuscule
+            if (/[A-Z]/.test(password)) {
+                reqUppercase.classList.add('valid');
+            } else {
+                reqUppercase.classList.remove('valid');
+            }
+            
+            // Chiffre
+            if (/[0-9]/.test(password)) {
+                reqNumber.classList.add('valid');
+            } else {
+                reqNumber.classList.remove('valid');
+            }
+            
+            // Caractère spécial
+            if (/[^A-Za-z0-9]/.test(password)) {
+                reqSpecial.classList.add('valid');
+            } else {
+                reqSpecial.classList.remove('valid');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<h2>Ajouter un avis pour {{ clinic.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <label>Note :</label>
+    <select name="rating">
+        <option value="1">1 ⭐</option>
+        <option value="2">2 ⭐⭐</option>
+        <option value="3">3 ⭐⭐⭐</option>
+        <option value="4">4 ⭐⭐⭐⭐</option>
+        <option value="5" selected>5 ⭐⭐⭐⭐⭐</option>
+    </select>
+
+    <label>Commentaire :</label>
+    <textarea name="comment"></textarea>
+
+    <button type="submit">Envoyer</button>
+</form>

@@ -1,0 +1,15 @@
+<h2>Avis sur les Cliniques</h2>
+<ul>
+    {% for review in reviews %}
+        <li>
+            <strong>Clinique : {{ review.clinic.name }}</strong> - {{ review.rating }}⭐<br>
+            <em>{{ review.patient.username }}</em> : {{ review.comment }} <br>
+            {% if review.response %}
+                <strong>Réponse :</strong> {{ review.response }}
+            {% else %}
+                <a href="{% url 'respond_clinic_review' review.id %}">Répondre</a>
+            {% endif %}
+            <a href="{% url 'delete_clinic_review' review.id %}" onclick="return confirm('Supprimer cet avis ?');">🗑️ Supprimer</a>
+        </li>
+    {% endfor %}
+</ul>

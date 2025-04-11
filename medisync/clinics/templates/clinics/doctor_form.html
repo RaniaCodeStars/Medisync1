@@ -1,0 +1,19 @@
+<form method="post">
+    {% csrf_token %}
+    <label>Nom :</label>
+    <input type="text" name="nom" value="{{ doctor.nom|default_if_none:'' }}" required>
+    
+    <label>Prénom :</label>
+    <input type="text" name="prenom" value="{{ doctor.prenom|default_if_none:'' }}" required>
+    
+    <label>Spécialité :</label>
+    <input type="text" name="specialty" value="{{ doctor.specialty.id|default_if_none:'' }}" required>
+
+    <label>Institution :</label>
+    <input type="text" name="institution" value="{{ doctor.institution|default_if_none:'' }}" required>
+
+    <label>Localisation :</label>
+    <input type="text" name="location" value="{{ doctor.location|default_if_none:'' }}" required>
+
+    <button type="submit">Enregistrer</button>
+</form>

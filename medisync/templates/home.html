@@ -1,0 +1,192 @@
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediSync{% endblock %}</title>
+    <!-- Liens vers les fichiers CSS et les polices -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+        <!-- En-tête / Barre de navigation -->
+        <header>
+            <nav class="navbar section-content">
+                <a href="#" class="nav-logo">
+                    <h2 class="logo-text">MediSync</h2>
+                </a>
+                <ul class="nav-menu">
+                    <button id="menu-close-button" class="fas fa-times"></button>
+                    <li class="nav-item">
+                        <a href="#home" class="nav-link">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#about" class="nav-link">À propos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#patient" class="nav-link">Patients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#doctor" class="nav-link">Soignants</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#teleconsultation" class="nav-link">Téléconsultation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#footer" class="nav-link">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'accounts:login' %}"  class="nav-link connect">Se connecter</a>
+                    </li>
+                </ul>
+                <button id="menu-open-button" class="fas fa-bars"></button>
+            </nav>
+        </header>
+    <!-- Section Hero -->
+    <section class="hero-section" id="home">
+        <div class="section-content">
+            <div class="hero-details">
+                <h3 class="subtitle">Facilitez votre quotidien avec notre plateforme de rendez-vous médicaux</h3>
+                <p class="description">Accédez rapidement aux meilleurs médecins, planifiez vos consultations en ligne et bénéficiez d’un suivi simplifié pour une meilleure santé.</p>
+                <div class="buttons">
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Rechercher médecin, spécialité, établissement" class="search-input">
+                            <button class="search-button"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="search-box">
+                            <input type="text" placeholder="Localisation..." class="location-input">
+                            <button class="location-button"><i class="fas fa-map-marker-alt"></i></button>
+                        </div>
+                    </div>
+                    <a href="#" class="button recherche">Rechercher</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section À propos -->
+    <section class="about-section" id="about">
+        <div class="section-content">
+            <video class="about-image-wrapper" autoplay loop muted>
+                <source src="{% static 'images/v4.mp4' %}" type="video/mp4">
+                Votre navigateur ne supporte pas la lecture de vidéos.
+            </video>
+            <div class="about-details">
+                <h2 class="section-title">À propos de nous</h2>
+                <p class="text">Nous avons créé MediSync avec un objectif clair : faciliter l’accès aux soins pour tous. Grâce à notre technologie avancée, nous mettons en relation les patients et les médecins, réduisant ainsi les délais d’attente et améliorant l’organisation des consultations.</p>
+                <div class="social-link-list">
+                    <a href="#" class="social-link"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Patients -->
+    <section class="patient-section" id="patient">
+        <div class="section-content">
+            <div class="patient-details">
+                <h2 class="section-title">Nos patients</h2>
+                <p class="text">Nous avons créé MediSync avec un objectif clair : faciliter l’accès aux soins pour tous. Grâce à notre technologie avancée, nous mettons en relation les patients et les médecins, réduisant ainsi les délais d’attente et améliorant l’organisation des consultations.</p>
+                <button class="btn-rendez"><a href="#se-connecter">Prenez rendez-vous</a></button>
+            </div>
+            <div>
+                <img class="patient-img" src="{% static 'image/m1.webp' %}" alt="Image de patient">
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Médecins -->
+    <section class="doctor-section" id="doctor">
+        <div class="section-content">
+            <div class="doctor-image-wrapper">
+                <img src="{% static 'image/C1.png' %}" alt="Médecin">
+                <img src="{% static 'image/C2.png' %}" alt="Médecin">
+                <img src="{% static 'image/C3.png' %}" alt="Médecin">
+            </div>
+            <div class="doctor-details">
+                <h2>Rejoignez MediSync dès aujourd’hui !</h2>
+                <p>Optimisez la gestion de vos consultations et offrez à vos patients une prise de rendez-vous rapide et fluide.</p>
+                <p>En vous inscrivant sur notre plateforme, vous accédez à un outil moderne qui vous permet de gérer votre emploi du temps avec efficacité, de réduire le taux d’absentéisme et d’améliorer la communication avec vos patients.</p>
+                <a href="#" class="btn-join">S'inscrire</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Téléconsultation -->
+    <section class="teleconsultation-section" id="teleconsultation">
+        <div class="section-content">
+            <div class="teleconsultation-details">
+                <h2>Consultation en ligne pour les patients en psychiatrie</h2>
+                <p>Accédez à des consultations à distance avec des psychiatres qualifiés depuis le confort de votre domicile. Notre plateforme de téléconsultation vous permet de bénéficier d'un suivi médical sécurisé et confidentiel.</p>
+                <p>Que ce soit pour un premier diagnostic, un suivi régulier ou une urgence, nos spécialistes en psychiatrie sont disponibles en ligne pour vous écouter et vous accompagner.</p>
+                <a href="#" class="btn-teleconsultation">Prendre rendez-vous</a>
+            </div>
+            <div class="teleconsultation-image-wrapper">
+                <img src="{% static 'image/s5.jpg' %}" alt="Patient en téléconsultation">
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Sécurité -->
+    <section class="security-section" id="security">
+        <div class="security-overlay"></div>
+        <div class="security-content">
+            <h2>Une plateforme sécurisée et performante</h2>
+            <p>Notre infrastructure backend garantit une gestion fluide et sécurisée des données, assurant la confidentialité et la rapidité des services médicaux en ligne.</p>
+            <p>Faites confiance à notre technologie avancée pour une expérience fiable et optimisée.</p>
+        </div>
+    </section>
+     <!-- Pied de page -->
+     <footer class="footer" id="footer">
+        <div class="footer-container">
+            <div class="row">
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="#">À propos de nous</a></li>
+                        <li><a href="#">Nos services</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">Programme d'affiliation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Aide</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Expédition</a></li>
+                        <li><a href="#">Retours</a></li>
+                        <li><a href="#">Statut de commande</a></li>
+                        <li><a href="#">Options de paiement</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Boutique en ligne</h4>
+                    <ul>
+                        <li><a href="#">Montres</a></li>
+                        <li><a href="#">Sacs</a></li>
+                        <li><a href="#">Chaussures</a></li>
+                        <li><a href="#">Robes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Suivez-nous</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+{% endblock %}
+</body>
+</html>
+    

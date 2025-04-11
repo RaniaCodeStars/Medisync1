@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <title>Mes Rendez-vous</title>
+  <!-- Bootstrap CSS (exemple Bootstrap 5) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    appearance: none;
+    border: 0;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    width: 100vw;
+    height: 100vh;
+    font-family: poppins, sans-serif;
+    font-size: 0.88rem;
+    background: #f6f6f9;
+    user-select: none;
+    display: flex;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 14rem auto 23rem;
+    margin-left: 5px;
+  }
+
+
+  a {
+    color: white;
+  }
+
+  h1 {
+    font-weight: 800;
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 0.87rem;
+  }
+
+  h4 {
+    font-size: 0.8rem;
+  }
+
+  h5 {
+    font-size: 0.77rem;
+  }
+
+  /*** Sidebar ***/
+
+  aside {
+    margin-top: 28.5px;
+    margin-bottom: 20px;
+    height: 100vh;
+    position: fixed;
+    width: 200px;
+    padding-left: 0;
+  }
+
+  aside .sidebar {
+    background: rgb(146, 188, 242);
+    display: flex;
+    flex-direction: column;
+    height: 86vh;
+    position: relative;
+    top: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  aside h3 {
+    font-weight: 500;
+    font-size: 13.3px;
+    margin-top: 8px;
+  }
+
+  aside .sidebar a {
+    display: flex;
+    color: whitesmoke;
+    margin-left: 2rem;
+    gap: 1rem;
+    align-items: center;
+    position: relative;
+    height: 3.7rem;
+    transition: all 300ms ease;
+  }
+
+  aside .sidebar a span {
+    font-size: 1.6rem;
+    transition: all 300ms ease;
+  }
+
+  aside .sidebar a:last-child {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+  }
+
+  aside .sidebar a.active {
+    background: rgb(131, 179, 241);
+    color: rgb(79, 148, 239);
+    margin-left: 0;
+  }
+
+  aside .sidebar a.active:before {
+    content: '';
+    width: 6px;
+    height: 100%;
+    background: rgb(79, 148, 239);
+  }
+
+  aside .sidebar a.active span {
+    color: rgb(79, 148, 239);
+    margin-left: calc(1rem - 3px);
+  }
+
+  aside .sidebar a:hover {
+    color: rgb(79, 148, 239);
+  }
+
+  aside .sidebar a:hover span {
+    margin-left: 1rem;
+  }
+
+  aside .sidebar .message-count {
+    background: rgb(253, 66, 66);
+    color: whitesmoke;
+    padding: 2px 10px;
+    font-size: 11px;
+    border-radius: 0.4rem;
+  }
+
+  .navbar {
+    background-color: white;
+    padding: 7px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    margin-top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  nav .top {
+    background: white;
+    display: flex;
+    align-items: center;
+  }
+
+  nav .logo {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .logo-text {
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    font-size: 30px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    font-weight: 600;
+  }
+
+  .navbar-links a {
+    color: rgb(79, 141, 208);
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 14px;
+    text-shadow: 2px 2px 5px rgba(99, 96, 96, 0.5)
+  }
+
+  .navbar-links a:hover {
+    background-color: rgb(160, 197, 237);
+    color: white;
+    border-radius: 10px;
+    height: 50px;
+    width: 300px;
+    text-shadow: 2px 2px 5px rgba(99, 96, 96, 0.5);
+    padding: 7px 15px;
+    font-size: 15px;
+    transition: 0.3s ease;
+    margin-left: 20px;
+  }
+
+  .navbar-profile {
+    display: flex;
+    align-items: center;
+    /* Aligner verticalement le texte et l'image */
+    gap: 10px;
+    /* Espace entre le texte et l'image */
+  }
+
+  .profile-name {
+    font-size: 14px;
+    color: #363949;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  aside .sidebar a {
+    text-decoration: none;
+    /* Enlève le soulignement des liens */
+  }
+
+  .main {
+    margin-left: 215px;
+    /* Largeur de la sidebar (200px) + espace supplémentaire (20px) */
+    margin-top: 40px;
+    /* Hauteur de la navbar */
+    width: 1700px;
+    font-size: 13px;
+  }
+
+  .mb-4 {
+    color: rgb(146, 188, 242);
+    font-weight: 600;
+    text-shadow: 2px 2px 5px rgba(165, 162, 162, 0.5);
+  }
+
+
+  .table {
+    font-size: 0.9rem;
+    border-collapse: collapse;
+    /* Supprime les espaces entre les cellules */
+    width: 980px;
+    background-color: white;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table thead {
+    background-color: #f6f6f9;
+    /* Arrière-plan gris clair */
+    color: #000;
+    /* Texte noir */
+    font-weight: bold;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #7d8da1;
+    ;
+    /* Ligne séparatrice */
+  }
+
+  .table th,
+  .table td {
+    text-align: left;
+    /* Aligne les cellules à gauche */
+    padding: 12px 15px;
+    /* Espacement dans les cellules */
+  }
+
+  .table td {
+    border-bottom: 1px solid #ddd;
+    /* Ligne fine entre les cellules */
+  }
+
+  .btn-detail {
+    background-color: rgb(146, 188, 242);
+    /* Couleur du bouton */
+    color: white;
+    /* Texte blanc */
+    border: none;
+    /* Supprime la bordure */
+    font-size: 0.8rem;
+    /* Taille de la police */
+    padding: 6px 12px;
+    /* Espacement interne */
+    border-radius: 4px;
+    /* Coins arrondis */
+    cursor: pointer;
+    /* Curseur */
+    transition: all 0.3s ease;
+    /* Effet de transition */
+  }
+
+  .btn-detail:hover {
+    background-color: rgb(99, 162, 245);
+    /* Couleur au survol (légèrement plus foncée) */
+    color: white;
+  }
+
+  .btn-modify {
+    background-color: #efa030;
+    /* Couleur du bouton Modifier */
+    color: white;
+    /* Texte blanc */
+    border: none;
+    /* Supprime la bordure */
+    font-size: 0.8rem;
+    /* Taille de la police */
+    padding: 6px 12px;
+    /* Espacement interne */
+    border-radius: 4px;
+    /* Coins arrondis */
+    cursor: pointer;
+    /* Curseur */
+    transition: all 0.3s ease;
+    /* Effet de transition */
+  }
+
+  .btn-modify:hover {
+    background-color: #e88700;
+    /* Couleur au survol */
+    color: white;
+  }
+
+
+  /* Style pour la boîte de recherche */
+  .search-box {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 980px;
+    /* Ajustez la largeur si nécessaire */
+  }
+
+  #searchInputPatient {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  #searchInputDoctor {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  #searchButtonPatient {
+    background-color: #92bcf2;
+    /* Couleur bleue comme la sidebar */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #searchButtonDoctor {
+    background-color: #92bcf2;
+    /* Couleur bleue comme la sidebar */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #searchButtonPatient:hover {
+    background-color: #7fa8d1;
+    /* Une nuance plus foncée au survol */
+  }
+
+  #searchButtonDocto:hover {
+    background-color: #7fa8d1;
+    /* Une nuance plus foncée au survol */
+  }
+
+  #searchButtonPatient .material-icons {
+    font-size: 20px;
+  }
+
+  #searchButtonDocto .material-icons {
+    font-size: 20px;
+  }
+
+  .no-results {
+    display: none;
+    text-align: center;
+    font-style: italic;
+    color: #666;
+  }
+
+  .btn-modify[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+  }
+
+  .profile-picture-detail {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-bottom: 1px;
+  }
+
+  .btn-choix1, .btn-choix2 {
+    margin-right: 10px;
+    background-color: rgb(146, 188, 242);
+    color: white;
+    border-radius: 13px;
+    margin-bottom: 20px;
+    border-color: #1770e4;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  .btn-choix1:hover, .btn-choix2 :hover {
+    background-color: rgb(99, 162, 245);
+    color: white;
+  }
+
+  .btn-choix2:hover {
+    background-color: rgb(99, 162, 245);
+    color: white;
+  }
+  .btn-choix1.active, .btn-choix2.active {
+    background-color: rgb(99, 162, 245); /* Couleur d'arrière-plan active */
+    color: white; /* Couleur du texte */
+    border-color: #1770e4; /* Couleur de la bordure */
+    border-bottom: 3px solid rgb(10, 52, 82);
+}
+
+</style>
+
+<body>
+  <nav class="navbar">
+    <div class="top">
+      <div class="logo">
+        <h2 class="logo-text">Medisync</h2>
+      </div>
+    </div>
+    <div class="navbar-links">
+      <a href="http://127.0.0.1:8000/medecins/medecins/doctor_list/">Prendre un rendez-vous</a>
+    </div>
+    <div class="navbar-profile">
+      {% if profile_picture %}
+      <img src="{{ profile_picture }}" alt="Photo de profil" class="profile-picture">
+      {% else %}
+      <img src="{% static 'images/default_profile.png' %}" alt="Photo de profil" class="profile-picture">
+      {% endif %}
+      <span class="profile-name">{{ doctor_name }}</span>
+    </div>
+  </nav>
+  <aside>
+    <div class="sidebar">
+      <a href="#">
+        <span class="material-icons">dashboard</span>
+        <h3>Tableau de bord</h3>
+      </a>
+      <a href="{% url 'appointments:medcin_appointments' %}" class="active">
+        <span class="material-icons">calendar_month</span>
+        <h3>Mes rendez-vous</h3>
+      </a>
+      <a href="#">
+        <span class="material-icons">description</span>
+        <h3>Documents</h3>
+      </a>
+      <a href="#">
+        <span class="material-icons">sms</span>
+        <h3>Messages</h3>
+        <!-- <span class="message-count">26</span> -->
+      </a>
+      <a href="{% url 'appointments:medcin_teleconsultations' %}">
+        <span class="material-icons">videocam</span>
+        <h3>Téléconsultation</h3>
+      </a>
+      <a href="{% url 'appointments:manage_availability' %}">
+        <span class="material-icons">timelapse</span>
+        <h3>Disponibilités</h3>
+      </a>
+      <a href="{% url 'appointments:manage_consultation_reasons' %}">
+        <span class="material-icons">monitor_heart</span>
+        <h3>Raisons de Consultation</h3>
+      </a>
+      <a href="#">
+        <span class="material-icons">settings</span>
+        <h3>Paramètres</h3>
+      </a>
+      <a href="#">
+        <span class="material-icons">logout</span>
+        <h3>Déconnexion</h3>
+      </a>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="container my-5">
+      <h1 class="mb-4">Mes Rendez-vous</h1>
+
+      <!-- Boutons pour basculer entre les rôles -->
+      <div >
+        <button class="btn btn-choix1" id="btnAsDoctor">Rendez-vous en tant que Médecin</button>
+        <button class="btn btn-choix2" id="btnAsPatient">Rendez-vous en tant que Patient</button>
+      </div>
+
+      <!-- Section : Rendez-vous en tant que Médecin -->
+      <div id="asDoctorSection" class="table-responsive">
+        <h2 class="mb-2">Rendez-vous avec vos Patients :</h2>
+        <div class="search-box">
+          <input type="text" id="searchInputDoctor" placeholder="Rechercher un rendez-vous..." />
+          <button id="searchButtonDoctor">
+            <span class="material-icons">search</span>
+          </button>
+        </div>
+        {% if as_doctor_appointments %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Horaire</th>
+              <th>Frais</th>
+              <th>Paiement</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appointment in as_doctor_appointments %}
+            <tr>
+              <td class="navbar-profile">
+                <div>
+                  {% if appointment.patient_photo %}
+                  <img src="{{ appointment.patient_photo }}" alt="Photo de {{ appointment.patient_full_name }}"
+                    class="profile-picture-detail">
+                  {% else %}
+                  <img src="{% static 'images/default_profile.png' %}" alt="Photo par défaut"
+                    class="profile-picture-detail">
+                  {% endif %}
+                </div>
+                <div>{{ appointment.patient_full_name }}</div>
+              </td>
+              <td>{{ appointment.date }} à {{ appointment.time }}</td>
+              <td>{{ appointment.prix }} DA</td>
+              <td>{{ appointment.get_payment_status_display }}</td>
+              <td>{{ appointment.get_status_display }}</td>
+              <td>
+                <a href="{% url 'appointments:doctor_appointment_detail' appointment.id %}?next={% url 'appointments:medcin_appointments' %}"
+                  class="btn btn-detail">Détail</a>
+                {% if appointment.status == 'Annulé' %}
+                <button class="btn btn-modify btn-sm" disabled>Modifier</button>
+                {% else %}
+                <a href="{% url 'appointments:modify_appointment' appointment.id %}?next={{ request.path }}"
+                  class="btn btn-modify btn-sm">Modifier</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            <tr class="no-results">
+              <td colspan="6">Aucun rendez-vous trouvé</td>
+          </tr>
+          </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">Aucun rendez-vous en tant que médecin.</div>
+        {% endif %}
+      </div>
+
+      <!-- Section : Rendez-vous en tant que Patient -->
+      <div id="asPatientSection" class="table-responsive" style="display: none;">
+        <h2>Vos Rendez-vous chez d'autres Médecins :</h2>
+        <div class="search-box">
+          <input type="text" id="searchInputPatient" placeholder="Rechercher un rendez-vous..." />
+          <button id="searchButtonPatient">
+            <span class="material-icons">search</span>
+          </button>
+        </div>
+        {% if as_patient_appointments %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Médecin</th>
+              <th>Horaire</th>
+              <th>Frais</th>
+              <th>Paiement</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appointment in as_patient_appointments %}
+            <tr>
+              <td class="navbar-profile">
+                <div>
+                  {% if appointment.doctor.user.profile_picture %}
+                  <img src="{{ appointment.doctor.user.profile_picture.url }}"
+                    alt="Photo de Dr. {{ appointment.doctor.nom }}" class="profile-picture-detail">
+                  {% else %}
+                  <img src="{% static 'images/default_profile.png' %}" alt="Photo par défaut"
+                    class="profile-picture-detail">
+                  {% endif %}
+                </div>
+                <div>
+                  Dr. {{ appointment.doctor.nom }} {{ appointment.doctor.prenom }}<br>
+                  {{ appointment.doctor.specialty }}
+                </div>
+              </td>
+              <td>{{ appointment.date }} à {{ appointment.time }}</td>
+              <td>{{ appointment.prix }} DA</td>
+              <td>{{ appointment.get_payment_status_display }}</td>
+              <td>{{ appointment.get_status_display }}</td>
+              <td>
+                <a href="#" class="btn btn-detail">Détail</a>
+              </td>
+            </tr>
+            {% endfor %}
+            <tr class="no-results">
+              <td colspan="6">Aucun rendez-vous trouvé</td>
+          </tr>
+          </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">Aucun rendez-vous en tant que patient.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const btnAsDoctor = document.getElementById('btnAsDoctor');
+    const btnAsPatient = document.getElementById('btnAsPatient');
+
+    btnAsDoctor.addEventListener('click', function () {
+        btnAsDoctor.classList.add('active'); // Ajoute la classe active au bouton Médecin
+        btnAsPatient.classList.remove('active'); // Retire la classe active du bouton Patient
+    });
+
+    btnAsPatient.addEventListener('click', function () {
+        btnAsPatient.classList.add('active'); // Ajoute la classe active au bouton Patient
+        btnAsDoctor.classList.remove('active'); // Retire la classe active du bouton Médecin
+    });
+});
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1. Gestion du basculement entre les onglets
+      const btnAsDoctor = document.getElementById('btnAsDoctor');
+      const btnAsPatient = document.getElementById('btnAsPatient');
+      const asDoctorSection = document.getElementById('asDoctorSection');
+      const asPatientSection = document.getElementById('asPatientSection');
+    
+      btnAsDoctor.addEventListener('click', function () {
+        asDoctorSection.style.display = '';
+        asPatientSection.style.display = 'none';
+        btnAsDoctor.classList.add('btn-primary');
+        btnAsDoctor.classList.remove('btn-secondary');
+        btnAsPatient.classList.add('btn-secondary');
+        btnAsPatient.classList.remove('btn-primary');
+      });
+    
+      btnAsPatient.addEventListener('click', function () {
+        asDoctorSection.style.display = 'none';
+        asPatientSection.style.display = '';
+        btnAsPatient.classList.add('btn-primary');
+        btnAsPatient.classList.remove('btn-secondary');
+        btnAsDoctor.classList.add('btn-secondary');
+        btnAsDoctor.classList.remove('btn-primary');
+      });
+    
+      // 2. Configuration de la recherche pour la section médecin
+      setupSearch(
+        'searchInputDoctor', 
+        'searchButtonDoctor', 
+        '#asDoctorSection .table',
+        '#asDoctorSection .no-results'
+      );
+    
+      // 3. Configuration de la recherche pour la section patient
+      setupSearch(
+        'searchInputPatient', 
+        'searchButtonPatient', 
+        '#asPatientSection .table',
+        '#asPatientSection .no-results'
+      );
+    
+      // Fonction générique pour configurer la recherche
+      function setupSearch(inputId, buttonId, tableSelector, noResultsSelector) {
+        const searchInput = document.getElementById(inputId);
+        const searchButton = document.getElementById(buttonId);
+        const table = document.querySelector(tableSelector);
+        const noResultsRow = document.querySelector(noResultsSelector);
+    
+        if (!searchInput || !searchButton || !table) return;
+    
+        const rows = table.querySelectorAll('tbody tr:not(.no-results)');
+    
+        function performSearch() {
+          const searchTerm = searchInput.value.toLowerCase();
+          let hasResults = false;
+    
+          rows.forEach(row => {
+            const cells = row.cells;
+            let rowText = '';
+            
+            // Concatène le texte de toutes les cellules sauf la dernière (actions)
+            for (let i = 0; i < cells.length - 1; i++) {
+              rowText += cells[i].textContent.toLowerCase() + ' ';
+            }
+    
+            const match = rowText.includes(searchTerm);
+            row.style.display = match ? '' : 'none';
+            if (match) hasResults = true;
+          });
+    
+          if (noResultsRow) {
+            noResultsRow.style.display = hasResults ? 'none' : 'block';
+          }
+        }
+    
+        searchInput.addEventListener('input', performSearch);
+        searchButton.addEventListener('click', performSearch);
+      }
+    
+      // Fonction pour gérer les cookies (si nécessaire)
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+    });
+    </script>
+</body>
+
+</html>
