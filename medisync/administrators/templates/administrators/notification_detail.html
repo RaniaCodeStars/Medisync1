@@ -1,0 +1,49 @@
+{% extends "administrators/base_admin.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <h2>{{ notification.title }}</h2>
+            <span class="badge bg-secondary">{{ notification.get_type_display }}</span>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <p class="text-muted">
+                    Reçu le {{ notification.created_at|date:"d/m/Y H:i" }}
+                </p>
+                <div class="alert alert-light">
+                    {{ notification.message|linebreaks }}
+                </div>
+            </div>
+
+            {% if sender_profile %}
+            <div class="card mb-3">
+                <div class="card-header">Profil du demandeur</div>
+                <div class="card-body">
+                    {% if notification.type == 'validation_compte_medecin' %}
+                        <p><strong>Nom:</strong> {{ sender_profile.nom }} {{ sender_profile.prenom }}</p>
+                        <p><strong>Spécialité:</strong> {{ sender_profile.specialite }}</p>
+                    {% else %}
+                        <p><strong>Clinique:</strong> {{ sender_profile.name }}</p>
+                        <p><strong>Localisation:</strong> {{ sender_profile.location }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'administrators:notification_list' %}" class="btn btn-secondary">
+                    Retour
+                </a>
+                {% if 'validation_compte' in notification.type %}
+                <a href="{% url 'administrators:doctor_validation'  %}" 
+                   class="btn btn-primary">
+                    Gérer ce compte
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

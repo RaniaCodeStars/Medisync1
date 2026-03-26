@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation du Rendez-vous</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="confirmation-container">
+        <h1>Votre demande rendez-vous a été envoyée avec succès !</h1>
+        <p>Nous vous contacterons bientôt pour confirmer les détails de votre rendez-vous.</p>
+        <a href="{% url 'clinics:clinic_dashboard' %}" class="btn-primary">Retour au tableau de bord</a>
+    </div>
+    <style>
+    /* Define color variables for consistent theming */
+:root {
+    --primary: #1d4ed8;
+    --primary-dark: #1e3a8a;
+    --secondary: #059669;
+    --danger: #b91c1c;
+    --light: #f1f5f9;
+    --dark: #0c1c3c;
+    --gray: #64748b;
+    --border: #cbd5e1;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --background: #ffffff;
+}
+
+/* Main container styling for a compact confirmation page */
+.confirmation-container {
+
+    max-width: 600px;
+    margin: 9.5rem auto;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--light);
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+/* Heading styling for a concise title */
+h1 {
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Paragraph styling for confirmation message */
+p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+/* Button styling for return to dashboard */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, var(--primary-dark) 0%, #1e3a8a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .confirmation-container {
+        margin: 1rem 0.75rem;
+        padding: 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    p {
+        font-size: 0.85rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+    }
+}
+</style>
+</body>
+</html>
+

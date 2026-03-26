@@ -1,855 +1,338 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inscription Sécurisée - Medisync</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4361ee;
-            --primary-light: #4895ef;
-            --secondary: #3f37c9;
-            --dark: #1a1a2e;
-            --light: #f8f9fa;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            width: 100%;
-        }
-
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            background-color: var(--primary-light);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: float 15s infinite linear;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-            }
-            100% {
-                transform: translateY(-1000px) rotate(720deg);
-            }
-        }
-
-        header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-        }
-
-        .logo h1 {
-            color: var(--primary);
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .logo h1:hover {
-            transform: scale(1.05);
-            text-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        .logo h1::after {
-            content: "";
-            display: block;
-            width: 40px;
-            height: 4px;
-            background: var(--success);
-            margin-top: 5px;
-            border-radius: 2px;
-        }
-
-        .container {
-            background-color: white;
-            padding: clamp(20px, 5vw, 40px);
-            border-radius: 16px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 500px;
-            margin: 20px auto;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s ease;
-        }
-
-        .container::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(67, 97, 238, 0.1) 0%,
-                rgba(72, 149, 239, 0.2) 50%,
-                rgba(76, 201, 240, 0.1) 100%
-            );
-            transform: rotate(30deg);
-            z-index: -1;
-            animation: shine 6s infinite linear;
-        }
-
-        @keyframes shine {
-            0% {
-                transform: rotate(30deg) translate(-30%, -30%);
-            }
-            100% {
-                transform: rotate(30deg) translate(30%, 30%);
-            }
-        }
-
-        h2 {
-            margin-bottom: clamp(20px, 5vw, 30px);
-            color: var(--dark);
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: 600;
-            position: relative;
-            display: inline-block;
-        }
-
-        h2::after {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 3px;
-        }
-
-        .form-group {
-            margin-bottom: clamp(15px, 3vw, 20px);
-            text-align: left;
-            position: relative;
-        }
-
-        label {
-            font-weight: 500;
-            color: var(--dark);
-            display: block;
-            margin-bottom: 8px;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-            transition: all 0.3s ease;
-        }
-
-        input[type="text"], 
-        input[type="email"], 
-        input[type="password"], 
-        select {
-            width: 100%;
-            padding: clamp(10px, 3vw, 12px) 15px;
-            margin-top: 5px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: clamp(0.85rem, 3vw, 0.95rem);
-            transition: all 0.3s ease;
-            background-color: #f9f9f9;
-        }
-
-        input[type="text"]:focus, 
-        input[type="email"]:focus, 
-        input[type="password"]:focus, 
-        select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-            outline: none;
-            background-color: white;
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border: none;
-            padding: clamp(12px, 3vw, 15px) 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            font-weight: 500;
-            margin-top: clamp(15px, 3vw, 20px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0.3) 0%,
-                rgba(255, 255, 255, 0) 60%
-            );
-            transform: rotate(30deg);
-            transition: all 0.3s ease;
-        }
-
-        button:hover::after {
-            animation: shine 1.5s infinite;
-        }
-
-        .form-group p {
-            margin-top: clamp(10px, 3vw, 15px);
-            color: #666;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-            text-align: center;
-        }
-
-        .form-group a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .form-group a:hover {
-            color: var(--secondary);
-            text-decoration: underline;
-        }
-
-        footer {
-            position: absolute;
-            bottom: clamp(10px, 3vw, 20px);
-            font-size: clamp(0.7rem, 3vw, 0.8rem);
-            color: #777;
-            z-index: 10;
-            width: 100%;
-            text-align: center;
-        }
-
-        .password-container {
-            position: relative;
-        }
-
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #999;
-            transition: all 0.3s ease;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-        }
-
-        .toggle-password:hover {
-            color: var(--primary);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .container {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        .wave {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%234361ee" opacity=".1"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="%234361ee" opacity=".1"/></svg>');
-            background-size: cover;
-            background-repeat: no-repeat;
-            z-index: -1;
-        }
-
-        /* Styles pour les messages d'erreur */
-        .error-message {
-            color: var(--danger);
-            font-size: clamp(0.65rem, 3vw, 0.75rem);
-            margin-top: 5px;
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .error-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--danger);
-            display: none;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-        }
-
-        .success-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--success);
-            display: none;
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-        }
-
-        /* Styles pour les indicateurs de force du mot de passe */
-        .password-strength {
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-
-        .password-strength-bar {
-            height: 100%;
-            width: 0;
-            background: var(--danger);
-            transition: all 0.3s ease;
-        }
-
-        .password-strength-text {
-            font-size: clamp(0.6rem, 3vw, 0.7rem);
-            margin-top: 3px;
-            text-align: right;
-            color: #666;
-        }
-
-        /* Styles pour les champs invalides */
-        input.invalid {
-            border-color: var(--danger) !important;
-            animation: shake 0.5s;
-        }
-
-        input.valid {
-            border-color: var(--success) !important;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-
-        /* Tooltip pour les exigences de mot de passe */
-        .password-requirements {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-top: 10px;
-            text-align: left;
-            display: none;
-        }
-
-        .password-requirements h4 {
-            margin-bottom: 8px;
-            font-size: clamp(0.75rem, 3vw, 0.85rem);
-            color: var(--dark);
-        }
-
-        .password-requirements ul {
-            list-style: none;
-            padding-left: 5px;
-        }
-
-        .password-requirements li {
-            font-size: clamp(0.65rem, 3vw, 0.75rem);
-            margin-bottom: 5px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .password-requirements li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #ccc;
-        }
-
-        .password-requirements li.valid {
-            color: var(--success);
-        }
-
-        .password-requirements li.valid::before {
-            content: "✓";
-            color: var(--success);
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                width: 95%;
-                padding: 20px 15px;
-            }
-            
-            header {
-                top: 15px;
-                left: 15px;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
-            
-            .logo h1::after {
-                width: 30px;
-            }
-        }
-        
-        @media (max-width: 350px) {
-            .container {
-                padding: 15px 10px;
-            }
-            
-            input[type="text"], 
-            input[type="email"], 
-            input[type="password"], 
-            select {
-                padding: 10px 12px;
-            }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
-    
-    <header>
-        <div class="logo">
-            <h1>Medisync</h1>
+{% load static %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Inscription</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" id="signupForm">
+                        {% csrf_token %}
+                        
+                        <!-- Choix du rôle -->
+                        <div class="form-group">
+                            <label for="id_role">Je m'inscris en tant que :</label>
+                            <select class="form-control" name="role" id="id_role" required>
+                                <option value="">Sélectionnez un rôle</option>
+                                {% for value, label in form.role.field.choices %}
+                                    {% if value %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Champs communs à tous les rôles -->
+                        <div class="form-group">
+                            <label for="id_email">Email</label>
+                            <input type="email" class="form-control" name="email" id="id_email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_username">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" name="username" id="id_username" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_password1">Mot de passe</label>
+                            <input type="password" class="form-control" name="password1" id="id_password1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_password2">Confirmer le mot de passe</label>
+                            <input type="password" class="form-control" name="password2" id="id_password2" required>
+                        </div>
+
+                        <!-- Champs spécifiques aux médecins -->
+                        <div id="doctorFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="id_nom">Nom</label>
+                                <input type="text" class="form-control" name="nom" id="id_nom">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_prenom">Prénom</label>
+                                <input type="text" class="form-control" name="prenom" id="id_prenom">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_specialty">Spécialité</label>
+                                <select class="form-control" name="specialty" id="id_specialty">
+                                    {% for specialty in specialties %}
+                                        <option value="{{ specialty.id }}">{{ specialty.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_experience">Années d'expérience</label>
+                                <input type="number" class="form-control" name="experience" id="id_experience">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_prix">Prix de consultation (DA)</label>
+                                <input type="number" step="0.01" class="form-control" name="prix" id="id_prix" value="3000.00">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_institution">Institution</label>
+                                <input type="text" class="form-control" name="institution" id="id_institution">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_location">Localisation</label>
+                                <select class="form-control" name="location" id="id_location">
+                                    {% for wilaya in wilaya_choices %}
+                                        <option value="{{ wilaya.0 }}">{{ wilaya.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_default_duration">Durée par défaut des RDV (minutes)</label>
+                                <input type="number" class="form-control" name="default_duration" id="id_default_duration" value="30">
+                            </div>
+
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" name="accept_online_appointments" id="id_accept_online_appointments">
+                                <label class="form-check-label" for="id_accept_online_appointments">Accepte les rendez-vous en ligne</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_profile_picture">Photo de profil</label>
+                                <input type="file" class="form-control-file" name="profile_picture" id="id_profile_picture">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_minimum_delay">Délai minimum pour RDV (jours)</label>
+                                <input type="number" class="form-control" name="minimum_delay" id="id_minimum_delay" value="1">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_maximum_delay">Délai maximum pour RDV (jours)</label>
+                                <input type="number" class="form-control" name="maximum_delay" id="id_maximum_delay" value="90">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_compte_RIP">Compte RIP (optionnel)</label>
+                                <input type="text" class="form-control" name="compte_RIP" id="id_compte_RIP">
+                            </div>
+                        </div>
+
+                        <!-- Champs spécifiques aux patients -->
+                        <div id="patientFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="id_nom">Nom</label>
+                                <input type="text" class="form-control" name="nom" id="id_nom_patient">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_prenom">Prénom</label>
+                                <input type="text" class="form-control" name="prenom" id="id_prenom_patient">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_sex">Sexe</label>
+                                <select class="form-control" name="sex" id="id_sex">
+                                    <option value="M">Masculin</option>
+                                    <option value="F">Féminin</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_blood_group">Groupe sanguin (optionnel)</label>
+                                <select class="form-control" name="blood_group" id="id_blood_group">
+                                    <option value="">Non spécifié</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_allergies">Allergies (optionnel)</label>
+                                <textarea class="form-control" name="allergies" id="id_allergies" rows="3"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_date_of_birth">Date de naissance (optionnel)</label>
+                                <input type="date" class="form-control" name="date_of_birth" id="id_date_of_birth">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_phone">Téléphone (optionnel)</label>
+                                <input type="text" class="form-control" name="phone" id="id_phone">
+                            </div>
+                        </div>
+
+                        <!-- Champs spécifiques aux pharmaciens -->
+                        <div id="pharmacistFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="id_pharmacy_name">Nom de la pharmacie</label>
+                                <input type="text" class="form-control" name="pharmacy_name" id="id_pharmacy_name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_pharmacy_address">Adresse de la pharmacie (optionnel)</label>
+                                <input type="text" class="form-control" name="pharmacy_address" id="id_pharmacy_address">
+                            </div>
+                        </div>
+
+                        <!-- Champs spécifiques aux cliniques -->
+                        <div id="clinicFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="id_name">Nom de la clinique</label>
+                                <input type="text" class="form-control" name="name" id="id_name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_phone">Téléphone</label>
+                                <input type="text" class="form-control" name="phone" id="id_phone_clinic">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_adresse">Adresse</label>
+                                <input type="text" class="form-control" name="adresse" id="id_adresse">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_location">Localisation</label>
+                                <select class="form-control" name="location" id="id_location_clinic">
+                                    {% for wilaya in wilaya_choices %}
+                                        <option value="{{ wilaya.0 }}">{{ wilaya.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_email">Email (optionnel)</label>
+                                <input type="email" class="form-control" name="email" id="id_email_clinic">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_description">Description</label>
+                                <textarea class="form-control" name="description" id="id_description" rows="5" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_photos">Photo de la clinique (optionnel)</label>
+                                <input type="file" class="form-control-file" name="photos" id="id_photos">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mt-4">S'inscrire</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p>Déjà inscrit ? <a href="{% url 'accounts:login' %}">Connectez-vous</a></p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </header>
-
-    <div class="container">
-        <h2>Inscription Sécurisée</h2>
-        <form id="registerForm" method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="username">Nom d'utilisateur</label>
-                <input type="text" name="username" id="username" required placeholder="Entre 3 et 20 caractères">
-                <i class="fas fa-exclamation-circle error-icon" id="username-error-icon"></i>
-                <i class="fas fa-check-circle success-icon" id="username-success-icon"></i>
-                <div class="error-message" id="username-error">Le nom d'utilisateur doit contenir entre 3 et 20 caractères</div>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" required placeholder="exemple@medisync.com">
-                <i class="fas fa-exclamation-circle error-icon" id="email-error-icon"></i>
-                <i class="fas fa-check-circle success-icon" id="email-success-icon"></i>
-                <div class="error-message" id="email-error">Veuillez entrer une adresse email valide</div>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <div class="password-container">
-                    <input type="password" name="password" id="password" required placeholder="Minimum 8 caractères">
-                    <i class="toggle-password fas fa-eye-slash" id="togglePassword"></i>
-                    <i class="fas fa-exclamation-circle error-icon" id="password-error-icon"></i>
-                    <i class="fas fa-check-circle success-icon" id="password-success-icon"></i>
-                </div>
-                <div class="error-message" id="password-error">Le mot de passe doit contenir au moins 8 caractères</div>
-                
-                <div class="password-strength">
-                    <div class="password-strength-bar" id="password-strength-bar"></div>
-                </div>
-                <div class="password-strength-text" id="password-strength-text">Faible</div>
-                
-                <div class="password-requirements" id="password-requirements">
-                    <h4>Exigences de sécurité:</h4>
-                    <ul>
-                        <li id="req-length">Minimum 8 caractères</li>
-                        <li id="req-uppercase">Au moins une majuscule</li>
-                        <li id="req-number">Au moins un chiffre</li>
-                        <li id="req-special">Au moins un caractère spécial</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="confirm-password">Confirmer le mot de passe</label>
-                <input type="password" name="confirm-password" id="confirm-password" required placeholder="Retapez votre mot de passe">
-                <i class="fas fa-exclamation-circle error-icon" id="confirm-error-icon"></i>
-                <i class="fas fa-check-circle success-icon" id="confirm-success-icon"></i>
-                <div class="error-message" id="confirm-error">Les mots de passe ne correspondent pas</div>
-            </div>
-
-            <div class="form-group">
-                <label for="role">Rôle</label>
-                <select name="role" id="role" required>
-                    <option value="" disabled selected>Sélectionnez votre rôle</option>
-                    <option value="MEDECIN">Médecin</option>
-                    <option value="PATIENT">Patient</option>
-                    <option value="PHARMACIEN">Pharmacien</option>
-                    <option value="ADMIN">Admin</option>
-                </select>
-                <i class="fas fa-exclamation-circle error-icon" id="role-error-icon"></i>
-                <i class="fas fa-check-circle success-icon" id="role-success-icon"></i>
-                <div class="error-message" id="role-error">Veuillez sélectionner un rôle</div>
-            </div>
-
-            <button type="submit" id="submitBtn">
-                <span>S'inscrire</span>
-            </button>
-            
-            <div class="form-group">
-                <p>Déjà un compte ? <a href="{% url 'accounts:login' %}">Se connecter</a></p>
-            </div>
-        </form>
     </div>
+</div>
 
-    <div class="wave"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('id_role');
+    const doctorFields = document.getElementById('doctorFields');
+    const patientFields = document.getElementById('patientFields');
+    const pharmacistFields = document.getElementById('pharmacistFields');
+    const clinicFields = document.getElementById('clinicFields');
 
-    <footer>
-        <p>&copy; 2025 Medisync. Tous droits réservés.</p>
-    </footer>
+    function toggleFields() {
+        const selectedRole = roleSelect.value;
+        
+        // Hide all fields first
+        doctorFields.style.display = 'none';
+        patientFields.style.display = 'none';
+        pharmacistFields.style.display = 'none';
+        clinicFields.style.display = 'none';
+        
+        // Show fields based on selected role
+        if (selectedRole === 'MEDECIN') {
+            doctorFields.style.display = 'block';
+        } else if (selectedRole === 'PATIENT') {
+            patientFields.style.display = 'block';
+        } else if (selectedRole === 'PHARMACIEN') {
+            pharmacistFields.style.display = 'block';
+        } else if (selectedRole === 'CLINIC') {
+            clinicFields.style.display = 'block';
+        }
+    }
 
-    <script>
-        // Création des particules animées
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = Math.min(Math.floor(window.innerWidth / 10), 90);
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                const size = Math.random() * 10 + 5;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                
-                const duration = Math.random() * 20 + 10;
-                const delay = Math.random() * 5;
-                particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
-                
-                particle.style.opacity = Math.random() * 0.4 + 0.1;
-                
-                particlesContainer.appendChild(particle);
-            }
+    // Initial call to set correct fields on page load
+    toggleFields();
+    
+    // Add event listener for role changes
+    roleSelect.addEventListener('change', toggleFields);
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('id_role');
+    const doctorFields = document.getElementById('doctorFields');
+    const patientFields = document.getElementById('patientFields');
+    const pharmacistFields = document.getElementById('pharmacistFields');
+    const clinicFields = document.getElementById('clinicFields');
+    const descriptionField = document.getElementById('id_description');
+
+    function toggleFields() {
+        const selectedRole = roleSelect.value;
+        
+        // Hide all fields first
+        doctorFields.style.display = 'none';
+        patientFields.style.display = 'none';
+        pharmacistFields.style.display = 'none';
+        clinicFields.style.display = 'none';
+        
+        // Remove required from all fields that might be hidden
+        descriptionField.removeAttribute('required');
+        
+        // Show fields based on selected role
+        if (selectedRole === 'MEDECIN') {
+            doctorFields.style.display = 'block';
+        } else if (selectedRole === 'PATIENT') {
+            patientFields.style.display = 'block';
+        } else if (selectedRole === 'PHARMACIEN') {
+            pharmacistFields.style.display = 'block';
+        } else if (selectedRole === 'CLINIC') {
+            clinicFields.style.display = 'block';
+            descriptionField.setAttribute('required', 'required');
         }
-        
-        // Toggle password visibility
-        const togglePassword = document.getElementById('togglePassword');
-        const password = document.getElementById('password');
-        
-        togglePassword.addEventListener('click', function() {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
-        
-        // Validation en temps réel
-        document.addEventListener('DOMContentLoaded', function() {
-            createParticles();
-            
-            const form = document.getElementById('registerForm');
-            const username = document.getElementById('username');
-            const email = document.getElementById('email');
-            const password = document.getElementById('password');
-            const confirmPassword = document.getElementById('confirm-password');
-            const role = document.getElementById('role');
-            
-            // Afficher les exigences de mot de passe au focus
-            password.addEventListener('focus', function() {
-                document.getElementById('password-requirements').style.display = 'block';
-            });
-            
-            password.addEventListener('blur', function() {
-                if (!this.value) {
-                    document.getElementById('password-requirements').style.display = 'none';
-                }
-            });
-            
-            // Validation du nom d'utilisateur
-            username.addEventListener('input', function() {
-                const value = this.value.trim();
-                const errorElement = document.getElementById('username-error');
-                const errorIcon = document.getElementById('username-error-icon');
-                const successIcon = document.getElementById('username-success-icon');
-                
-                if (value.length < 3 || value.length > 20) {
-                    showError(this, errorElement, errorIcon, successIcon, 
-                             'Le nom d\'utilisateur doit contenir entre 3 et 20 caractères');
-                } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
-                    showError(this, errorElement, errorIcon, successIcon, 
-                             'Seuls les lettres, chiffres et underscores sont autorisés');
-                } else {
-                    showSuccess(this, errorElement, errorIcon, successIcon);
-                }
-            });
-            
-            // Validation de l'email
-            email.addEventListener('input', function() {
-                const value = this.value.trim();
-                const errorElement = document.getElementById('email-error');
-                const errorIcon = document.getElementById('email-error-icon');
-                const successIcon = document.getElementById('email-success-icon');
-                
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                    showError(this, errorElement, errorIcon, successIcon, 
-                             'Veuillez entrer une adresse email valide');
-                } else {
-                    showSuccess(this, errorElement, errorIcon, successIcon);
-                }
-            });
-            
-            // Validation du mot de passe
-            password.addEventListener('input', function() {
-                const value = this.value;
-                const errorElement = document.getElementById('password-error');
-                const errorIcon = document.getElementById('password-error-icon');
-                const successIcon = document.getElementById('password-success-icon');
-                
-                // Vérifier la force du mot de passe
-                checkPasswordStrength(value);
-                
-                // Vérifier les exigences
-                checkPasswordRequirements(value);
-                
-                if (value.length < 8) {
-                    showError(this, errorElement, errorIcon, successIcon, 
-                             'Le mot de passe doit contenir au moins 8 caractères');
-                } else {
-                    showSuccess(this, errorElement, errorIcon, successIcon);
-                    
-                    // Vérifier aussi la confirmation si déjà remplie
-                    if (confirmPassword.value) {
-                        confirmPassword.dispatchEvent(new Event('input'));
-                    }
-                }
-            });
-            
-            // Validation de la confirmation du mot de passe
-            confirmPassword.addEventListener('input', function() {
-                const value = this.value;
-                const errorElement = document.getElementById('confirm-error');
-                const errorIcon = document.getElementById('confirm-error-icon');
-                const successIcon = document.getElementById('confirm-success-icon');
-                
-                if (value !== password.value) {
-                    showError(this, errorElement, errorIcon, successIcon, 
-                             'Les mots de passe ne correspondent pas');
-                } else {
-                    showSuccess(this, errorElement, errorIcon, successIcon);
-                }
-            });
-            
-            // Validation du rôle
-            role.addEventListener('change', function() {
-                const value = this.value;
-                const errorElement = document.getElementById('role-error');
-                const errorIcon = document.getElementById('role-error-icon');
-                const successIcon = document.getElementById('role-success-icon');
-                
-                if (!value) {
-                    showError(this, errorElement, errorIcon, successIcon, 
-                             'Veuillez sélectionner un rôle');
-                } else {
-                    showSuccess(this, errorElement, errorIcon, successIcon);
-                }
-            });
-            
-            // Validation du formulaire avant soumission
-            form.addEventListener('submit', function(e) {
-                let isValid = true;
-                
-                // Forcer la validation de tous les champs
-                username.dispatchEvent(new Event('input'));
-                email.dispatchEvent(new Event('input'));
-                password.dispatchEvent(new Event('input'));
-                confirmPassword.dispatchEvent(new Event('input'));
-                role.dispatchEvent(new Event('change'));
-                
-                // Vérifier s'il y a des erreurs
-                document.querySelectorAll('.error-message').forEach(el => {
-                    if (el.style.display === 'block') {
-                        isValid = false;
-                    }
-                });
-                
-                if (!isValid) {
-                    e.preventDefault();
-                    // Animation pour montrer qu'il y a des erreurs
-                    document.querySelectorAll('input.invalid').forEach(input => {
-                        input.style.animation = 'shake 0.5s';
-                        setTimeout(() => {
-                            input.style.animation = '';
-                        }, 500);
-                    });
-                    
-                    // Faire défiler jusqu'à la première erreur
-                    const firstError = document.querySelector('.error-message[style="display: block;"]');
-                    if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }
-            });
-            
-            // Ajustement pour très petits écrans
-            function adjustLayout() {
-                const container = document.querySelector('.container');
-                const windowWidth = window.innerWidth;
-                
-                if (windowWidth < 350) {
-                    const scale = Math.min(1, windowWidth / 350);
-                    container.style.transform = `scale(${scale})`;
-                    container.style.transformOrigin = 'top center';
-                } else {
-                    container.style.transform = 'none';
-                }
-            }
-            
-            window.addEventListener('resize', adjustLayout);
-            adjustLayout();
-        });
-        
-        // Fonction pour afficher une erreur
-        function showError(input, errorElement, errorIcon, successIcon, message) {
-            input.classList.add('invalid');
-            input.classList.remove('valid');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            errorIcon.style.display = 'block';
-            successIcon.style.display = 'none';
-        }
-        
-        // Fonction pour afficher un succès
-        function showSuccess(input, errorElement, errorIcon, successIcon) {
-            input.classList.remove('invalid');
-            input.classList.add('valid');
-            errorElement.style.display = 'none';
-            errorIcon.style.display = 'none';
-            successIcon.style.display = 'block';
-        }
-        
-        // Fonction pour vérifier la force du mot de passe
-        function checkPasswordStrength(password) {
-            let strength = 0;
-            const strengthBar = document.getElementById('password-strength-bar');
-            const strengthText = document.getElementById('password-strength-text');
-            
-            // Longueur minimale
-            if (password.length >= 8) strength += 1;
-            if (password.length >= 12) strength += 1;
-            
-            // Contient des majuscules
-            if (/[A-Z]/.test(password)) strength += 1;
-            
-            // Contient des chiffres
-            if (/[0-9]/.test(password)) strength += 1;
-            
-            // Contient des caractères spéciaux
-            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
-            
-            // Mettre à jour la barre de force
-            const width = strength * 20;
-            strengthBar.style.width = `${width}%`;
-            
-            // Changer la couleur et le texte selon la force
-            if (strength <= 1) {
-                strengthBar.style.backgroundColor = 'var(--danger)';
-                strengthText.textContent = 'Faible';
-                strengthText.style.color = 'var(--danger)';
-            } else if (strength <= 3) {
-                strengthBar.style.backgroundColor = 'var(--warning)';
-                strengthText.textContent = 'Moyen';
-                strengthText.style.color = 'var(--warning)';
-            } else {
-                strengthBar.style.backgroundColor = 'var(--success)';
-                strengthText.textContent = 'Fort';
-                strengthText.style.color = 'var(--success)';
-            }
-        }
-        
-        // Fonction pour vérifier les exigences du mot de passe
-        function checkPasswordRequirements(password) {
-            const reqLength = document.getElementById('req-length');
-            const reqUppercase = document.getElementById('req-uppercase');
-            const reqNumber = document.getElementById('req-number');
-            const reqSpecial = document.getElementById('req-special');
-            
-            // Longueur
-            if (password.length >= 8) {
-                reqLength.classList.add('valid');
-            } else {
-                reqLength.classList.remove('valid');
-            }
-            
-            // Majuscule
-            if (/[A-Z]/.test(password)) {
-                reqUppercase.classList.add('valid');
-            } else {
-                reqUppercase.classList.remove('valid');
-            }
-            
-            // Chiffre
-            if (/[0-9]/.test(password)) {
-                reqNumber.classList.add('valid');
-            } else {
-                reqNumber.classList.remove('valid');
-            }
-            
-            // Caractère spécial
-            if (/[^A-Za-z0-9]/.test(password)) {
-                reqSpecial.classList.add('valid');
-            } else {
-                reqSpecial.classList.remove('valid');
-            }
-        }
-    </script>
+    }
+
+    // Initial call to set correct fields on page load
+    toggleFields();
+    
+    // Add event listener for role changes
+    roleSelect.addEventListener('change', toggleFields);
+});
+</script>
+
 </body>
 </html>

@@ -1,0 +1,334 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+
+{% block title %}
+  {% if object %}
+    {{ object.name }}
+  {% else %}
+    Créer une Clinique
+  {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2980b9;
+        --accent-color: #e74c3c;
+        --light-color: #f8f9fa;
+        --dark-color: #343a40;
+        --success-color: #2ecc71;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    h2 {
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    h4 {
+        color: var(--secondary-color);
+        margin: 1.5rem 0 1rem;
+    }
+
+    form {
+        margin-top: 1.5rem;
+    }
+
+    .mb-3 {
+        margin-bottom: 1.5rem !important;
+    }
+
+    label {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="tel"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="url"]:focus,
+    input[type="tel"]:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .border.p-3.mb-3 {
+        background-color: var(--light-color);
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+
+    .border.p-3.mb-3:hover {
+        box-shadow: var(--box-shadow);
+    }
+
+    .form-check-label {
+        font-weight: normal;
+        color: var(--dark-color);
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+    }
+
+    .btn-success:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    .errorlist {
+        color: var(--accent-color);
+        margin-top: 0.5rem;
+        padding-left: 1rem;
+        list-style-type: none;
+    }
+
+    hr {
+        margin: 2rem 0;
+        border: 0;
+        height: 1px;
+        background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    }
+
+    img {
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    /* Style pour les champs de formulaire en erreur */
+    .error input,
+    .error textarea,
+    .error select {
+        border-color: var(--accent-color);
+    }
+
+    /* Style pour le formulaire des médecins */
+    .doctor-form {
+        position: relative;
+    }
+
+    .delete-checkbox {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+    }
+
+    /* Animation pour les boutons */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .btn:active {
+        animation: pulse 0.3s;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>
+      {% if object %}
+        {{ object.name }}
+      {% else %}
+        Créer une Clinique
+      {% endif %}
+    </h2>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.non_field_errors }}
+        </div>
+
+        <!-- Champs User -->
+        <div class="mb-3">
+            {{ form.email.label_tag }}<br>
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.username.label_tag }}<br>
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.password.label_tag }}<br>
+            {{ form.password }}
+            {{ form.password.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.confirm_password.label_tag }}<br>
+            {{ form.confirm_password }}
+            {{ form.confirm_password.errors }}
+        </div>
+
+        <!-- Champs Clinic -->
+        <div class="mb-3">
+            {{ form.name.label_tag }}<br>
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.phone.label_tag }}<br>
+            {{ form.phone }}
+            {{ form.phone.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.adresse.label_tag }}<br>
+            {{ form.adresse }}
+            {{ form.adresse.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.location.label_tag }}<br>
+            {{ form.location }}
+            {{ form.location.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.site_web.label_tag }}<br>
+            {{ form.site_web }}
+            {{ form.site_web.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.description.label_tag }}<br>
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.allow_reviews.label_tag }}<br>
+            {{ form.allow_reviews }}
+            {{ form.allow_reviews.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.appointment_policy.label_tag }}<br>
+            {{ form.appointment_policy }}
+            {{ form.appointment_policy.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.horaires.label_tag }}<br>
+            {{ form.horaires }}
+            {{ form.horaires.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.photos.label_tag }}<br>
+            {{ form.photos }}
+            {% if object and object.photos %}
+                <br>
+                <img src="{{ object.photos.url }}" alt="Photo clinique" style="max-width: 200px; margin-top:10px;">
+            {% endif %}
+            {{ form.photos.errors }}
+        </div>
+
+        <hr>
+
+        <h4>Médecins associés</h4>
+        {{ doctor_formset.management_form }}
+        {% for form in doctor_formset.forms %}
+            <div class="border p-3 mb-3 doctor-form">
+                {% for field in form.visible_fields %}
+                    <div class="mb-2">
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+                {% if doctor_formset.can_delete %}
+                    <div class="delete-checkbox form-check">
+                        {{ form.DELETE }} <label class="form-check-label">Supprimer</label>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i>
+            {% if object %}
+                Mettre à jour
+            {% else %}
+                Créer
+            {% endif %}
+        </button>
+        <a href="{% url 'administrators:clinic-list' %}" class="btn btn-secondary ms-2">Annuler</a>
+    </form>
+</div>
+{% endblock %}

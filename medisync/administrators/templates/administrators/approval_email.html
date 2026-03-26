@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Votre compte médecin a été approuvé</title>
+</head>
+<body>
+    <p>Bonjour Dr. {{ doctor.nom }},</p>
+    
+    <p>Nous avons le plaisir de vous informer que votre demande de compte médecin sur notre plateforme a été approuvée.</p>
+    
+    <p>Vous pouvez dès à présent vous connecter à votre compte en utilisant vos identifiants :</p>
+    
+    <p>
+        <strong>Email:</strong> {{ doctor.user.email }}<br>
+    </p>
+    
+    <p>
+        <a href="{{ protocol }}://{{ domain }}{% url 'login' %}" 
+           style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+            Se connecter
+        </a>
+    </p>
+    
+    <p>Cordialement,<br>
+    L'équipe de gestion</p>
+</body>
+</html>

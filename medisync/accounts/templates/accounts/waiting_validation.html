@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation en cours - Medisync</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --success-light: #6fd7f5;
+      --info: #4cc9f0;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    .validation-card {
+      background: white;
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .validation-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    h2::after {
+      content: "";
+      display: block;
+      width: 50px;
+      height: 3px;
+      background: var(--success);
+      margin: 15px auto 0;
+      border-radius: 2px;
+    }
+
+    .lead {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      color: var(--gray);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.75rem;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid var(--primary);
+      background-color: transparent;
+      color: var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn i {
+      margin-right: 0.5rem;
+    }
+
+    .status-icon {
+      font-size: 4rem;
+      color: var(--info);
+      margin-bottom: 1.5rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .validation-card {
+        padding: 2rem 1.5rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .lead {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="validation-card">
+      <div class="status-icon">
+        <i class="fas fa-hourglass-half"></i>
+      </div>
+      <h2>Merci pour votre inscription !</h2>
+      <p class="lead">
+        Votre compte a bien été créé et est actuellement en attente de validation par notre équipe.
+      </p>
+      <p>
+        <i class="fas fa-envelope"></i> Vous recevrez une notification par email dès que votre compte sera approuvé.
+      </p>
+      <p>
+        <i class="fas fa-clock"></i> Temps de traitement estimé : 24-48 heures
+      </p>
+      <a href="/" class="btn">
+        <i class="fas fa-home"></i> Retour à l'accueil
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Animation pour le bouton
+    document.querySelector('.btn').addEventListener('mouseenter', function() {
+      this.innerHTML = '<i class="fas fa-home"></i> Retour à l\'accueil <i class="fas fa-chevron-right"></i>';
+    });
+    
+    document.querySelector('.btn').addEventListener('mouseleave', function() {
+      this.innerHTML = '<i class="fas fa-home"></i> Retour à l\'accueil';
+    });
+
+    // Compteur informatif (optionnel)
+    let counter = 0;
+    const messages = [
+      "Vérification en cours...",
+      "Analyse de votre profil...",
+      "Presque terminé..."
+    ];
+    
+    setInterval(() => {
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+      console.log(randomMessage); // Pour debug, peut être affiché dans l'UI si besoin
+    }, 5000);
+  </script>
+</body>
+</html>

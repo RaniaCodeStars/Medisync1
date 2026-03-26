@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Paramètres</title>
+    <!-- <link rel="stylesheet" href="{% static 'css/patient_appointments.css' %}"> -->
+    <!-- Bootstrap CSS (ici Bootstrap 5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        outline: 0;
+        appearance: none;
+        border: 0;
+        text-decoration: none;
+        list-style: none;
+        box-sizing: border-box;
+    }
+
+    html {
+        font-size: 14px;
+    }
+
+    body {
+        width: 100vw;
+        height: 100vh;
+        font-family: poppins, sans-serif;
+        font-size: 0.88rem;
+        background: #f6f6f9;
+        user-select: none;
+        display: flex;
+        width: 96%;
+        margin: 0 auto;
+        gap: 1.8rem;
+        grid-template-columns: 14rem auto 23rem;
+        margin-left: 5px;
+    }
+
+
+    a {
+        color: white;
+    }
+
+    h1 {
+        font-weight: 800;
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    h3 {
+        font-size: 0.87rem;
+    }
+
+    h4 {
+        font-size: 0.8rem;
+    }
+
+    h5 {
+        font-size: 0.77rem;
+    }
+
+    /*** Sidebar ***/
+
+    aside {
+        margin-top: 28.5px;
+        margin-bottom: 20px;
+        height: 100vh;
+        position: fixed;
+        width: 200px;
+        padding-left: 0;
+    }
+
+    aside .sidebar {
+        background: rgb(146, 188, 242);
+        display: flex;
+        flex-direction: column;
+        height: 86vh;
+        position: relative;
+        top: 3rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    aside h3 {
+        font-weight: 500;
+        font-size: 13.3px;
+        margin-top: 8px;
+    }
+
+    aside .sidebar a {
+        display: flex;
+        color: whitesmoke;
+        margin-left: 2rem;
+        gap: 1rem;
+        align-items: center;
+        position: relative;
+        height: 3.7rem;
+        transition: all 300ms ease;
+    }
+
+    aside .sidebar a span {
+        font-size: 1.6rem;
+        transition: all 300ms ease;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+    }
+
+    aside .sidebar a.active {
+        background: rgb(131, 179, 241);
+        color: #1976d2;
+        /*mod*/
+        margin-left: 0;
+    }
+
+    aside .sidebar a.active:before {
+        content: '';
+        width: 6px;
+        height: 100%;
+        background: #1976d2;
+        /*mod*/
+    }
+
+    aside .sidebar a.active span {
+        color: #1976d2;
+        ;
+        /*mod*/
+        margin-left: calc(1rem - 3px);
+    }
+
+    aside .sidebar a:hover {
+        color: #1976d2;
+    }
+
+    aside .sidebar a:hover span {
+        margin-left: 1rem;
+    }
+
+    aside .sidebar .message-count {
+        background: rgb(253, 66, 66);
+        color: whitesmoke;
+        padding: 2px 10px;
+        font-size: 11px;
+        border-radius: 0.4rem;
+    }
+
+    .navbar {
+        background-color: white;
+        padding: 7px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        margin-top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    nav .top {
+        background: white;
+        display: flex;
+        align-items: center;
+    }
+
+    nav .logo {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .logo-text {
+        color: white;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        font-size: 30px;
+        margin-top: 2px;
+        margin-bottom: 0px;
+        font-weight: 600;
+    }
+
+    /* .navbar-links a {
+        /* color: rgb(79, 141, 208);
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 14px;
+        text-shadow: 2px 2px 5px rgba(99, 96, 96, 0.5) 
+    }
+
+    .navbar-links a:hover {
+        /* background-color: rgb(160, 197, 237);
+        color: white;
+        border-radius: 10px;
+        height: 50px;
+        width: 300px;
+        text-shadow: 2px 2px 5px rgba(99, 96, 96, 0.5);
+        padding: 7px 15px;
+        font-size: 15px;
+        transition: 0.3s ease;
+        margin-left: 20px; 
+    } */
+
+    .navbar-profile {
+        display: flex;
+        align-items: center;
+        /* Aligner verticalement le texte et l'image */
+        gap: 10px;
+        /* Espace entre le texte et l'image */
+    }
+
+    .profile-name {
+        font-size: 14px;
+        color: #363949;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    aside .sidebar a {
+        text-decoration: none;
+        /* Enlève le soulignement des liens */
+    }
+
+    .main {
+        margin-left: 215px;
+        /* Largeur de la sidebar (200px) + espace supplémentaire (20px) */
+        margin-top: 40px;
+        /* Hauteur de la navbar */
+        width: 1700px;
+        font-size: 13px;
+    }
+
+    .mb-4 {
+        color: #1976d2;
+        /*mod*/
+        font-weight: 600;
+        text-shadow: 2px 2px 5px rgba(165, 162, 162, 0.5);
+    }
+
+    .btn-outline-primary {
+        margin-right: 250px;
+        height: 35px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #1976d2;
+    }
+
+
+    .navbar-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 4px 15px 4px 10px;
+        border-radius: 30px;
+        background: linear-gradient(135deg, rgba(25, 118, 210, 0.1), rgba(25, 118, 210, 0.05));
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* cursor: pointer; */
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(25, 118, 210, 0.1);
+    }
+
+    /* .navbar-profile::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(25, 118, 210, 0.2), rgba(25, 118, 210, 0.1));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .navbar-profile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(25, 118, 210, 0.15);
+    } */
+
+    /* .navbar-profile:hover::before {
+        opacity: 1;
+    } */
+
+    .profile-name {
+        font-size: 14px;
+        color: #2c3e50;
+        font-weight: 600;
+        margin: 0;
+        position: relative;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-name::after {
+        content: "Médecin";
+        font-size: 11px;
+        color: #1976d2;
+        font-weight: 500;
+        opacity: 0.8;
+        margin-top: -2px;
+    }
+
+    .profile-picture {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        background: #eff6ff;
+        padding: 2px;
+    }
+
+    .navbar-profile .profile-picture {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+        border-color: #1976d2;
+    }
+
+    /* Badge de statut */
+    .profile-status {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 12px;
+        height: 12px;
+        background: #10b981;
+        border-radius: 50%;
+        border: 2px solid white;
+        z-index: 2;
+    }
+
+    /* Effet au clic
+    .navbar-profile:active {
+        transform: scale(0.98);
+        background: linear-gradient(135deg, rgba(25, 118, 210, 0.15), rgba(25, 118, 210, 0.1));
+    } */
+
+    /* Style pour la navbar-links */
+    .navbar-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-left: auto;
+        /* Pousse tout le contenu à droite */
+    }
+
+    /* Style pour la cloche de notification */
+    .notification-bell {
+        position: relative;
+        margin-right: 20px;
+        /* Espace avant le profil */
+        color: #1976d2;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 28px;
+        /* Taille augmentée */
+        display: flex;
+        align-items: center;
+        height: 40px;
+        /* Alignement parfait avec le profil */
+    }
+
+    .notification-bell:hover {
+        color: #0d47a1;
+        transform: scale(1.1) rotate(10deg);
+        /* Animation plus dynamique */
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 1px;
+        /* Position ajustée pour la taille agrandie */
+        right: -2px;
+        width: 17px;
+        /* Taille légèrement augmentée */
+        height: 17px;
+        background-color: #ff4757;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: bold;
+        /* border: 2px solid white; */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        /* Ombre pour le relief */
+    }
+
+    /* Ajustement pour le profil */
+    .navbar-profile {
+        margin-left: 0;
+        /* Supprime tout décalage */
+    }
+</style>
+<style>
+    /* Style pour la scrollbar - Version élégante et moderne */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Track (fond de la scrollbar) */
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    /* Handle (barre de défilement) */
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    /* Handle au survol */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Pour les liens de la page Paramètres */
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card a {
+        color: #363949;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+        padding-left: 10px;
+    }
+
+    .card a:hover {
+        color: #1976d2;
+        border-left: 3px solid #1976d2;
+        background: rgba(25, 118, 210, 0.05);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+</style>
+
+<body>
+    <nav class="navbar">
+        <div class="top">
+            <div class="logo">
+                <h2 class="logo-text">Medisync</h2>
+            </div>
+        </div>
+        <div class="navbar-links">
+            <div class="notification-bell">
+                <i class="material-icons">notifications</i>
+                {% if unread_notification_count > 0 %}
+                    <span class="notification-badge">{{ unread_notification_count }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="navbar-profile">
+            {% if profile_picture %}
+            <img src="{{ profile_picture }}" alt="Photo de profil" class="profile-picture">
+            {% else %}
+            <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de profil" class="profile-picture">
+            {% endif %}
+            <span class="profile-name">{{ doctor_name }}</span>
+        </div>
+    </nav>
+    <aside>
+        <div class="sidebar">
+            <a href="#">
+                <span class="material-icons">dashboard</span>
+                <h3>Tableau de bord</h3>
+            </a>
+            <a href="{% url 'appointments:medcin_urgent_appointments' %}">
+                <span class="material-icons">warning</span>
+                <h3>Les Urgences</h3>
+            </a>
+            <a href="{% url 'appointments:medcin_appointments' %}">
+                <span class="material-icons">calendar_month</span>
+                <h3>Mes Rendez-vous</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons">groups</span>
+                <h3>Mes Patients</h3>
+            </a>
+            <a href="{% url 'messaging:chat_list' %}">
+                <span class="material-icons">sms</span>
+                <h3>Messages</h3>
+                <!-- <span class="message-count">26</span> -->
+            </a>
+            <a href="{% url 'appointments:medcin_teleconsultations' %}">
+                <span class="material-icons">videocam</span>
+                <h3>Téléconsultation</h3>
+            </a>
+            <a href="{% url 'appointments:manage_availability' %}">
+                <span class="material-icons">timelapse</span>
+                <h3>Disponibilités</h3>
+            </a>
+            <a href="{% url 'appointments:manage_consultation_reasons' %}">
+                <span class="material-icons">monitor_heart</span>
+                <h3>Raisons de Consultation</h3>
+            </a>
+            <a href="{% url 'medecins:medcin_settings' %}" class="active">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons">logout</span>
+                <h3>Déconnexion</h3>
+            </a>
+        </div>
+    </aside>
+    <!-- Ajoutez ce CSS dans votre balise <style> -->
+<style>
+    /* Animation d'apparition progressive */
+    .settings-section {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease-out;
+        margin-bottom: 20px;
+    }
+    
+    .settings-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Délais d'animation différents pour chaque section */
+    #profile-section { transition-delay: 0.1s; }
+    #history-section { transition-delay: 0.2s; }
+    #preferences-section { transition-delay: 0.3s; }
+    #delete-section { transition-delay: 0.4s; }
+    
+    
+    .alert-container {
+        margin: 20px 0;
+    }
+
+    .alert {
+        padding: 15px;
+        background-color: #f8d7da;
+        /* Couleur rouge pâle pour les erreurs */
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        /* Couleur bleue pâle pour les succès */
+        border: 1px solid #bee5eb;
+        border-radius: 5px;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+    /* vous pouvez personnaliser un peu plus : */
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+    }
+
+</style>
+<style>
+    /* Style de base pour les items de menu */
+    .menu-item {
+        padding: 12px 15px;
+        margin: 2px 0;
+        border-left: 3px solid transparent;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: block;
+    }
+
+    .menu-item:hover {
+        background: rgba(25, 118, 210, 0.05);
+        border-left: 3px solid #1976d2;
+    }
+
+    .menu-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .menu-text {
+        color: #363949;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+        margin-left: -10px;
+    }
+
+    .menu-item:hover .menu-text {
+        color: #1976d2;
+    }
+
+    .menu-text i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Style du switch */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e2e8f0;
+        transition: .4s;
+        border-radius: 24px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .slider {
+        background-color: #1976d2;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    /* Animation au hover */
+    .menu-item:hover .slider {
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(25, 118, 210, 0.1);
+    }
+</style>
+
+
+<!-- Modifiez votre HTML dans la partie main -->
+<div class="main">
+    <div class="container mt-5">
+        {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+            <div class="alert 
+              {% if 'error' in message.tags %}alert-danger
+              {% elif 'warning' in message.tags %}alert-warning
+              {% elif 'success' in message.tags %}alert-success
+              {% else %}alert-info{% endif %}
+              alert-dismissible fade show" role="alert">
+                {{ message }}
+                <!-- BOOTSTRAP 4 CLOSE BUTTON -->
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <h1 class="mb-4">Paramètres du compte</h1>
+        
+
+        <!-- Section Profil -->
+        <div class="card border-0 shadow-sm settings-section" id="profile-section">
+            <div class="card-body">
+                <h5 class="card-title text-primary">
+                    <i class="fas fa-id-card me-2"></i> Profil
+                </h5>
+                <hr>
+                <a href="{% url 'medecins:medcin_edit_profile' %}" class="d-block py-2 text-decoration-none">
+                    <i class="fas fa-user-edit me-2"></i> Modifier mes informations
+                </a>
+                <a href="#" class="d-block py-2 text-decoration-none">
+                    <i class="fas fa-lock me-2"></i> Sécurité et mot de passe
+                </a>
+            </div>
+        </div>
+
+        <!-- Section Historique -->
+        <div class="card border-0 shadow-sm settings-section" id="history-section">
+            <div class="card-body">
+                <h5 class="card-title text-primary">
+                    <i class="fas fa-history me-2"></i> Historique
+                </h5>
+                <hr>
+                <a href="{% url 'appointments:medcin_appointment_history' %}" class="d-block py-2 text-decoration-none">
+                    <i class="fas fa-calendar-check me-2"></i> Rendez-vous passés
+                </a>
+                <a href="#" class="d-block py-2 text-decoration-none">
+                    <i class="fas fa-file-alt me-2"></i> Historiques médicales
+                </a>
+                <!-- <a href="#" class="d-block py-2 text-decoration-none">
+                    <i class="fas fa-file-alt me-2"></i> Documents médicaux
+                </a> -->
+            </div>
+        </div>
+
+        <!-- Section Préférences -->
+        <!-- Section Préférences -->
+<!-- Section Préférences -->
+<div class="card border-0 shadow-sm settings-section" id="preferences-section">
+    <div class="card-body">
+        <h5 class="card-title text-primary">
+            <i class="fas fa-sliders-h me-2"></i> Préférences
+        </h5>
+        <hr>
+        <div class="menu-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="menu-text">
+                    <i class="fas fa-bell me-2"></i> Notifications 
+                </span>
+                <label class="switch">
+                    <input type="checkbox" id="notificationToggle" {% if request.user.doctor_profile.notifications %}checked{% endif %}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+        
+        <!-- Section Suppression de compte -->
+        <div class="card border-0 shadow-sm settings-section delete-account-card" id="delete-section">
+            <div class="card-body p-4">
+                <div class="border-start border-3 border-danger ps-3">
+                    <h5 class="text-danger mb-3">
+                        <i class="fas fa-user-slash me-2"></i> Supprimer mon compte
+                    </h5>
+                    <p class="small text-muted mb-3">
+                        Cette action supprimera définitivement votre compte et toutes les données associées.
+                    </p>
+                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                        <i class="far fa-trash-alt me-1"></i> Supprimer mon compte
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ajoutez ce script à la fin de votre body -->
+<script>
+    // Animation d'apparition progressive
+    document.addEventListener('DOMContentLoaded', function() {
+        const sections = document.querySelectorAll('.settings-section');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("notificationToggle");
+        toggle.addEventListener("change", function () {
+            const isChecked = toggle.checked;
+    
+            fetch("{% url 'medecins:toggle_notifications' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "enabled=" + isChecked
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    console.log("Notifications:", data.enabled ? "activées" : "désactivées");
+                } else {
+                    alert("Erreur lors de la mise à jour.");
+                    toggle.checked = !isChecked; // revert en cas d’erreur
+                }
+            })
+            .catch(error => {
+                console.error("Erreur:", error);
+                toggle.checked = !isChecked; // revert en cas d’erreur
+            });
+        });
+    });
+    </script>
+    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

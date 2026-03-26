@@ -1,0 +1,484 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+
+{% block title %}Statistiques des Patients{% endblock %}
+
+{% block content %}
+<div class="stats-container">
+  <!-- En-tête -->
+  <div class="stats-header">
+    <h1><i class="fas fa-chart-line"></i> Statistiques des Patients</h1>
+  </div>
+
+  <!-- Cartes de statistiques -->
+  <div class="stats-cards">
+    <!-- Carte Total -->
+    <div class="stats-card primary">
+      <div class="card-content">
+        <div class="card-title">Total Patients</div>
+        <div class="card-value">{{ activity_stats.total }}</div>
+      </div>
+      <div class="card-icon">
+        <i class="fas fa-users"></i>
+      </div>
+    </div>
+
+    <!-- Carte Actifs -->
+    <div class="stats-card success">
+      <div class="card-content">
+        <div class="card-title">Patients Actifs (30j)</div>
+        <div class="card-value">{{ activity_stats.active }}</div>
+      </div>
+      <div class="card-icon">
+        <i class="fas fa-user-check"></i>
+      </div>
+    </div>
+
+    <!-- Carte Inactifs -->
+    <div class="stats-card warning">
+      <div class="card-content">
+        <div class="card-title">Patients Inactifs</div>
+        <div class="card-value">{{ activity_stats.inactive }}</div>
+      </div>
+      <div class="card-icon">
+        <i class="fas fa-user-clock"></i>
+      </div>
+    </div>
+
+    <!-- Carte Tendance -->
+    <div class="stats-card info">
+      <div class="card-content">
+        <div class="card-title">Tendance d'Activité</div>
+        <div class="card-value">{{ activity_trend.trend }}%</div>
+        <div class="card-trend {% if activity_trend.is_increasing %}up{% else %}down{% endif %}">
+          {% if activity_trend.is_increasing %}<i class="fas fa-arrow-up"></i>{% else %}<i class="fas fa-arrow-down"></i>{% endif %}
+        </div>
+      </div>
+      <div class="card-icon">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques -->
+  <div class="stats-charts">
+    <!-- Graphique Sexe -->
+    <div class="chart-container">
+      <h3><i class="fas fa-venus-mars"></i> Répartition par Sexe</h3>
+      <canvas id="genderChart"></canvas>
+    </div>
+
+    <!-- Graphique Groupe Sanguin -->
+    <div class="chart-container">
+      <h3><i class="fas fa-tint"></i> Répartition par Groupe Sanguin</h3>
+      <canvas id="bloodGroupChart"></canvas>
+    </div>
+
+    <!-- Graphique Tendance -->
+    <div class="chart-container">
+      <h3><i class="fas fa-calendar-alt"></i> Tendance des Créations</h3>
+      <canvas id="creationTrendChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Ajout de Font Awesome pour les icônes -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- Ajout de Chart.js pour des graphiques professionnels -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  /* Base Styles */
+  :root {
+    --primary: #4361ee;
+    --primary-light: #e0e7ff;
+    --success: #2ecc71;
+    --success-light: #e8f8f0;
+    --warning: #f39c12;
+    --warning-light: #fef5e6;
+    --info: #00b4d8;
+    --info-light: #e6f7ff;
+    --danger: #e74c3c;
+    --dark: #2c3e50;
+    --light: #f8f9fa;
+    --white: #ffffff;
+    --gray: #95a5a6;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background-color: #f5f7fa;
+    color: var(--dark);
+    line-height: 1.6;
+  }
+
+  /* Container */
+  .stats-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+
+  /* Header */
+  .stats-header {
+    margin-bottom: 40px;
+    text-align: center;
+    padding: 25px 0;
+    background-color: var(--primary);
+    border-radius: 10px;
+    color: white;
+    box-shadow: var(--shadow);
+  }
+
+  .stats-header h1 {
+    font-size: 32px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  /* Cards */
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+
+  .stats-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border-left: 5px solid;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .stats-card.primary {
+    border-color: var(--primary);
+  }
+
+  .stats-card.success {
+    border-color: var(--success);
+  }
+
+  .stats-card.warning {
+    border-color: var(--warning);
+  }
+
+  .stats-card.info {
+    border-color: var(--info);
+  }
+
+  .card-content {
+    flex: 1;
+  }
+
+  .card-title {
+    font-size: 14px;
+    color: var(--gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 5px;
+  }
+
+  .card-trend {
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card-trend.up {
+    color: var(--success);
+  }
+
+  .card-trend.down {
+    color: var(--danger);
+  }
+
+  .card-icon {
+    font-size: 40px;
+    opacity: 0.2;
+    color: inherit;
+  }
+
+  /* Charts */
+  .stats-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+
+  .chart-container {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+
+  .chart-container:hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .chart-container h3 {
+    color: var(--dark);
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: 300px !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .stats-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-charts {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .stats-header h1 {
+      font-size: 28px;
+    }
+    
+    .stats-cards {
+      gap: 20px;
+    }
+    
+    .card-value {
+      font-size: 24px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .stats-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-header h1 {
+      font-size: 24px;
+    }
+    
+    .chart-container {
+      padding: 20px 15px;
+    }
+  }
+</style>
+
+<script>
+// Configuration des graphiques avec Chart.js
+document.addEventListener('DOMContentLoaded', function() {
+  // Graphique de répartition par sexe
+  if (document.getElementById('genderChart')) {
+    new Chart(document.getElementById('genderChart').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: {{ gender_distribution.labels|safe }},
+        datasets: [{
+          data: {{ gender_distribution.data|safe }},
+          backgroundColor: ['#4361ee', '#2ecc71'],
+          borderWidth: 0,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: {
+                size: 14
+              },
+              padding: 20
+            }
+          },
+          tooltip: {
+            bodyFont: {
+              size: 14
+            },
+            titleFont: {
+              size: 16
+            }
+          }
+        },
+        cutout: '70%'
+      }
+    });
+  }
+
+  // Graphique de répartition par groupe sanguin
+  if (document.getElementById('bloodGroupChart')) {
+    new Chart(document.getElementById('bloodGroupChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: {{ blood_group_distribution.labels|safe }},
+        datasets: [{
+          data: {{ blood_group_distribution.data|safe }},
+          backgroundColor: [
+            '#4361ee', 
+            '#2ecc71', 
+            '#00b4d8', 
+            '#f39c12', 
+            '#e74c3c', 
+            '#9b59b6'
+          ],
+          borderWidth: 0,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            bodyFont: {
+              size: 14
+            },
+            titleFont: {
+              size: 16
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              drawBorder: false
+            },
+            ticks: {
+              font: {
+                size: 12
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 12
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Graphique de tendance des créations
+  if (document.getElementById('creationTrendChart')) {
+    new Chart(document.getElementById('creationTrendChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: {{ creation_trend.labels|safe }},
+        datasets: [{
+          label: 'Nouveaux patients',
+          data: {{ creation_trend.data|safe }},
+          fill: true,
+          backgroundColor: 'rgba(67, 97, 238, 0.1)',
+          borderColor: '#4361ee',
+          borderWidth: 3,
+          tension: 0.4,
+          pointBackgroundColor: '#4361ee',
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            bodyFont: {
+              size: 14
+            },
+            titleFont: {
+              size: 16
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              drawBorder: false
+            },
+            ticks: {
+              font: {
+                size: 12
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                size: 12
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+
+{% endblock %}

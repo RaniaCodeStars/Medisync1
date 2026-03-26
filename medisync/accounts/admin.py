@@ -19,7 +19,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = [ProfileInline]  # ✅ Ajoute le profil à l'admin
 
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password')}),
+        (None, {'fields': ('username', 'email', 'password','profile_picture')}),
         ('Informations personnelles', {'fields': ('phone',)}),
         ('Permissions', {'fields': ('is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Statut', {'fields': ('is_active',)}),

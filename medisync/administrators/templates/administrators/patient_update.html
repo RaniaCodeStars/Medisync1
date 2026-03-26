@@ -1,0 +1,86 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Mise à jour du patient{% endblock %}
+
+{% block content %}
+<div class="admin-section-container p-5">
+  <div class="section-header mb-4">
+    <h2><i class="fas fa-user-edit"></i> Modifier un patient</h2>
+    <p class="section-subtitle">Mettez à jour les informations du patient ci-dessous.</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data" class="row g-4">
+        {% csrf_token %}
+
+        <h5 class="text-primary">Compte utilisateur</h5>
+        <div class="col-md-6">
+          {{ form.username.label_tag }}
+          {{ form.username|add_class:"form-control" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.email.label_tag }}
+          {{ form.email|add_class:"form-control" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.password1.label_tag }}
+          {{ form.password1|add_class:"form-control" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.password2.label_tag }}
+          {{ form.password2|add_class:"form-control" }}
+        </div>
+
+        <hr class="mt-4 mb-3">
+
+        <h5 class="text-primary">Informations personnelles</h5>
+        <div class="col-md-6">
+          {{ form.nom.label_tag }}
+          {{ form.nom|add_class:"form-control" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.prenom.label_tag }}
+          {{ form.prenom|add_class:"form-control" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.sex.label_tag }}
+          {{ form.sex|add_class:"form-select" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.blood_group.label_tag }}
+          {{ form.blood_group|add_class:"form-select" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.allergies.label_tag }}
+          {{ form.allergies|add_class:"form-control" }}
+        </div>
+        <div class="col-md-6">
+          {{ form.compte_RIP.label_tag }}
+          {{ form.compte_RIP|add_class:"form-control" }}
+        </div>
+
+        <div class="col-12 text-end">
+          <a href="{% url 'administrators:admin_patients_list' %}" class="btn btn-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Retour
+          </a>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Enregistrer les modifications
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

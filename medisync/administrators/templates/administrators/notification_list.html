@@ -1,0 +1,219 @@
+{% extends "administrators/base_admin.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 font-weight-bold text-gray-800">Notifications</h1>
+        <button id="mark-all-read" class="btn btn-sm btn-light border">
+            <i class="fas fa-check-circle mr-2"></i>Tout marquer comme lu
+        </button>
+    </div>
+
+    <div class="notification-container">
+        {% for notification in notifications|dictsort:"is_read" %}
+        <div class="notification-card 
+            {% if notification.type == 'nouveau_compte_clinic' %}card-clinic
+            {% elif notification.type == 'nouveau_compte_medecin' %}card-doctor
+            {% elif notification.type == 'probleme_signale' %}card-warning
+            {% elif notification.type == 'validation_compte_clinic' %}card-success
+            {% elif notification.type == 'validation_compte_medecin' %}card-success
+            {% elif notification.type == 'compte_valide' %}card-info
+            {% else %}card-default{% endif %}
+            {% if not notification.is_read %} unread{% endif %}">
+
+            <a href="{% url 'administrators:notification_detail' notification.id %}" class="notification-link">
+                <div class="notification-icon">
+                    {% if notification.type == 'nouveau_compte_clinic' %}
+                        <i class="fas fa-clinic-medical"></i>
+                    {% elif notification.type == 'nouveau_compte_medecin' %}
+                        <i class="fas fa-user-md"></i>
+                    {% elif notification.type == 'probleme_signale' %}
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    {% elif notification.type == 'validation_compte_clinic' %}
+                        <i class="fas fa-check-circle text-success"></i>
+                    {% elif notification.type == 'validation_compte_medecin' %}
+                        <i class="fas fa-user-check text-success"></i>
+                    {% elif notification.type == 'compte_valide' %}
+                        <i class="fas fa-check-double text-info"></i>
+                    {% else %}
+                        <i class="fas fa-bell"></i>
+                    {% endif %}
+                </div>
+
+                <div class="notification-content">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="notification-title">{{ notification.title }}</h5>
+                        <span class="notification-time">{{ notification.created_at|timesince }}</span>
+                    </div>
+                    <p class="notification-message">{{ notification.message|truncatechars:120 }}</p>
+
+                    <div class="notification-footer">
+                        <span class="badge 
+                            {% if notification.type == 'nouveau_compte_clinic' %}badge-clinic
+                            {% elif notification.type == 'nouveau_compte_medecin' %}badge-doctor
+                            {% elif notification.type == 'probleme_signale' %}badge-warning
+                            {% elif notification.type == 'validation_compte_clinic' or notification.type == 'validation_compte_medecin' %}badge-success
+                            {% elif notification.type == 'compte_valide' %}badge-info
+                            {% else %}badge-secondary{% endif %}">
+                            {{ notification.get_type_display }}
+                        </span>
+                        {% if not notification.is_read %}
+                        <span class="unread-badge">Nouveau</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="empty-notifications">
+            <i class="fas fa-bell-slash"></i>
+            <p>Aucune notification disponible</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<style>
+.notification-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.notification-card {
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    background: white;
+}
+
+.notification-card.unread {
+    border-left: 4px solid;
+}
+
+.card-clinic.unread {
+    border-left-color: #28a745;
+}
+
+.card-doctor.unread {
+    border-left-color: #17a2b8;
+}
+
+.card-default.unread {
+    border-left-color: #6c757d;
+}
+
+.notification-link {
+    display: flex;
+    padding: 20px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.notification-link:hover {
+    text-decoration: none;
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+    margin-right: 20px;
+    color: #6c757d;
+}
+
+.card-clinic .notification-icon {
+    color: #28a745;
+}
+
+.card-doctor .notification-icon {
+    color: #17a2b8;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #343a40;
+}
+
+.notification-time {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.notification-message {
+    font-size: 0.95rem;
+    color: #495057;
+    margin-bottom: 10px;
+}
+
+.notification-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.badge-clinic {
+    background-color: #e6f7eb;
+    color: #28a745;
+}
+
+.badge-doctor {
+    background-color: #e6f9fc;
+    color: #17a2b8;
+}
+
+.unread-badge {
+    font-size: 0.75rem;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.empty-notifications {
+    text-align: center;
+    padding: 50px 20px;
+    color: #6c757d;
+}
+
+.empty-notifications i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-notifications p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+</style>
+
+<script>
+document.getElementById('mark-all-read').addEventListener('click', function() {
+    fetch("{% url 'administrators:mark_all_read' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 'success') {
+            location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}

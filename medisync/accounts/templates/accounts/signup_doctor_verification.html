@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Vérification de votre statut de médecin</h2>
+<p>Un email a été envoyé à {{ email }}. Veuillez compléter les informations ci-dessous pour vérifier votre identité.</p>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ verification_form.as_p }}
+    <button type="submit" name="doctor_verification_submit">Soumettre pour vérification</button>
+</form>
+{% endblock %}

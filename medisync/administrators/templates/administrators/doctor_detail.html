@@ -1,0 +1,301 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+
+{% block title %}Détails du Médecin{% endblock %}
+
+{% block content %}
+<div class="admin-section-container">
+    <div class="section-header mb-4">
+        <h1><i class="fas fa-user-md"></i> Détails du médecin</h1>
+        <a href="{% url 'administrators:doctor_list' %}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h2>Dr. {{ doctor.nom }} {{ doctor.prenom }}</h2>
+        </div>
+
+        <div class="card-body">
+            <div class="profile-container">
+                <div class="profile-picture">
+                    {% if user.profile_picture %}
+                        <img id="profileImg" src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de profil" class="img-thumbnail rounded-circle">
+                    {% else %}
+                        <img id="profileImg" src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de profil" class="img-thumbnail rounded-circle">
+                    {% endif %}
+                    <p><strong>Nom d'utilisateur:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                </div>
+
+                <div class="profile-meta">
+                    <div>
+                        <p><strong>Spécialité:</strong> {{ doctor.specialty.nom|default:"Non spécifié" }}</p>
+                        <p><strong>Localisation:</strong> {{ doctor.get_location_display }}</p>
+                        <p><strong>Expérience:</strong> {{ doctor.experience }} ans</p>
+                        <p><strong>Prix consultation:</strong> {{ doctor.prix }} DA</p>
+                        <p><strong>Institution:</strong> {{ doctor.institution }}</p>
+                    </div>
+                    <div>
+                        <p><strong>Statut:</strong> 
+                            <span class="badge {% if doctor.status == 'approved' %}badge-success{% else %}badge-warning{% endif %}">
+                                {{ doctor.get_status_display }}
+                            </span>
+                        </p>
+                        <p><strong>RDV en ligne:</strong> 
+                            {% if doctor.accept_online_appointments %}
+                                <i class="fas fa-check text-success"></i> Oui
+                            {% else %}
+                                <i class="fas fa-times text-danger"></i> Non
+                            {% endif %}
+                        </p>
+                        <p><strong>Durée RDV par défaut:</strong> {{ doctor.default_duration }} min</p>
+                        <p><strong>Délai minimum:</strong> {{ doctor.minimum_delay }} jours</p>
+                        <p><strong>Délai maximum:</strong> {{ doctor.maximum_delay }} jours</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions mt-4 text-end">
+                <a href="{% url 'administrators:doctor_list' %}" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+                <a href="{% url 'administrators:doctor_update' doctor.id %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #4e73df;
+    --secondary-color: #858796;
+    --background-light: #f8f9fc;
+    --text-color: #343a40;
+    --border-color: #e3e6f0;
+    --success-color: #1cc88a;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+    --font-family: 'Inter', sans-serif;
+}
+
+/* Container général */
+.admin-section-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: var(--font-family);
+    color: var(--text-color);
+}
+
+/* Header section */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.section-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-back {
+    background-color: var(--background-light);
+    border: 1px solid var(--border-color);
+    padding: 8px 14px;
+    border-radius: var(--border-radius);
+    color: #6c757d;
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+    font-weight: 600;
+}
+
+.btn-back:hover {
+    background-color: #e2e6ea;
+    color: #495057;
+}
+
+/* Carte */
+.card {
+    background: #fff;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    background-color: var(--background-light);
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.card-header h2 {
+    font-size: 22px;
+    color: var(--primary-color);
+    font-weight: 700;
+    margin: 0;
+}
+
+.card-body {
+    padding: 25px 30px;
+}
+
+/* Profile container flex */
+.profile-container {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+
+/* Photo profil */
+.profile-picture {
+    flex: 0 0 200px;
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.profile-picture img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--border-color);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.profile-picture img.zoomed {
+    transform: scale(1.5);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    z-index: 10;
+    position: relative;
+}
+
+/* Infos à droite */
+.profile-meta {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.profile-meta p {
+    font-size: 16px;
+    color: #5a5c69;
+    margin: 0;
+    text-align: justify;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+    color: #fff;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.badge-success {
+    background-color: var(--success-color);
+}
+
+.badge-warning {
+    background-color: var(--warning-color);
+}
+
+/* Couleurs icônes */
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+/* Boutons */
+.btn {
+    padding: 10px 22px;
+    font-size: 15px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    user-select: none;
+    transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #6c757d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    box-shadow: 0 4px 14px rgba(46, 89, 217, 0.4);
+}
+
+/* Actions boutons */
+.actions {
+    margin-top: 2rem;
+    text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .profile-meta {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .profile-picture {
+        margin-bottom: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const profileImg = document.getElementById('profileImg');
+    if (profileImg) {
+        profileImg.addEventListener('click', () => {
+            profileImg.classList.toggle('zoomed');
+        });
+    }
+});
+</script>
+
+{% endblock %}

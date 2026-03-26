@@ -18,7 +18,7 @@ class DoctorAdmin(admin.ModelAdmin):
     """
     Configuration de l'interface admin pour Doctor.
     """
-    list_display = ('user', 'nom', 'prenom', 'specialty', 'experience', 'location',
+    list_display = ('user', 'nom', 'prenom', 'specialty', 'experience', 'location','commune',
                      'accept_online_appointments', 'compte_RIP', 'prix')  # Ajout de la localisation
     search_fields = ('nom', 'prenom', 'specialty__nom', 'user__email', 'user__username')  # Utilisation des champs 'email' et 'username'
     list_filter = ('specialty', 'location', 'accept_online_appointments')  # Filtrage par localisation ajouté
@@ -33,3 +33,11 @@ class DoctorAdmin(admin.ModelAdmin):
             kwargs["queryset"] = User.objects.filter(profile__role='MEDECIN')  # Filtrage basé sur le rôle dans Profile
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+from django.contrib import admin
+from .models import Commune
+
+class CommuneAdmin(admin.ModelAdmin):
+    list_display = ('name', 'wilaya')  # Affiche les champs dans la liste
+    search_fields = ('name',)  # Permet la recherche par nom de la commune
+
+admin.site.register(Commune, CommuneAdmin)

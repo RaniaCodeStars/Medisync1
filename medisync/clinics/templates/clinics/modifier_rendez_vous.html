@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+
+<div class="container mt-5">
+    <h2 class="mb-4">Modifier le rendez-vous</h2>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="id_nom" class="form-label">Nom</label>
+            {{ form.nom }}
+            {% if form.nom.errors %}
+                <div class="text-danger">{{ form.nom.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_telephone" class="form-label">Téléphone</label>
+            {{ form.telephone }}
+            {% if form.telephone.errors %}
+                <div class="text-danger">{{ form.telephone.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_specialite" class="form-label">Spécialité</label>
+            {{ form.speciality }}
+            {% if form.speciality.errors %}
+                <div class="text-danger">{{ form.speciality.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_jour" class="form-label">Jour</label>
+            {{ form.jour }}
+            {% if form.jour.errors %}
+                <div class="text-danger">{{ form.jour.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_heure" class="form-label">Heure</label>
+            {{ form.heure }}
+            {% if form.heure.errors %}
+                <div class="text-danger">{{ form.heure.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_motif" class="form-label">Motif</label>
+            {{ form.motif }}
+            {% if form.motif.errors %}
+                <div class="text-danger">{{ form.motif.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{% url 'clinics:mes_demandes' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+    
+</body>
+</html>

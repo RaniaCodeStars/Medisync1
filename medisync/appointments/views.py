@@ -1,38 +1,58 @@
 from django.shortcuts import render, get_object_or_404
 from medecins.models import Doctor
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta, time
 from appointments.models import Appointment, SpecificAvailability, WeeklyAvailability, ConsultationReason
 from datetime import date, timedelta
 from datetime import datetime, timedelta, date
 from datetime import datetime, timedelta
 
+# appointments/views.py
+
+from django.shortcuts import render, get_object_or_404
 
 def book_appointment(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
     consultation_reasons = doctor.consultation_reasons.all()
 
-    user_nom, user_prenom = None, None
+    # Initialisation des variables de pré‑remplissage
+    user_nom, user_prenom = '', ''
+    user_email = ''
+    user_phone = ''
+    user_dob = None
+
     if request.user.is_authenticated:
         try:
             # Si l'utilisateur est un patient
-            if hasattr(request.user, 'patient_profile'):  # Vérifie la relation avec le modèle Patient
+            if hasattr(request.user, 'patient_profile'):
                 patient = request.user.patient_profile
-                user_nom = patient.nom
-                user_prenom = patient.prenom
+                user_nom    = patient.nom or ''
+                user_prenom = patient.prenom or ''
             # Si l'utilisateur est un médecin
-            elif hasattr(request.user, 'doctor'):  # Vérifie la relation avec le modèle Doctor
-                doctor_profile = request.user.doctor
-                user_nom = doctor_profile.nom
-                user_prenom = doctor_profile.prenom
+            elif hasattr(request.user, 'doctor_profile'):
+                doc_prof = request.user.doctor_profile
+                user_nom    = doc_prof.nom or ''
+                user_prenom = doc_prof.prenom or ''
+
+            # Champs toujours disponibles sur User
+            user_email = request.user.email or ''
+            user_phone = request.user.phone or ''
+            user_dob   = request.user.date_of_birth  # peut être None ou un date object
         except Exception as e:
-            print(f"Erreur lors de la récupération du profil : {e}")
+            # En cas d'erreur, on laisse les champs vides
+            print(f"Erreur récupération profil : {e}")
 
     context = {
         'doctor': doctor,
         'consultation_reasons': consultation_reasons,
-        'user_nom': user_nom,
+        # variables pour pré‑remplir le modal
+        'user_nom'   : user_nom,
         'user_prenom': user_prenom,
+        'user_email' : user_email,
+        'user_phone' : user_phone,
+        'user_dob'   : user_dob,
+        'has_reasons': doctor.consultation_reasons.exists(),
+        'default_duration': doctor.default_duration or 30,
     }
     return render(request, 'appointments/book.html', context)
 
@@ -51,26 +71,26 @@ def get_availabilities_api(request, doctor_id):
     ]
     return JsonResponse({"availabilities": availabilities})
 
-
 def get_available_times_api(request):
     """
-    API pour récupérer les créneaux horaires disponibles pour une date donnée,
-    en utilisant la durée du motif de consultation sélectionné si fourni,
-    sinon en utilisant la durée par défaut du médecin.
+    API pour récupérer les créneaux horaires disponibles pour une date donnée.
+    Gère à la fois les créneaux normaux et urgents.
     """
     try:
-        # Récupération des paramètres GET
+        # 1. Extraction des paramètres
+        is_emergency = request.GET.get('is_emergency', 'false') == 'true'
         date_str = request.GET.get("date")
         doctor_id = request.GET.get("doctor_id")
         consultation_reason_id = request.GET.get("consultation_reason_id")
         
+        # 2. Validation des paramètres obligatoires
         if not date_str or not doctor_id:
             return JsonResponse(
                 {"error": "Les paramètres 'date' et 'doctor_id' sont obligatoires"},
                 status=400
             )
 
-        # Validation de la date
+        # 3. Conversion de la date
         try:
             date = datetime.strptime(date_str, "%Y-%m-%d").date()
         except ValueError:
@@ -79,37 +99,63 @@ def get_available_times_api(request):
                 status=400
             )
 
-        # Récupération du médecin
+        # 4. Récupération du médecin
         doctor = get_object_or_404(Doctor, id=doctor_id)
         
-        # Déterminer la durée à utiliser pour le créneau
-        if consultation_reason_id:
-            # Récupérer le motif et utiliser sa durée (en minutes)
+        # 5. Détermination de la durée
+        if is_emergency:
+            slot_duration = getattr(doctor, 'default_duration', 30)
+        elif consultation_reason_id:
             reason = get_object_or_404(ConsultationReason, id=consultation_reason_id, doctor=doctor)
             slot_duration = reason.duration
         else:
-            # Utiliser la durée par défaut du médecin (ici 30 minutes si non défini)
             slot_duration = getattr(doctor, 'default_duration', 30)
 
-        # Recherche des disponibilités spécifiques pour la date donnée
-        specific = doctor.specific_availabilities.filter(date=date, is_active=True).first()
-        if specific:
-            time_slots = generate_time_slots(specific.start_time, specific.end_time, slot_duration)
-            available_times = filter_available_slots(doctor, date, time_slots, slot_duration)
-            return JsonResponse({"available_times": available_times})
+        # 6. Récupération des disponibilités
+        availability = None
 
-        # Recherche des disponibilités hebdomadaires pour le jour de la semaine correspondant
-        weekly = doctor.weekly_availabilities.filter(day=date.strftime("%A").lower()).first()
-        if weekly:
-            time_slots = generate_time_slots(weekly.start_time, weekly.end_time, slot_duration)
-            available_times = filter_available_slots(doctor, date, time_slots, slot_duration)
-            return JsonResponse({"available_times": available_times})
+        if is_emergency:
+            # ✅ Priorité aux disponibilités spécifiques
+            availability = doctor.specific_availabilities.filter(
+                date=date,
+                is_active=True
+            ).first()
 
-        # Si aucune disponibilité n'est trouvée, retourner une liste vide
+            # ❌ Si aucune specific dispo, fallback sur weekly emergency
+            if not availability:
+                availability = doctor.weekly_availabilities.filter(
+                    day=date.strftime("%A").lower(),
+                    is_emergency=True
+                ).first()
+        else:
+            # Cas normal : Specific > Weekly normale
+            availability = doctor.specific_availabilities.filter(
+                date=date,
+                is_active=True
+            ).first() or doctor.weekly_availabilities.filter(
+                day=date.strftime("%A").lower(),
+                is_emergency=False
+            ).first()
+
+        # 7. Génération des créneaux
+        if availability:
+            time_slots = generate_time_slots(
+                availability.start_time,
+                availability.end_time,
+                slot_duration
+            )
+            available_times = filter_available_slots(doctor, date, time_slots, slot_duration)
+            return JsonResponse({
+                "available_times": available_times,
+                "is_emergency": is_emergency  # Pour information frontend
+            })
+
         return JsonResponse({"available_times": []})
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
 
 def generate_time_slots(start_time, end_time, slot_duration=30):
     """
@@ -134,7 +180,7 @@ def filter_available_slots(doctor, date, time_slots, slot_duration):
     [start, start + slot_duration] qui est comparé aux intervalles réservés.
     """
     # Récupérer tous les rendez-vous réservés pour ce médecin à la date donnée
-    reserved_appointments = doctor.appointments.filter(date=date)
+    reserved_appointments = doctor.appointments.filter(date=date).exclude(status="cancelled")
 
     # Créer une liste d'intervalles réservés (datetime) : (start_datetime, end_datetime)
     reserved_intervals = []
@@ -206,70 +252,302 @@ def get_consultation_reasons(request, doctor_id):
         # Aucun motif défini : on indique de passer directement au calendrier
         return JsonResponse({"consultation_reasons": [], "has_reasons": False})
 
+from django.db.models import Q
+from .models import WeeklyAvailability  # ou ajuste selon l'import réel
 
 def get_combined_available_dates_api(request, doctor_id):
-    """
-    API pour récupérer toutes les dates disponibles d'un médecin en combinant
-    les disponibilités spécifiques et hebdomadaires, tout en respectant les
-    délais définis par le médecin.
-    """
     doctor = get_object_or_404(Doctor, id=doctor_id)
     today = date.today()
 
-    # Récupérer les délais personnalisés du médecin ou appliquer des valeurs par défaut
     minimum_delay = timedelta(days=doctor.minimum_delay if doctor.minimum_delay is not None else 1)
     maximum_delay = timedelta(days=doctor.maximum_delay if doctor.maximum_delay is not None else 90)
     min_date = today + minimum_delay
     max_date = today + maximum_delay
 
-    # Récupérer les disponibilités spécifiques actives après le délai minimum
     specific_availabilities = doctor.specific_availabilities.filter(is_active=True, date__gte=min_date)
     specific_dates = {availability.date for availability in specific_availabilities}
 
-    # Récupérer les disponibilités hebdomadaires
     weekly_availabilities = doctor.weekly_availabilities.all()
     day_to_num = {
-        'monday': 0,
-        'tuesday': 1,
-        'wednesday': 2,
-        'thursday': 3,
-        'friday': 4,
-        'saturday': 5,
-        'sunday': 6,
+        'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+        'friday': 4, 'saturday': 5, 'sunday': 6,
     }
 
     available_dates = set()
-    weeks_to_check = maximum_delay.days // 7  # Convertir le délai maximum en semaines
+    emergency_dates = set()
+    weeks_to_check = maximum_delay.days // 7
 
     for weekly in weekly_availabilities:
         target_weekday = day_to_num.get(weekly.day.lower())
         if target_weekday is None:
             continue
 
-        # Calcul des occurrences hebdomadaires
         delta_days = (target_weekday - today.weekday() + 7) % 7
         next_date = today + timedelta(days=delta_days)
 
         for i in range(weeks_to_check):
             date_occurrence = next_date + timedelta(weeks=i)
-            # Vérifier si la date est hors des limites définies
             if date_occurrence < min_date or date_occurrence > max_date:
                 continue
-            # Vérifier si une disponibilité spécifique existe déjà
             if date_occurrence not in specific_dates:
                 available_dates.add(date_occurrence)
 
-    # Convertir les ensembles en liste triée
+            # ✅ Ajoutons si ce créneau hebdo est marqué comme urgence
+            if weekly.is_emergency:
+                emergency_dates.add(date_occurrence)
+
     all_available_dates = sorted(specific_dates.union(available_dates))
 
     # Retourner les données sous forme JSON
     return JsonResponse({
         "available_dates": [
-            {"date": dt.isoformat(), "is_specific": dt in specific_dates}
+            {
+                "date": dt.isoformat(),
+                "is_specific": dt in specific_dates,
+                "has_emergency": has_emergency_on_date(dt, doctor),  # <- à ajouter
+                "has_non_emergency": has_non_emergency_on_date(dt, doctor)
+            }
             for dt in all_available_dates
         ]
     })
 
+
+def has_emergency_on_date(date_obj, doctor):
+    weekday = date_obj.strftime('%A').lower()
+    
+    # Vérifie les créneaux hebdomadaires d'urgence
+    weekly_emergency = doctor.weekly_availabilities.filter(
+        day=weekday, is_emergency=True
+    ).exists()
+
+    # Vérifie les créneaux spécifiques si tu en as dans ton modèle (optionnel)
+    # Si tu veux ignorer ça, retire cette partie
+    specific_emergency = doctor.specific_availabilities.filter(
+        date=date_obj, is_active=True
+    ).exists()  # ← à personnaliser si tu veux un flag `is_emergency` dans les spécifiques aussi
+
+    return weekly_emergency or specific_emergency
+
+def has_non_emergency_on_date(date_obj, doctor):
+    weekday = date_obj.strftime('%A').lower()
+    
+    # Vérifie les créneaux hebdomadaires normaux
+    weekly_non_emergency = doctor.weekly_availabilities.filter(
+        day=weekday, 
+        is_emergency=False
+    ).exists()
+
+    # Vérifie les créneaux spécifiques non-urgents
+    specific_non_emergency = doctor.specific_availabilities.filter(
+        date=date_obj, 
+        is_active=True
+    ).exists()
+
+    return weekly_non_emergency or specific_non_emergency
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from medecins.models import Doctor  # Import depuis l'app medecins
+from .models import Appointment, ConsultationReason
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+
+from .models import Appointment, ConsultationReason
+from medecins.models import Doctor
+
+User = get_user_model()
+
+# @require_POST
+# def confirm_appointment(request):
+#     # 0. Vérifier la connexion
+#     if not request.user.is_authenticated:
+#         return JsonResponse({
+#             'error': 'Vous devez vous connecter ou créer un compte pour prendre un rendez‑vous.'
+#         }, status=401)
+
+#     try:
+#         # 1. Extraction des données
+#         doctor_id       = request.POST.get('doctor_id')
+#         date_str        = request.POST.get('date')
+#         time_str        = request.POST.get('time')
+#         is_urgence      = request.POST.get('is_urgence') == 'true'
+
+#         # 2. Validation des champs obligatoires
+#         if not all([doctor_id, date_str, time_str]):
+#             return JsonResponse(
+#                 {'error': 'Doctor ID, date et time sont requis.'},
+#                 status=400
+#             )
+
+#         # 3. Conversion des dates
+#         try:
+#             date_obj = timezone.datetime.strptime(date_str, '%Y-%m-%d').date()
+#             time_obj = timezone.datetime.strptime(time_str, '%H:%M').time()
+#         except ValueError:
+#             return JsonResponse(
+#                 {'error': 'Format de date (YYYY‑MM‑DD) ou heure (HH:MM) invalide.'},
+#                 status=400
+#             )
+
+#         # 4. Récupération des objets
+#         doctor = get_object_or_404(Doctor, id=doctor_id)
+#         consultation_reason = None
+#         if not is_urgence:
+#             reason_id = request.POST.get('consultation_reason_id')
+#             if reason_id:
+#                 consultation_reason = get_object_or_404(
+#                     ConsultationReason,
+#                     id=reason_id,
+#                     doctor=doctor
+#                 )
+
+#         # 5. Création du rendez-vous
+#         appointment = Appointment(
+#             doctor            = doctor,
+#             patient           = request.user,  # on sait qu'il est authentifié
+#             date              = date_obj,
+#             time              = time_obj,
+#             is_emergency      = is_urgence,
+#             emergency_reason  = request.POST.get('urgence_details') if is_urgence else None,
+#             consultation_reason = consultation_reason,
+#             status            = 'pending'
+#         )
+
+#         # 6. Calcul automatique
+#         if is_urgence:
+#             appointment.duration = getattr(doctor, 'default_duration', 30)
+#             appointment.prix     = float(doctor.prix or 0.00)
+#         else:
+#             appointment.prix = appointment.calculate_prix()
+
+#         # 7. Validation & sauvegarde
+#         appointment.full_clean()
+#         appointment.save()
+
+#         return JsonResponse({
+#             'success'        : True,
+#             'appointment_id' : appointment.id,
+#             'date'           : date_str,
+#             'time'           : time_str,
+#             'is_emergency'   : is_urgence,
+#             'doctor_name'    : f"{doctor.nom} {doctor.prenom}"
+#         })
+
+#     except ValidationError as e:
+#         return JsonResponse({'error': e.message_dict or e.messages}, status=400)
+#     except Exception as e:
+#         return JsonResponse({'error': f'Erreur serveur: {str(e)}'}, status=500)
+
+
+
+
+
+
+# appointments/views.py
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.core.exceptions import ValidationError
+import json
+from django.contrib.auth.decorators import login_required
+from .models import Appointment, ConsultationReason
+from medecins.models import Doctor
+import logging
+logger = logging.getLogger(__name__)
+
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+@require_POST
+def confirm_appointment(request):
+    try:
+        logger.info("Requête reçue. Données brutes : %s", request.body)
+        data = json.loads(request.body)  # Une seule ligne nécessaire
+        try:
+            datetime.strptime(data["time"], "%H:%M")
+        except ValueError:
+            raise ValidationError("Format de l'heure invalide. Utilisez HH:MM.")
+        # Validation des champs obligatoires
+        required_fields = ['doctor_id', 'date', 'time']
+        for field in required_fields:
+            if field not in data:
+                raise ValidationError(f"Champ manquant : {field}")
+
+        # Récupération du médecin
+        try:
+            doctor = Doctor.objects.get(id=data['doctor_id'])
+        except Doctor.DoesNotExist:
+            logger.error("Médecin introuvable : ID %s", data['doctor_id'])
+            return JsonResponse({'error': 'Médecin introuvable'}, status=404)
+
+        # Validation motif/urgence
+        if not data.get('is_urgence') and not data.get('reason_id'):
+            if doctor.consultation_reasons.exists():
+                raise ValidationError("Un motif de consultation est requis.")
+            
+        is_online = data.get('is_online', False)
+        notes=data.get('notes', '')
+
+
+        # Création du rendez-vous
+        appointment = Appointment(
+            doctor=doctor,
+            patient=request.user,
+            date=data['date'],
+            time=data['time'],
+            is_emergency=data.get('is_urgence', False),
+            emergency_reason=data.get('urgence_details', '')[:500],
+            consultation_reason_id=data.get('reason_id'),
+            is_online=is_online,
+            notes=notes
+        )
+
+        # Validation et sauvegarde
+        appointment.full_clean()
+        appointment.save()
+
+        
+
+        logger.info("Rendez-vous créé : ID %s", appointment.id)
+        return JsonResponse({
+            'success': True,
+            'appointment_id': appointment.id,
+            'doctor_name': f"{doctor.nom} {doctor.prenom}"
+        })
+
+    except json.JSONDecodeError as e:
+        logger.error("Erreur de décodage JSON : %s", str(e))
+        return JsonResponse({'error': 'Format JSON invalide'}, status=400)
+        
+    except ValidationError as e:
+        logger.warning("Erreur de validation : %s", e.message_dict)
+        return JsonResponse({'error': e.message_dict}, status=400)
+
+    except Exception as e:
+        logger.exception("Erreur inattendue : %s", str(e))
+        return JsonResponse({'error': 'Erreur interne du serveur'}, status=500)
+
+
+# appointments/views.py
+from django.shortcuts import get_object_or_404
+from .models import Appointment
+
+def confirmation_page(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    return render(request, "appointments/confirmation.html", {"appointment": appointment})
 
 # def get_weekly_available_dates_api(request, doctor_id):
 #     """
@@ -308,7 +586,28 @@ def get_combined_available_dates_api(request, doctor_id):
 #     # Retourner toutes les dates de travail trouvées
 #     return JsonResponse({"work_dates": sorted(available_dates)})
 
+# views.py
+# appointments/views.py
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
+from medecins.models import Doctor
 
+@login_required
+@require_GET
+def get_doctor_info(request, doctor_id):
+    """
+    Renvoie en JSON les infos du médecin, notamment accept_online_appointments.
+    """
+    try:
+        doctor = Doctor.objects.get(pk=doctor_id)
+    except Doctor.DoesNotExist:
+        return JsonResponse({'error': 'Médecin non trouvé'}, status=404)
+
+    return JsonResponse({
+        'id': doctor.id,
+        'accept_online_appointments': doctor.accept_online_appointments,
+    })
 
 #---------------------------------------------------------------------------------------------------------
 # PATIENT APPOINTMENTS:
@@ -320,37 +619,32 @@ from appointments.models import Appointment
 from patients.models import Patient
 from django.contrib.auth import get_user_model
 from patients.models import Patient
+from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 @login_required
 def patient_appointments(request):
     """
     Affiche la liste des rendez-vous du patient connecté.
     """
-    User = get_user_model()#pour tester
-
-    try:
-        #pour tester----------------------------------------------------------------------------------------
-        # Simuler un patient spécifique pour le test
-        test_user = User.objects.get(email="patient1@exemple.com")  # Remplace avec un email valide
-        request.user = test_user  # Simule la connexion du patient dans la vue
-        #---------------------------------------------------------------------------------------------------
-
-        # Récupérer le profil patient
-        patient = request.user.patient_profile  # Accès via related_name
-    except Patient.DoesNotExist:
-        patient = None
+    patient = request.user
+    today = now().date()
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     # Utiliser `request.user` (objet User) pour la requête
     appointments = Appointment.objects.filter(
         patient=request.user,
-        is_online=False  # <-- Ajout de ce filtre
+        date__gte=today,
+        is_online=False,
+        is_emergency=False
     ).order_by('-date', '-time') if patient else []
 
     context = {
         'appointments': appointments,
-        'nom': patient.nom if patient else None,
-        'prenom': patient.prenom if patient else None,
+        'patient_name': f"{patient.patient_profile.nom} {patient.patient_profile.prenom}" if hasattr(patient, 'patient_profile') else patient.username,
         'profile_picture': request.user.profile_picture.url if request.user.profile_picture else None,
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/patient_appointments.html', context)
 
@@ -359,17 +653,11 @@ from django.http import HttpResponseForbidden
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from datetime import datetime
+
 @login_required
 def cancel_appointment(request, appointment_id):
-    User = get_user_model()  # Pour le test
-
-    try:
-        # Simuler un patient spécifique pour le test
-        test_user = User.objects.get(email="patient1@exemple.com")  # Remplacez par un email valide
-        request.user = test_user  # Simule la connexion du patient
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'Utilisateur de test non trouvé'}, status=404)
-
+   
     appointment = get_object_or_404(Appointment, id=appointment_id)
 
     # Vérifiez que l'utilisateur connecté est autorisé à annuler ce rendez-vous
@@ -377,10 +665,20 @@ def cancel_appointment(request, appointment_id):
         return JsonResponse({'error': 'Non autorisé'}, status=403)
 
     # Changez le statut du rendez-vous pour "Annulé"
-    appointment.status = 'Annulé'
+    appointment.status = 'cancelled'
     appointment.save()
 
+    doctor = appointment.doctor
+    appointment_datetime = datetime.combine(appointment.date, appointment.time)
+    message = (
+     f"Le patient {appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom} "
+     f"a annulé le rendez-vous prévu le {appointment_datetime.strftime('%d/%m/%Y à %Hh%M')}."
+    )
+    send_notification(doctor.user, message)
+
+
     return JsonResponse({'success': 'Rendez-vous annulé'})
+
 
 
 @login_required
@@ -388,61 +686,114 @@ def patient_teleconsultations(request):
     """
     Affiche la liste des téléconsultations (rendez-vous en ligne) du patient connecté.
     """
-    User = get_user_model() #pour tester
-    try:
-        #pour tester----------------------------------------------------------------------------------------
-        # Simuler un patient spécifique pour le test
-        test_user = User.objects.get(email="patient1@exemple.com")  # Remplace avec un email valide
-        request.user = test_user  # Simule la connexion du patient dans la vue
-        #---------------------------------------------------------------------------------------------------
-
-        # Récupérer l'utilisateur en tant que patient
-        patient = request.user.patient_profile
-    except Patient.DoesNotExist:
-        patient = None
-
+    patient = request.user
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+    today = now().date()
     # Filtrer les rendez-vous en ligne associés à cet utilisateur (patient)
-    teleconsultations = Appointment.objects.filter(patient=request.user, is_online=True).order_by('-date', '-time') if patient else []
+    teleconsultations = Appointment.objects.filter(patient=request.user,date__gte=today, is_online=True, is_emergency=False).order_by('-date', '-time') if patient else []
 
     context = {
         'teleconsultations': teleconsultations,
-        'patient_name': f"{patient.nom} {patient.prenom}" if patient else "Patient inconnu"
+        'patient_name': f"{patient.patient_profile.nom} {patient.patient_profile.prenom}" if hasattr(patient, 'patient_profile') else patient.username,
+        'profile_picture': request.user.profile_picture.url if request.user.profile_picture else None,
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/patient_teleconsultations.html', context)
 
 from django.http import Http404
-
 @login_required
 def appointment_detail(request, appointment_id):
     """
     Affiche le détail d'un rendez-vous pour l'utilisateur connecté.
+    Gère les rôles de médecin et de patient.
     """
-    User = get_user_model() #pour tester
-    try:
-        #pour tester----------------------------------------------------------------------------------------
-        # Simuler un patient spécifique pour le test
-        test_user = User.objects.get(email="patient1@exemple.com")  # Remplace avec un email valide
-        request.user = test_user  # Simule la connexion du patient dans la vue
-        #---------------------------------------------------------------------------------------------------
 
-        # Récupérer le rendez-vous correspondant au patient connecté
-        appointment = get_object_or_404(Appointment, id=appointment_id, patient=request.user)
+    try:
+        
+        # Récupérer le rendez-vous
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+
+        # Vérifie que l'utilisateur connecté est autorisé à voir ce rendez-vous
+        if appointment.patient != request.user and appointment.doctor.user != request.user:
+            raise Http404("Vous n'êtes pas autorisé à accéder à ce rendez-vous.")
+
     except Appointment.DoesNotExist:
         raise Http404("Rendez-vous non trouvé ou non autorisé.")
 
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+
+    # Récupération des informations pour le profil (Patient ou Médecin)
+    if hasattr(appointment.patient, 'patient_profile'):
+        patient_name = f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}"
+        role = "Patient"
+    elif hasattr(appointment.patient, 'doctor_profile'):
+        patient_name = f"Dr. {appointment.patient.doctor_profile.nom} {appointment.patient.doctor_profile.prenom}"
+        role = "Médecin"
+    else:
+        patient_name = "Rôle inconnu"
+        role = "Non défini"
+
+    # Récupérer les autres informations nécessaires
     online_link = appointment.online_link if appointment.is_online else None
     doctor = appointment.doctor
 
     context = {
         'appointment': appointment,
-        'latitude': doctor.latitude,
-        'longitude': doctor.longitude,
-        'patient_name': f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}" if hasattr(appointment.patient, 'patient_profile') else "Patient inconnu",
+        'patient_name': patient_name,
+        'role': role,  # Ajoute le rôle pour le contexte
         'online_link': online_link,
+        'profile_picture': request.user.profile_picture.url if request.user.profile_picture else None,
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/patient_appointment_details.html', context)
 
 
+@login_required
+def patient_urgent_appointments(request):
+    """
+    Affiche les urgences pour le patient connecté.
+    """
+
+    patient = request.user  # Le patient est l'utilisateur connecté
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+    today = now().date()
+
+    # Récupérer uniquement les rendez-vous urgents liés au patient
+    urgent_appointments = Appointment.objects.filter(patient=patient,date__gte=today, is_emergency=True).order_by('-date', '-time')
+
+    context = {
+        'urgent_appointments': urgent_appointments,
+        'patient_name': f"{patient.patient_profile.nom} {patient.patient_profile.prenom}" if hasattr(patient, 'patient_profile') else patient.username,
+        'profile_picture': request.user.profile_picture.url if request.user.profile_picture else None,
+        'unread_notification_count': unread_count,
+    }
+    return render(request, 'appointments/patient_urgent_appointments.html', context)
+
+
+from django.utils.timezone import now
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def patient_appointment_history(request):
+    """
+    Vue pour afficher l'historique des rendez-vous du patient connecté.
+    """
+    patient = request.user
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+
+    past_appointments = Appointment.objects.filter(
+        patient=patient,
+        date__lt=now().date()  # Inclut uniquement les rendez-vous passés
+    ).order_by('-date', '-time')
+
+    context = {
+        'past_appointments': past_appointments,
+        'patient_name': f"{patient.patient_profile.nom} {patient.patient_profile.prenom}" if hasattr(patient, 'patient_profile') else patient.username,
+        'profile_picture': request.user.profile_picture.url if request.user.profile_picture else None,
+        'unread_notification_count': unread_count,
+    }
+    return render(request, 'appointments/patient_appointment_history.html', context)
 
 
 #---------------------------------------------------------------------------------------------------------
@@ -453,53 +804,49 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from appointments.models import Appointment
 from itertools import chain
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from appointments.models import Appointment
 
 @login_required
 def medcin_appointments(request):
     """
-    Affiche les rendez-vous liés au médecin connecté.
-    - En tant que médecin : rendez-vous des patients avec lui.
-    - En tant que patient : rendez-vous pris par ce médecin chez d'autres médecins.
+    Affiche uniquement les rendez-vous des patients avec le médecin connecté.
     """
-    User = get_user_model()
+    # Vérifier que l'utilisateur est bien un médecin
+    if not hasattr(request.user, 'doctor_profile'):
+        return HttpResponse("Vous devez être un médecin pour accéder à cette page.", status=403)
 
-    try:
-        # Simuler un médecin pour le test
-        test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace avec un email valide
-        request.user = test_user  # Simule la connexion du médecin
+    # Récupérer le profil médecin
+    doctor = request.user.doctor_profile
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+    today = now().date()
 
-        # Récupérer le médecin
-        doctor = request.user.doctor_profile
-    except AttributeError:
-        doctor = None
+    # Sélectionner uniquement les rendez-vous où ce médecin reçoit des patients
+    as_doctor_appointments = Appointment.objects.filter(
+        doctor=doctor,
+        date__gte=today,
+        is_online=False,
+        is_emergency=False
+    ).order_by('-date', '-time')
 
-    # Rendez-vous en tant que médecin
-    as_doctor_appointments = Appointment.objects.filter(doctor=doctor, is_online=False).order_by('-date', '-time') if doctor else []
-
-    # Rendez-vous en tant que patient
-    as_patient_appointments = Appointment.objects.filter(patient=request.user, is_online=False).order_by('-date', '-time')
-
-    # Utilisation de itertools.chain pour fusionner les deux QuerySet (sans affecter le résultat du rendu)
-    all_appointments = chain(as_doctor_appointments, as_patient_appointments)
-
-    # Ajoute le nom complet pour les patients ou médecins selon leur rôle
-    for appointment in all_appointments:
+    # Ajouter le nom et la photo du patient pour chaque rendez-vous
+    for appointment in as_doctor_appointments:
         if hasattr(appointment.patient, 'patient_profile'):
             appointment.patient_full_name = f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}"
-        elif hasattr(appointment.patient, 'doctor_profile'):
-            appointment.patient_full_name = f"{appointment.patient.doctor_profile.nom} {appointment.patient.doctor_profile.prenom}"
         else:
-            appointment.patient_full_name = "Rôle inconnu"
-
+            appointment.patient_full_name = appointment.patient.username  # Si le patient n'a pas de profil spécifique
+        
         # Ajoute la photo si disponible
         appointment.patient_photo = appointment.patient.profile_picture.url if hasattr(appointment.patient, 'profile_picture') and appointment.patient.profile_picture else None
 
     context = {
-        'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'doctor_name': f"{doctor.nom} {doctor.prenom}",
         'profile_picture': request.user.profile_picture.url if hasattr(request.user, 'profile_picture') and request.user.profile_picture else None,
-        'as_doctor_appointments': as_doctor_appointments,  # Rendez-vous en tant que médecin
-        'as_patient_appointments': as_patient_appointments,  # Rendez-vous en tant que patient
+        'as_doctor_appointments': as_doctor_appointments,
+        'unread_notification_count': unread_count,
     }
+    
     return render(request, 'appointments/medcin_appointments.html', context)
 
 
@@ -509,29 +856,22 @@ def doctor_appointment_detail(request, appointment_id):
     Affiche les détails d'un rendez-vous pour le médecin connecté,
     y compris les informations sur le patient.
     """
-    User = get_user_model()  # Pour tester uniquement
 
     try:
-        # Simuler un médecin pour le test
-        test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace avec l'email valide
-        request.user = test_user  # Simule la connexion du médecin pour cette vue
-
-        # Récupérer le médecin
         doctor = request.user.doctor_profile
     except AttributeError:
         doctor = None
 
     # Vérifier que le rendez-vous appartient bien au médecin connecté
     appointment = get_object_or_404(Appointment, id=appointment_id, doctor=doctor) if doctor else None
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     # Ajoute une logique pour récupérer le nom et le prénom
    
     if hasattr(appointment.patient, 'patient_profile'):
         patient_name = f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}"
         compte_RIP = appointment.patient.patient_profile.compte_RIP or "Ce patient ne possède pas de compte RIP"
-    elif hasattr(appointment.patient, 'doctor_profile'):
-        patient_name = f"{appointment.patient.doctor_profile.nom} {appointment.patient.doctor_profile.prenom}"
-        compte_RIP = appointment.patient.doctor_profile.compte_RIP or "Ce patient ne possède pas de compte RIP"
+    
     else:
         patient_name = "Rôle inconnu"
         compte_RIP = "Ce patient ne possède pas de compte RIP"
@@ -544,47 +884,52 @@ def doctor_appointment_detail(request, appointment_id):
         'patient_name': patient_name,
         'online_link' : online_link,
         'compte_RIP' : compte_RIP,
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/medcin_appointment_detail.html', context)
-
 
 
 @login_required
 def medcin_teleconsultations(request):
     """
-    Affiche la liste des téléconsultations (rendez-vous en ligne) du médecin connecté.
+    Affiche les téléconsultations :
+    - En tant que médecin : téléconsultations où l'utilisateur est médecin.
+    - En tant que patient : téléconsultations où l'utilisateur est patient avec d'autres médecins.
     """
-    User = get_user_model()  # Pour tester
+    User = get_user_model()
 
     try:
-        # Simuler un médecin pour le test
-        test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-        request.user = test_user  # Simule la connexion du médecin dans la vue
-
-        # Récupérer l'utilisateur en tant que médecin
         doctor = request.user.doctor_profile
+        today = now().date()
     except AttributeError:
         doctor = None
 
-    # Filtrer les téléconsultations associées au médecin
-    teleconsultations = Appointment.objects.filter(doctor=doctor, is_online=True).order_by('-date', '-time') if doctor else []
 
-    # Ajoute une logique pour récupérer le nom et le prénom
-    for teleconsultation in teleconsultations:
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+
+    # Téléconsultations en tant que médecin
+    as_doctor_teleconsultations = Appointment.objects.filter(doctor=doctor,date__gte=today, is_online=True, is_emergency=False).order_by('-date', '-time') if doctor else []
+
+    # Téléconsultations en tant que patient
+    as_patient_teleconsultations = Appointment.objects.filter(patient=request.user, is_online=True, is_emergency=False).order_by('-date', '-time')
+
+    # Ajoute les noms complets et photos pour chaque rôle
+    for teleconsultation in chain(as_doctor_teleconsultations, as_patient_teleconsultations):
         if hasattr(teleconsultation.patient, 'patient_profile'):
-            # Si l'utilisateur a un profil Patient
             teleconsultation.patient_full_name = f"{teleconsultation.patient.patient_profile.nom} {teleconsultation.patient.patient_profile.prenom}"
-        elif hasattr(teleconsultations.patient, 'doctor_profile'):
-            # Si l'utilisateur a un profil Médecin
+        elif hasattr(teleconsultation.patient, 'doctor_profile'):
             teleconsultation.patient_full_name = f"{teleconsultation.patient.doctor_profile.nom} {teleconsultation.patient.doctor_profile.prenom}"
         else:
-            # Si le rôle est inconnu
-            teleconsultation.patient_full_name = "Rôle inconnu"
+            teleconsultation.patient_full_name = teleconsultation.patient.username
+        
+        # Ajoute la photo si disponible
+        teleconsultation.patient_photo = teleconsultation.patient.profile_picture.url if hasattr(teleconsultation.patient, 'profile_picture') and teleconsultation.patient.profile_picture else None
 
-    teleconsultation.patient_photo = teleconsultation.patient.profile_picture.url if teleconsultation.patient.profile_picture else None
     context = {
-        'teleconsultations': teleconsultations,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'as_doctor_teleconsultations': as_doctor_teleconsultations,  # Téléconsultations en tant que médecin
+        'as_patient_teleconsultations': as_patient_teleconsultations,  # Téléconsultations en tant que patient
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/medcin_teleconsultations.html', context)
 
@@ -602,14 +947,12 @@ def modify_appointment(request, appointment_id):
     Vue pour modifier un rendez-vous (statut, paiement, prix).
     """
 
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user  # Simule la connexion du médecin dans la vue
-
-        # Récupérer l'utilisateur en tant que médecin
+    # Récupérer l'utilisateur en tant que médecin
     doctor = request.user.doctor_profile
     # Récupérer le rendez-vous correspondant
     appointment = get_object_or_404(Appointment, id=appointment_id)
+
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     # Vérifier que l'utilisateur est le médecin du rendez-vous
     if appointment.doctor.user != request.user:
@@ -617,25 +960,121 @@ def modify_appointment(request, appointment_id):
 
     next_page = request.GET.get('next', None)  # Récupère la page d'origine
 
+    # Récupérer l'ancienne valeur du statut avant toute modification
+    old_status = appointment.status  # Ancien statut, avant modification du formulaire
+    print(f"Ancien statut : {old_status}")
+    old_price = appointment.prix  # Sauvegarde l'ancien prix
+    print(f"Ancien prix : {old_price}")
+    if appointment.is_online==True :
+     old_teleconsultation_link = appointment.online_link
+
+
     if request.method == 'POST':
         form = ModifyAppointmentForm(request.POST, instance=appointment)
         if form.is_valid():
-            # Sauvegarde sans recalcul du prix
-            form.save(commit=False)  # Ne sauvegarde pas immédiatement
-            appointment.save(skip_prix_calculation=True)  # Bypass le calcul du prix
-            if next_page:
-                return HttpResponseRedirect(next_page)
-            else:
-                return redirect('appointments:medcin_appointments')  # Redirige par défaut
+            print(form.cleaned_data)
+            # Nous devons d'abord récupérer l'ancienne valeur avant toute modification
+            appointment = form.save(commit=False)  # Sauvegarde sans appliquer à la base
+            # Récupérer la nouvelle valeur du statut
+            new_status = form.cleaned_data['status']  # Nouveau statut après modification
+            print(f"Nouveau statut : {new_status}")
+            new_price = form.cleaned_data['prix']
+            print(f"Nouveau prix : {new_price}")
+            if appointment.is_online==True :
+             new_teleconsultation_link = form.cleaned_data['online_link']
+
+            # Enregistrer la modification dans la base de données
+            
+            appointment.save(skip_prix_calculation=True)
+
+            # Vérifier si le statut a changé
+            if old_status != new_status:
+                print(f"Le statut a changé de {old_status} à {new_status}")
+                appointment_datetime = datetime.combine(appointment.date, appointment.time)
+                message = (
+                  f"Votre rendez-vous avec Dr. {appointment.doctor.nom} {appointment.doctor.prenom} "
+                  f"prévu le {appointment_datetime.strftime('%d/%m/%Y à %Hh%M')} est maintenant "
+                  f"'{appointment.get_status_display()}'."
+                )
+
+                # Envoi de la notification à l'utilisateur (patient)
+                print(f"Envoi de la notification à l'utilisateur : {appointment.patient}")
+                send_notification(appointment.patient, message)  # Correctement accédé à l'utilisateur
+
+            # Vérifier si le prix a changé
+            if old_price != new_price:
+                print(f"Le prix a changé de {old_price} à {new_price}")
+                appointment_datetime = datetime.combine(appointment.date, appointment.time)
+                message = (
+                  f"Le prix de votre rendez-vous avec Dr. {appointment.doctor.nom} {appointment.doctor.prenom} "
+                  f"prévu le {appointment_datetime.strftime('%d/%m/%Y à %Hh%M')} a été modifié à {new_price} DA."
+                )
+                send_notification(appointment.patient, message)
+
+            if appointment.is_online==True :
+                if old_teleconsultation_link != new_teleconsultation_link:
+                    appointment_datetime = datetime.combine(appointment.date, appointment.time)
+                    message = (
+                    f"Le lien de téléconsultation pour votre rendez-vous avec Dr. {appointment.doctor.nom} {appointment.doctor.prenom}"
+                    f"prévu le {appointment_datetime.strftime('%d/%m/%Y à %Hh%M')} a été mis à jour. "
+                    f"Voici le lien : {new_teleconsultation_link}."
+                    )
+                    send_notification(appointment.patient, message)
+                
+            
+
+
+            return HttpResponseRedirect(next_page) if next_page else redirect('appointments:medcin_appointments')
     else:
         form = ModifyAppointmentForm(instance=appointment)
+
+    patient_name = f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}"
+    appointment.patient_photo = appointment.patient.profile_picture.url if appointment.patient.profile_picture else None
 
     context = {
         'form': form,
         'appointment': appointment,
+        'patient_name': patient_name,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/medcin_appointment_modifier.html', context)
+
+
+
+from core.models import Notification  # Import du modèle depuis core
+from core.models import Notification  # Import du modèle depuis core
+from patients.models import Patient  # Import du modèle Patient pour vérifier les notifications
+
+from patients.models import Patient
+from medecins.models import Doctor
+
+def send_notification(user_or_profile, message):
+    """
+    Accepte un utilisateur ou un profil (Patient/Doctor) et envoie une notification.
+    """
+    
+
+    # Si on reçoit un profil (Doctor ou Patient), on récupère le user
+    if hasattr(user_or_profile, 'user'):
+        user = user_or_profile.user
+    else:
+        user = user_or_profile
+
+    try:
+        patient = user.patient_profile
+        if patient.notifications:
+            Notification.objects.create(user=user, message=message)
+            print("Notification envoyée au patient")
+    except Patient.DoesNotExist:
+        try:
+            doctor = user.doctor_profile
+            if doctor.notifications:
+                Notification.objects.create(user=user, message=message)
+                print("Notification envoyée au médecin")
+        except Doctor.DoesNotExist:
+            print("Utilisateur inconnu (ni patient ni médecin)")
+
 
 
 from django.contrib import messages
@@ -643,15 +1082,17 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import WeeklyAvailability, SpecificAvailability
 from .forms import WeeklyAvailabilityForm, SpecificAvailabilityForm
+from django.core.exceptions import ValidationError
+
 @login_required
 def manage_availability(request):
     """
     Vue pour gérer les disponibilités hebdomadaires, spécifiques, et les horaires d'urgence d'un médecin connecté.
     """
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+
     doctor = request.user.doctor_profile  # Profil du médecin connecté
+
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     # Récupérer les disponibilités du médecin
     weekly_availabilities = WeeklyAvailability.objects.filter(doctor=doctor, is_emergency=False)
@@ -673,23 +1114,41 @@ def manage_availability(request):
                 weekly = form_weekly.save(commit=False)
                 weekly.doctor = doctor  # Associe le médecin connecté
                 weekly.is_emergency = False
-                weekly.save()  # Enregistre après avoir ajouté `doctor`
-                messages.success(request, "Disponibilité hebdomadaire ajoutée avec succès.")
-                return redirect('appointments:manage_availability')
+                try:
+                    weekly.save()   # full_clean() + save()
+                except ValidationError as e:
+                    for msg in e.messages:
+                        messages.error(request, msg)
+                else:
+                    messages.success(request, "Disponibilité hebdomadaire ajoutée avec succès.")
+                    return redirect('appointments:manage_availability')
             else:
-                messages.error(request, "Erreur dans le formulaire hebdomadaire. Veuillez corriger.")
+                for error in form_weekly.errors:
+                  messages.error(request, form_weekly.errors[error])
 
         # Ajout de disponibilité spécifique
         elif form_type == 'specific':
             form_specific = SpecificAvailabilityForm(request.POST, prefix='specific')
             if form_specific.is_valid():
-                specific = form_specific.save(commit=False)
-                specific.doctor = doctor  # Associe le médecin connecté
-                specific.save()
-                messages.success(request, "Disponibilité spécifique ajoutée avec succès.")
-                return redirect('appointments:manage_availability')
+             specific = form_specific.save(commit=False)
+             specific.doctor = doctor  # 👉 On affecte le docteur avant d'appeler full_clean() dans .save()
+             try:
+                 specific.full_clean()  # 👉 Appelle manuellement clean() du modèle pour éviter l'erreur
+                 specific.save()
+             except ValidationError as e:
+                 for msg in e.messages:
+                     messages.error(request, msg)
+             else:
+                 messages.success(request, "Disponibilité spécifique ajoutée avec succès.")
+                 return redirect('appointments:manage_availability')
             else:
-                messages.error(request, "Erreur dans le formulaire spécifique. Veuillez corriger.")
+                for field, errors in form_specific.errors.items():
+                 for error in errors:
+                    # Si l'erreur est générale (non liée à un champ), ne pas afficher '__all__'
+                   if field == '__all__':
+                       messages.error(request, error)
+                   else:
+                       messages.error(request, f"{field} : {error}")
 
         # Ajout d'horaire d'urgence
         elif form_type == 'emergency':
@@ -698,9 +1157,14 @@ def manage_availability(request):
                 emergency = form_emergency.save(commit=False)
                 emergency.doctor = doctor  # Associe le médecin connecté
                 emergency.is_emergency = True  # Marque comme urgence
-                emergency.save()
-                messages.success(request, "Horaires d'urgence ajoutés avec succès.")
-                return redirect('appointments:manage_availability')
+                try:
+                    emergency.save()
+                except ValidationError as e:
+                    for msg in e.messages:
+                        messages.error(request, msg)
+                else:
+                    messages.success(request, "Horaires d'urgence ajoutés avec succès.")
+                    return redirect('appointments:manage_availability')
             else:
                 messages.error(request, "Erreur dans le formulaire des horaires d'urgence. Veuillez corriger.")
 
@@ -712,6 +1176,7 @@ def manage_availability(request):
         'form_specific': form_specific,
         'form_emergency': form_emergency,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/manage_availability.html', context)
 
@@ -726,11 +1191,10 @@ def edit_weekly_availability(request, availability_id):
     """
     Vue pour modifier une disponibilité hebdomadaire.
     """
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+    
     doctor = request.user.doctor_profile  # Profil du médecin connecté
     availability = get_object_or_404(WeeklyAvailability, id=availability_id, doctor=request.user.doctor_profile)
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     if request.method == 'POST':
         form = WeeklyAvailabilityForm(request.POST, instance=availability)
@@ -744,6 +1208,7 @@ def edit_weekly_availability(request, availability_id):
         'form': form,
         'availability': availability,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/edit_weekly_availability.html', context)
 
@@ -764,9 +1229,7 @@ def delete_weekly_availability(request, availability_id):
     """
     Vue pour supprimer une disponibilité hebdomadaire.
     """
-    User = get_user_model()  # Simule un utilisateur pour les tests
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Médecin connecté
-    request.user = test_user
+    
     doctor = request.user.doctor_profile  # Profil du médecin connecté
 
     # Récupérer la disponibilité et vérifier qu'elle appartient au médecin
@@ -789,9 +1252,7 @@ def delete_emergency_availability(request, availability_id):
     """
     Vue pour supprimer un horaire d'urgence.
     """
-    User = get_user_model()  # Simule un utilisateur pour les tests
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Médecin connecté
-    request.user = test_user
+    
     doctor = request.user.doctor_profile  # Récupérer le profil du médecin connecté
     emergency = get_object_or_404(WeeklyAvailability, id=availability_id, doctor=doctor, is_emergency=True)
 
@@ -816,12 +1277,12 @@ def edit_specific_availability(request, availability_id):
     """
     Vue pour modifier une disponibilité spécifique.
     """
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+    
     doctor = request.user.doctor_profile
     # Récupérer la disponibilité spécifique
     availability = get_object_or_404(SpecificAvailability, id=availability_id)
+
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     # Vérifier que l'utilisateur est bien le médecin associé à cette disponibilité
     if availability.doctor != request.user.doctor_profile:
@@ -850,6 +1311,7 @@ def edit_specific_availability(request, availability_id):
         'form': form,
         'availability': availability,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/edit_specific_availability.html', context)
 
@@ -864,9 +1326,7 @@ def delete_specific_availability(request, availability_id):
     """
     Vue pour supprimer une disponibilité spécifique.
     """
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+    
     # Récupérer la disponibilité spécifique
     availability = get_object_or_404(SpecificAvailability, id=availability_id)
 
@@ -885,11 +1345,10 @@ from .forms import ConsultationReasonForm
 
 @login_required
 def manage_consultation_reasons(request):
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+    
     doctor = request.user.doctor_profile
     reasons = ConsultationReason.objects.filter(doctor=doctor)
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     if request.method == 'POST':
         form = ConsultationReasonForm(request.POST)
@@ -906,6 +1365,7 @@ def manage_consultation_reasons(request):
         'reasons': reasons,
         'form': form,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/manage_consultation_reasons.html', context)
 
@@ -915,11 +1375,10 @@ def edit_consultation_reason(request, reason_id):
     """
     Vue pour modifier un motif de consultation existant.
     """
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+    
     doctor = request.user.doctor_profile
     reason = get_object_or_404(ConsultationReason, id=reason_id)
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
 
     # Vérifie que le motif appartient au médecin connecté
     if reason.doctor != doctor:
@@ -941,6 +1400,7 @@ def edit_consultation_reason(request, reason_id):
         'form': form,
         'reason': reason,
         'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else "Médecin inconnu",
+        'unread_notification_count': unread_count,
     }
     return render(request, 'appointments/edit_consultation_reason.html', context)
 
@@ -953,9 +1413,7 @@ def delete_consultation_reason(request, reason_id):
     """
     Vue pour supprimer une raison de consultation.
     """
-    User = get_user_model()  # Pour tester
-    test_user = User.objects.get(email="medcin3@exemple.com")  # Remplace par un email valide
-    request.user = test_user
+    
     reason = get_object_or_404(ConsultationReason, id=reason_id)
 
     if request.method == 'POST':
@@ -965,3 +1423,130 @@ def delete_consultation_reason(request, reason_id):
 
     messages.error(request, "Action non autorisée.")
     return redirect('appointments:manage_consultation_reasons')
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Appointment
+
+@login_required
+def medcin_urgent_appointments(request):
+    """
+    Affiche les rendez-vous urgents pour le médecin connecté.
+    """
+    
+    doctor = getattr(request.user, 'doctor_profile', None)
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+    today = now().date()
+
+    if not doctor:
+        return render(request, 'appointments/no_access.html', {'message': "Vous n'êtes pas autorisé à accéder à cette page."})
+
+    # Récupérer uniquement les rendez-vous urgents liés au médecin connecté
+    # Rendez-vous urgents en tant que médecin
+    as_doctor_urgent_appointments = Appointment.objects.filter(doctor=doctor,date__gte=today, is_emergency=True).order_by('-date', '-time')
+
+    # Rendez-vous urgents en tant que patient
+    as_patient_urgent_appointments = Appointment.objects.filter(patient=request.user, is_emergency=True).order_by('-date', '-time')
+
+    for appointment in chain(as_doctor_urgent_appointments, as_patient_urgent_appointments):
+        if hasattr(appointment.patient, 'patient_profile'):
+            appointment.patient_full_name = f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}"
+        elif hasattr(appointment.patient, 'doctor_profile'):  # Si le patient est un médecin
+            appointment.patient_full_name = f"{appointment.patient.doctor_profile.nom} {appointment.patient.doctor_profile.prenom}"
+        else:
+            appointment.patient_full_name = appointment.patient.username
+    
+        appointment.patient_photo = appointment.patient.profile_picture.url if hasattr(appointment.patient, 'profile_picture') and appointment.patient.profile_picture else None
+
+    context = {
+        'doctor_name': f"{doctor.nom} {doctor.prenom}" if doctor else None,
+        'as_doctor_urgent_appointments': as_doctor_urgent_appointments,  # Urgents où il est médecin
+        'as_patient_urgent_appointments': as_patient_urgent_appointments,  # Urgents où il est patient
+        'profile_picture': request.user.profile_picture.url if hasattr(request.user, 'profile_picture') and request.user.profile_picture else None,
+        'unread_notification_count': unread_count,
+    }
+    return render(request, 'appointments/medcin_urgent_appointments.html', context)
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.utils.timezone import now
+from django.core.exceptions import PermissionDenied
+from appointments.models import Appointment
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
+
+@login_required
+def doctor_appointment_history(request):
+    """
+    Vue pour afficher l'historique des rendez-vous du médecin connecté.
+    """
+    # Récupérer l'instance Doctor associée à l'utilisateur connecté
+    doctor_instance = get_object_or_404(Doctor, user=request.user)
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+
+    # Filtrer les rendez-vous passés liés au médecin
+    past_appointments = Appointment.objects.filter(
+        doctor=doctor_instance,  # Passe une instance de Doctor ici
+        date__lt=now().date()  # Inclut uniquement les rendez-vous passés
+    ).order_by('-date', '-time')
+
+    for appointment in past_appointments:
+        appointment.patient_full_name = f"{appointment.patient.patient_profile.nom} {appointment.patient.patient_profile.prenom}"
+    context = {
+        'past_appointments': past_appointments,
+        'doctor_name': f"{doctor_instance.nom} {doctor_instance.prenom}",
+        'profile_picture': doctor_instance.user.profile_picture.url if doctor_instance.user.profile_picture else None,
+        'unread_notification_count': unread_count,
+    }
+    return render(request, 'appointments/medcin_appointment_history.html', context)
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from core.models import Notification  # si le modèle est bien dans core
+from medecins.models import Doctor
+
+@login_required
+def doctor_notifications(request):
+    doctor = Doctor.objects.get(user=request.user)
+    unread_count = Notification.objects.filter(user=request.user, status='unread').count()
+    notifications = Notification.objects.filter(user=request.user).order_by('-sent_at')[:50]
+    return render(request, 'appointments/doctor_notifications.html', {
+        'notifications': notifications,'unread_notification_count': unread_count,
+        'doctor_name': f"{request.user.doctor_profile.nom} {request.user.doctor_profile.prenom}" if doctor else None
+    })
+
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404
+from core.models import Notification  # assuming your Notification model is in app 'core'
+
+@login_required
+def doctor_mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.status = 'read'
+    notification.save()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+def doctor_delete_notification(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.delete()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+def doctor_mark_all_notifications_as_read(request):
+    Notification.objects.filter(user=request.user, status='unread').update(status='read')
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+def doctor_delete_all_notifications(request):
+    Notification.objects.filter(user=request.user).delete()
+    return JsonResponse({'status': 'success'})

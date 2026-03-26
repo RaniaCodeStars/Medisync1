@@ -1,0 +1,27 @@
+{% extends "administrators/base_admin.html" %}
+
+{% block title %}Modifier un patient{% endblock %}
+
+{% block content %}
+<div class="admin-form-container">
+  <div class="form-header">
+    <h1><i class="fas fa-user-edit"></i> Modifier un patient</h1>
+    <a href="{% url 'administrators:admin_patients_list' %}" class="btn-back">
+      <i class="fas fa-arrow-left"></i> Retour à la liste des patients
+    </a>
+  </div>
+
+  <div class="card form-card">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }} <!-- Affiche tous les champs du formulaire -->
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-save"></i> Sauvegarder les modifications
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

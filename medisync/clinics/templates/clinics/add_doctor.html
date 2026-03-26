@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/headeraside.css' %}?v=1.2">
     <link rel="stylesheet" type="text/css" href="{% static 'css/add_doctor.css' %}?v=1.2">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Tableau de bord</title>
@@ -11,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
+    <header style="background-color: #375fa4; position: fixed;">
         <nav class="navbar section-content">
             <a href="#" class="nav-logo">
                 <h2 class="logo-text">Medisync</h2>
@@ -30,82 +31,129 @@
                 <li class="nav-item">
                     <a href="#doctor" class="nav-link2">Mes document</a>
                 </li>
-                <li class="nav-item" >
-                    {% if clinic.photos %}
-                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
-                {% else %}
-                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
-                {% endif %} 
-                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                <li class="nav-item">
+                    <a href="{% url 'clinics:clinic_profile' %}">
+                        {% if clinic.photos %}
+                            <img src="{{ clinic.photos.url }}" alt="Photo de la clinique" style="height: 40px; width: 40px; border-radius: 120px; border: solid 3px #FFF;">
+                        {% else %}
+                            <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de la clinique" style="height: 60px; width: 60px; border-radius: 120px; border: solid 5px #FFF;">
+                        {% endif %}
+                    </a>
                 </li>
+                
             </ul>
 
             <button id="menu-open-button" class="fas fa-bars" ></button>
         </nav>
         </div>
     </header>
-    <aside>
-        <div class="sidebar">
-            <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="active">
+    <aside style="background: linear-gradient(135deg, #375fa4, #2c3e50);max-height: 1300px;">
+        <div class="sidebar" style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+            <a href="{% url 'clinics:clinic_dashboard' %}" class="{% if request.resolver_match.url_name == 'clinic_dashboard' %}active{% endif %}">
                 <span class="material-icons">dashboard</span>
                 <h3>Tableau de bord</h3>
             </a>   
-            
-            
-            <a href="#">
+            <a href="{% url 'clinics:mes_demandes' %}" class="{% if request.resolver_match.url_name == 'mes_demandes' %}active{% endif %}">
                 <span class="material-icons">calendar_month</span>
                 <h3>Mes rendez-vous</h3>
             </a>
-            <a href="#">
+            <a href="{% url 'clinics:confirm_doctor' %}" class="{% if request.resolver_match.url_name == 'confirm_doctor' %}active{% endif %}">
                 <span class="material-icons">description</span>
-                <h3>Documents</h3>
+                <h3>Docs à valider</h3>
             </a>
-            <a href="#">
+            <a href="#" class="{% if 'messages' in request.path %}active{% endif %}">
                 <span class="material-icons">sms</span>
                 <h3>Messages</h3>
                 <!-- <span class="message-count">26</span> -->
             </a>
-            <a href="#">
+            
+            <a href="#" class="{% if 'teleconsultation' in request.path %}active{% endif %}">
                 <span class="material-icons">videocam</span>
                 <h3>Téléconsultation</h3>
             </a>
-            <a href="{% url 'manage_doctors' clinic_id=clinic.id %}">
-                <span class="material-icons">bar_chart</span> <!-- Icône Statistiques -->
-                <h3>Gérer les médecins</h3>
+            
+            <a href="{% url 'clinics:manage_doctors' %}" class="{% if request.resolver_match.url_name == 'manage_doctors' %}active{% endif %}">
+                <span class="material-icons">bar_chart</span>
+                <h3>Gérer Médecins</h3>
             </a>
-            <a href="{% url 'clinic_profile' clinic_id=clinic.id %}">
-                <span class="material-icons">person</span> <!-- Icône de profil -->
+            
+            <a href="{% url 'clinics:clinic_profile' %}" class="{% if request.resolver_match.url_name == 'clinic_profile' %}active{% endif %}">
+                <span class="material-icons">person</span>
                 <h3>Profil</h3> 
             </a>
-            <a href="{% url 'clinic_edit' clinic_id=clinic.id %}">
-                <span class="material-icons">edit</span> <!-- Icône de modification -->
+            
+            <a href="{% url 'clinics:clinic_edit' %}" class="{% if request.resolver_match.url_name == 'clinic_edit' %}active{% endif %}">
+                <span class="material-icons">edit</span>
                 <h3>Modifier Profil</h3> 
             </a> 
-
+    
             {% if clinic %}
-            <a href="{% url 'edit_horaires' clinic.id %}">
-                <span class="material-icons">schedule</span>
-                <h3>Modifier Horaires</h3>
-            </a>
-        {% else %}
-            <p>Aucune clinique sélectionnée.</p>
-        {% endif %} 
-        <a href="#">
-            <span class="material-icons">settings</span>
-            <h3>Paramètres</h3>
-        </a>
+                <a href="{% url 'clinics:edit_horaires' %}" class="{% if request.resolver_match.url_name == 'edit_horaires' %}active{% endif %}">
+                    <span class="material-icons">schedule</span>
+                    <h3>Modifier Horaires</h3>
+                </a>
+            {% else %}
+                <p class="no-clinic-message">Aucune clinique sélectionnée.</p>
+            {% endif %} 
             
-        <a href="#">
-            <span class="material-icons">logout</span>
-            <h3>Déconnexion</h3>
-        </a>
+            <a href="{% url 'clinics:clinic_settings' %}" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            
+            <div class="modal fade logout-modal" id="logoutModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-footer">
+                            
+                            <a href="#" id="confirmLogout" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                                <span class="material-icons">logout</span>
+                                <h3>Déconnexion</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <script>
+                    document.getElementById("confirmLogout").addEventListener("click", function() {
+                        window.location.href = "{% url 'accounts:login' %}";
+                    });
+                </script>
+                  <!-- Bootstrap JS Bundle avec Popper -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+                <script>
+        // Optionnel: Animation supplémentaire
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatar = document.querySelector('.avatar-container');
+            
+            avatar.addEventListener('click', function() {
+                // Animation au clic (optionnel)
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Gestion personnalisée de la déconnexion (optionnel)
+            const confirmLogout = document.querySelector('.logout-btn.confirm');
+            confirmLogout.addEventListener('click', function() {
+                // Vous pouvez ajouter ici un préchargement ou animation
+                console.log('Déconnexion en cours...');
+            });
+        });
+                </script>
+                <button id="menu-open-button" class="fas fa-bars" ></button>
+
         </div>
     </aside>
-    <div class="container" style="width:400px;margin-left: 500px;">
+    <div class="container" style="width:400px;margin-left: 500px;    margin-top: 100px; width: 450px;    height: 1200px">
         <h2>{% if editing %}Modifier{% else %}Ajouter{% endif %} un médecin</h2>
     
-        <form method="post" enctype="multipart/form-data"
-            action="{% if editing %}{% url 'edit_doctor' doctor.id %}{% else %}{% url 'add_doctor' clinic_id=clinic.id %}{% endif %}">
+        <form method="post" enctype="multipart/form-data" 
+            action="{% if editing %}{% url 'clinics:edit_doctor' doctor.id %}{% else %}{% url 'clinics:add_doctor'  %}{% endif %}" style="width: 400px;max-height:350px">
             {% csrf_token %}
             {{ form.as_p }}
     
@@ -114,7 +162,215 @@
             </button>
         </form>
     </div>
-    
+    <style>
+        /* Import fonts for a premium look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Define color variables for consistent theming */
+:root {
+    --primary: #1d4ed8;
+    --primary-dark: #1e3a8a;
+    --accent: #b91c1c;
+    --light: #f1f5f9;
+    --dark: #0c1c3c;
+    --gray: #64748b;
+    --border: #cbd5e1;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Body styling with a subtle gradient */
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e2e8f0 100%);
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Container styling for a compact and modern form */
+
+.container {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    position: relative;
+}
+
+/* Heading styling for a concise and elegant title */
+.container h2 {
+    color: var(--dark);
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    position: relative;
+}
+
+.container h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 1px;
+}
+
+/* Form styling for a compact and flexible layout */
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+/* Form paragraph styling */
+form p {
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+/* Label styling */
+label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.85rem;
+}
+
+/* Input, select, and textarea styling */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--dark);
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.1);
+    background-color: #ffffff;
+}
+
+input[type="file"] {
+    padding: 0.7rem;
+    border: 1px dashed var(--border);
+    background: var(--light);
+}
+
+/* Button styling */
+button[type="submit"],
+a.btn-secondary {
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.75rem;
+    border: none;
+    text-decoration: none;
+}
+
+button[type="submit"] {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(90deg, var(--primary-dark) 0%, #1e3a8a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+a.btn-secondary {
+    background: #ffffff;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    margin-left: 0.5rem;
+}
+
+a.btn-secondary:hover {
+    background: var(--light);
+    color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Error message styling */
+.errorlist {
+    color: var(--accent);
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    list-style: none;
+    padding: 0.5rem;
+    background: rgba(185, 28, 28, 0.1);
+    border-radius: 4px;
+}
+
+/* Help text styling */
+.helptext {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-top: 0.3rem;
+    display: block;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem 0.75rem;
+        padding: 1rem;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    form p {
+        min-width: 100%;
+    }
+
+    button[type="submit"],
+    a.btn-secondary {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .container h2 {
+        font-size: 1.3rem;
+    }
+}
+    </style>
        
         
         

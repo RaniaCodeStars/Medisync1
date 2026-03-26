@@ -23,11 +23,12 @@ class Profile(models.Model):
         ('PATIENT', 'Patient'),
         ('ADMIN', 'Admin'),
         ('PHARMACIEN', 'Pharmacien'),
+        ('CLINIC','clinic'),
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='PATIENT')
-    is_verified = models.BooleanField(default=True)  # Indique si l'utilisateur a été vérifié
+    is_verified = models.BooleanField(default=False)  # Indique si l'utilisateur a été vérifié
     clinic_name = models.CharField(max_length=255, blank=True, null=True)  # Optionnel, pour les médecins
 
     def __str__(self):
@@ -48,3 +49,18 @@ class Profile(models.Model):
     @property
     def is_admin(self):
         return self.role == 'ADMIN'
+
+from django.db import models
+
+from django.utils.timezone import now
+
+class NotificationAdmin(models.Model):
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    sujet = models.CharField(max_length=255)
+    message = models.TextField()
+    date_envoye = models.DateTimeField(default=now)
+    lu = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification pour {self.User.prenom} {self.User.nom} - {self.sujet}"
+

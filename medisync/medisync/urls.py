@@ -32,6 +32,10 @@ urlpatterns = [
     path('clinic/', include('clinics.urls')), 
     path('', include('core.urls')),  # URLs de l'application core (pour la page d'accueil, etc.)
     path('appointments/', include('appointments.urls')),
+    path('administrators/', include(('administrators.urls', 'administrators'), namespace='administrators')),
+    path('messages/', include('messaging.urls')),
+    path('patients/', include('patients.urls')), 
+
     # path('api/', include('api.urls')),  # Inclure les URLs de l'API
 
 ]

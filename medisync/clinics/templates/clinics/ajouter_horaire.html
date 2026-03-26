@@ -1,0 +1,188 @@
+<!-- ajouter_horaire.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un horaire</title>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter un horaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="schedule-container">
+        <h1>Ajouter un horaire pour le Dr {{ doctor.name }}</h1>
+
+        <form method="post" class="schedule-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span class="error-message">{{ field.errors }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn-primary">Ajouter</button>
+        </form>
+    </div>
+</body>
+</html>
+<style>
+    /* Define color variables for consistent theming */
+:root {
+    --primary: #1d4ed8;
+    --primary-dark: #1e3a8a;
+    --secondary: #059669;
+    --danger: #b91c1c;
+    --light: #f1f5f9;
+    --dark: #0c1c3c;
+    --gray: #64748b;
+    --border: #cbd5e1;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --background: #ffffff;
+}
+
+/* Main container styling for a compact schedule form */
+.schedule-container {
+    max-width: 700px;
+    margin: 1rem auto;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--light);
+    border-radius: 8px;
+}
+
+/* Heading styling for a concise title */
+h1 {
+    font-size: 1.4rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid var(--primary);
+    padding-bottom: 0.3rem;
+}
+
+/* Form styling for a compact and horizontal layout */
+.schedule-form {
+    flex-wrap: wrap;
+    gap: 1rem;
+    background-color: var(--background);
+    padding: 1.2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+/* Form field container styling */
+.schedule-form > div {
+    flex: 1;
+    min-width: 140px;
+}
+
+/* Label styling */
+label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+/* Input and select styling */
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: var(--dark);
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+    margin-bottom: 30px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.1);
+    background-color: #ffffff;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Error message styling */
+.error-message {
+    font-size: 0.8rem;
+    color: var(--danger);
+    margin-top: 0.3rem;
+    display: block;
+}
+
+/* Submit button styling */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-end;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, var(--primary-dark) 0%, #1e3a8a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .schedule-container {
+        padding: 0.75rem;
+    }
+
+    .schedule-form {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .schedule-form > div {
+        flex: 1 0 100%;
+    }
+
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+}
+</style>
+</body>
+</html>

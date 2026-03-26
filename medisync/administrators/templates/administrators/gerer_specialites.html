@@ -1,0 +1,367 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+
+{% block title %}Gestion des Spécialités{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <header class="admin-header">
+    <h1><i class="fas fa-stethoscope"></i> Gestion des spécialités</h1>
+    <p class="subtitle">Ajoutez, modifiez ou supprimez des spécialités disponibles.</p>
+  </header>
+
+  {% if messages %}
+    <section class="alerts-container">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <section class="card card--primary">
+    <header class="card-header">
+      <h2><i class="fas fa-plus-circle"></i> Ajouter une spécialité</h2>
+    </header>
+    <div class="card-body">
+      <form method="post" action="{% url 'administrators:gerer_specialites' %}" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="{{ form.nom.id_for_label }}" class="form-label">{{ form.nom.label }}</label>
+          {{ form.nom }}
+          {% if form.nom.errors %}
+            <div class="form-error">{{ form.nom.errors }}</div>
+          {% endif %}
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn--success">
+            <i class="fas fa-save"></i> Ajouter
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card card--secondary">
+    <header class="card-header">
+      <h2><i class="fas fa-list"></i> Liste des spécialités</h2>
+    </header>
+    <div class="card-body table-responsive">
+      <table class="table table--hover">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for specialite in specialites %}
+          <tr>
+            <td>{{ specialite.nom }}</td>
+            <td class="text-center">
+              <form method="post" action="{% url 'administrators:supprimer_specialite' pk=specialite.pk %}" class="delete-form">
+                {% csrf_token %}
+                <button type="button" class="btn btn--danger btn--circle swal-delete" data-nom="{{ specialite.nom }}" title="Supprimer">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="2" class="text-center text-muted">Aucune spécialité enregistrée.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<style>
+/* --- Variables couleurs --- */
+:root {
+  --color-primary: #60b7f0;
+  --color-success: #3ec586;
+  --color-danger: #ea5455;
+  --color-bg: #fff;
+  --color-text: #000000;
+  --color-muted: #c8e4f7;
+  --color-gray-light: #f8f9fa;
+  --color-gray-medium: #dee2e6;
+  --color-hover-bg: #e9f0ff;
+  --border-radius: 12px;
+  --transition: 0.3s ease;
+  --shadow-light: 0 4px 12px rgba(25, 25, 27, 0.15);
+}
+
+/* Container principale */
+.admin-container {
+  max-width: 900px;
+  margin: 3rem auto;
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+  padding: 2.5rem 3rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--color-text);
+}
+
+/* Header */
+.admin-header h1 {
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: var(--color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  color: var(--color-muted);
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+/* Card commune */
+.card {
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 10px rgba(132, 18, 18, 0.07);
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+  transition: box-shadow var(--transition);
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  padding: 1.2rem 2rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-bg);
+  user-select: none;
+}
+
+.card--primary .card-header {
+  background-color: var(--color-primary);
+}
+
+.card--secondary .card-header {
+  background-color: #60b7f0;
+}
+
+/* Corps de carte */
+.card-body {
+  padding: 1.8rem 2.2rem;
+}
+
+/* Formulaire */
+.form-group {
+  margin-bottom: 1.6rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+form input[type="text"] {
+  font-size: 1.05rem;
+  padding: 12px 14px;
+  border: 1.8px solid var(--color-gray-medium);
+  border-radius: 10px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  box-shadow: none;
+  outline: none;
+  font-weight: 500;
+}
+
+form input[type="text"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Erreurs formulaire */
+.form-error {
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  margin-top: 0.3rem;
+  font-weight: 600;
+}
+
+/* Boutons */
+.btn {
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.55rem 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: background-color var(--transition), box-shadow var(--transition);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+  user-select: none;
+}
+
+.btn i {
+  font-size: 1.2rem;
+}
+
+/* Bouton succès (ajouter) */
+.btn--success {
+  background-color: var(--color-success);
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(25, 135, 84, 0.4);
+}
+
+.btn--success:hover,
+.btn--success:focus {
+  background-color: #157347;
+  box-shadow: 0 7px 20px rgba(21, 115, 71, 0.6);
+}
+
+/* Bouton danger (supprimer) */
+.btn--danger {
+  background-color: var(--color-danger);
+  color: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 3px 10px rgba(220, 53, 69, 0.4);
+  justify-content: center;
+}
+
+.btn--danger:hover,
+.btn--danger:focus {
+  background-color: #b02a37;
+  box-shadow: 0 5px 14px rgba(176, 42, 55, 0.6);
+}
+
+/* Table */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.75rem;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.table thead tr {
+  background-color: var(--color-gray-light);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #495057;
+  border-radius: var(--border-radius);
+}
+
+.table thead th {
+  padding: 0.9rem 1.3rem;
+  text-align: left;
+  user-select: none;
+}
+
+.table tbody tr {
+  background-color: var(--color-bg);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.05);
+  transition: background-color var(--transition);
+  border-radius: var(--border-radius);
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-hover-bg);
+}
+
+.table tbody td {
+  padding: 1.1rem 1.3rem;
+  vertical-align: middle;
+}
+
+/* Center actions column */
+.text-center {
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .admin-container {
+    padding: 2rem 1.2rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.45rem 1.2rem;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    box-shadow: none;
+    background-color: transparent;
+  }
+
+  .table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .table tbody td:last-child {
+    justify-content: center;
+  }
+}
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.swal-delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const form = button.closest('form');
+        const nom = button.getAttribute('data-nom') || 'cette spécialité';
+
+        Swal.fire({
+          title: 'Confirmation',
+          text: `Êtes-vous sûr de vouloir supprimer "${nom}" ?`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Oui, supprimer',
+          cancelButtonText: 'Annuler',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit();
+          }
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}

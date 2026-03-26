@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{% static 'css/help_center.css' %}">
 </head>
 <body>
+
     <header>
         <nav class="navbar section-content">
             <a href="#" class="nav-logo">
@@ -15,31 +16,27 @@
             <ul class="nav-menu">
                 <button id="menu-close-button" class="fas fa-times" ></button>
                 <li class="nav-item">
-                    <a href="#home" class="nav-link2">Acceuil </a>
+                    <a href="{% url 'clinics:clinic_dashboard' %}" class="nav-link2">Acceuil </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'help_center' %}" class="nav-link2">Centre d'aide</a>
+                    <a href="{% url 'clinics:help_center' %}" class="nav-link2">Centre d'aide</a>
                 </li>
-                
                 <li class="nav-item">
-                    <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+                    <a href="{% url 'clinics:mes_demandes' %}" class="nav-link2">Mes rendez-vous</a>
                 </li>
                 <li class="nav-item">
                     <a href="#doctor" class="nav-link2">Mes document</a>
                 </li>
-                <li class="nav-item" >
-                    {% if clinic.photos %}
-                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
-                {% else %}
-                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
-                {% endif %} 
-                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                <li class="nav-item">
+                    {% if clinic and clinic.photos %}
+                        <img src="{{ clinic.photos.url }}" alt="Photo de la clinique" style="height: 40px; width: 40px; border-radius: 120px; border:solid 3px #FFF;">
+                    {% else %}
+                        <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de la clinique" style="height: 60px; width: 60px; border-radius: 120px; border:solid 5px #FFF;">
+                    {% endif %} 
                 </li>
             </ul>
-
             <button id="menu-open-button" class="fas fa-bars" ></button>
         </nav>
-        </div>
     </header>
     <h1>Centre d'aide Medisync</h1>
 

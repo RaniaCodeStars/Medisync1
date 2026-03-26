@@ -1,0 +1,254 @@
+{% extends 'administrators/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">{{ page_title }}</h1>
+    <ol class="breadcrumb mb-4">
+        
+    </ol>
+    
+    <div class="row">
+        <!-- Carte 1: Médecins totaux -->
+        
+
+
+        <div class="row fade-in delay-1">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card">
+                <div class="card-body">
+                    <div class="card-icon primary">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="card-value">{{ total_doctors }}</div>
+                    <div class="card-title">Médecins Totaux</div>
+                    
+
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Carte 2: Médecins approuvés -->
+        <div class="col-xl-3 col-md-6 mb-4">
+    <div class="dashboard-card card">
+        <div class="card-body">
+            <div class="card-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="card-value">{{ approved_doctors }}</div>
+            <div class="card-title">Médecins Approuvés</div>
+            
+        </div>
+    </div>
+</div>
+        
+        <!-- Carte 3: En attente -->
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="dashboard-card card">
+            <div class="card-body">
+                <div class="card-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-value">{{ pending_doctors }}</div>
+                <div class="card-title">Médecins en Attente</div>
+                 </div>
+        </div>
+    </div>
+        
+        <!-- Carte 4: Nouveaux médecins -->
+        <div class="col-xl-3 col-md-6 mb-4">
+        <div class="dashboard-card card">
+            <div class="card-body">
+                <div class="card-icon info">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="card-value">{{ new_doctors_count }}</div>
+                <div class="card-title">Nouveaux (30j)</div>
+                
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <!-- Graphiques et tableaux -->
+    <div class="row">
+        <!-- Activité des médecins -->
+        <div class="col-xl-6 mb-4">
+    <div class="dashboard-card card h-100">  <!-- Added h-100 for equal height -->
+        <div class="card-body">
+            <div class="row align-items-center h-100">  <!-- Ensure full height -->
+                <!-- Stats Section -->
+                <div class="col-md-6 text-center py-3">  <!-- Added padding -->
+                   
+                    <h3 class="card-value mb-1">{{ active_stats.active }}</h3>  <!-- h3 for better hierarchy -->
+                    <p class="card-title text-muted mb-3">sur {{ active_stats.total }} médecins</p>
+                    
+                    <div class="trend-indicator mt-3">
+                        <span class="badge trend-badge {% if activity_trend.is_increasing %}bg-success{% else %}bg-danger{% endif %}">
+                            <i class="fas fa-arrow-{% if activity_trend.is_increasing %}up{% else %}down{% endif %} me-1"></i>
+                            {{ activity_trend.trend }}%
+                        </span>
+                        <p class="small text-muted mt-1 mb-0">par rapport à la période précédente</p>
+                    </div>
+                </div>
+                
+                <!-- Chart Section -->
+                <div class="col-md-6">
+                    <div class="chart-container" style="position: relative; height:100%; min-height:200px;">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+    
+    <!-- Tableaux supplémentaires -->
+    <div class="row">
+        <!-- Localisations -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Répartition géographique
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Wilaya</th>
+                                    <th>Nombre de médecins</th>
+                                    <th>Pourcentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loc in location_stats %}
+                                <tr>
+                                    <td>{{ loc.location }}</td>
+                                    <td>{{ loc.count }}</td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {% widthratio loc.count approved_doctors 100 %}%;" 
+                                                 aria-valuenow="{% widthratio loc.count approved_doctors 100 %}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {% widthratio loc.count approved_doctors 100 %}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Spécialités détaillées -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-stethoscope me-1"></i>
+                    Spécialités médicales
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Spécialité</th>
+                                    <th>Nombre</th>
+                                    <th>Tendance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spec in specialties_stats %}
+                                <tr>
+                                    <td>{{ spec.specialty__nom|default:"Non spécifié" }}</td>
+                                    <td>{{ spec.count }}</td>
+                                    <td>
+                                        <span class="text-success">
+                                            <i class="fas fa-arrow-up"></i> +5%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<style>/* Style pour l'icône info */
+
+.card-icon.info {
+    background-color: rgba(13, 202, 240, 0.1);
+    color: #0dcaf0;
+}
+
+/* Animation pour l'icône étoile */
+.card-icon.info i.fa-star {
+    transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover .card-icon.info i.fa-star {
+    transform: rotate(15deg);
+}</style>
+{% block scripts %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Graphique d'activité
+const ctx1 = document.getElementById('activityChart').getContext('2d');
+const activityChart = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+        labels: ['Actifs', 'Inactifs'],
+        datasets: [{
+            data: [{{ active_stats.active }}, {{ active_stats.inactive }}],
+            backgroundColor: ['#28a745', '#dc3545'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+
+// Graphique des spécialités
+const ctx2 = document.getElementById('specialtyChart').getContext('2d');
+const specialtyChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: [{% for spec in specialties_stats %}'{{ spec.specialty__nom|default:"Autre" }}',{% endfor %}],
+        datasets: [{
+            label: 'Nombre de médecins',
+            data: [{% for spec in specialties_stats %}{{ spec.count }},{% endfor %}],
+            backgroundColor: '#007bff',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

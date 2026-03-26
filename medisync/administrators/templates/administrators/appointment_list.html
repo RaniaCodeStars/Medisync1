@@ -1,0 +1,218 @@
+{% extends 'administrators/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">{{ page_title }}</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'administrators:dashboard_admin' %}">Tableau de bord</a></li>
+        <li class="breadcrumb-item active">Rendez-vous</li>
+    </ol>
+    
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i>
+            Filtres
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Statut</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Tous</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>En attente</option>
+                        <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmés</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Annulés</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" id="date" name="date" class="form-control" value="{{ date_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="emergency" class="form-label">Urgence</label>
+                    <select id="emergency" name="emergency" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="yes" {% if emergency_filter == 'yes' %}selected{% endif %}>Urgences seulement</option>
+                        <option value="no" {% if emergency_filter == 'no' %}selected{% endif %}>Non urgences</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Filtrer</button>
+                    <a href="{% url 'administrators:appointment_list' %}" class="btn btn-secondary">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Total RDV</h5>
+                            <h2 class="mb-0">{{ stats.total }}</h2>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>Tendance: 
+                        <span class="{% if stats.is_increasing %}text-success{% else %}text-warning{% endif %}">
+                            {{ stats.trend }}%
+                            <i class="fas fa-arrow-{% if stats.is_increasing %}up{% else %}down{% endif %}"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Confirmés</h5>
+                            <h2 class="mb-0">{{ stats.confirmed }}</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>{{ stats.confirmed_pct }}% du total</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Aujourd'hui</h5>
+                            <h2 class="mb-0">{{ upcoming }}</h2>
+                        </div>
+                        <i class="fas fa-calendar-day fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>{{ upcoming }} RDV dans 7 jours</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Annulés</h5>
+                            <h2 class="mb-0">{{ stats.cancelled }}</h2>
+                        </div>
+                        <i class="fas fa-times-circle fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>{{ stats.cancelled_pct }}% du total</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Liste des rendez-vous -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Liste des rendez-vous
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Date/Heure</th>
+                            <th>Médecin</th>
+                            <th>Patient</th>
+                            <th>Motif</th>
+                            <th>Durée</th>
+                            <th>Statut</th>
+                            <th>Paiement</th>
+                            <th>Urgence</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in appointments %}
+                        <tr>
+                            <td>
+                                {{ app.date|date:"d/m/Y" }} 
+                                <br>
+                                <small>{{ app.time|time:"H:i" }}</small>
+                            </td>
+                            <td>
+                                Dr. {{ app.doctor.nom }} {{ app.doctor.prenom }}
+                                <br>
+                                <small class="text-muted">{{ app.doctor.specialty.nom }}</small>
+                            </td>
+                            <td>
+                                {{ app.patient.patient_profile.nom }} {{ app.patient.patient_profile.prenom }}
+                                <br>
+                                <small class="text-muted">{{ app.patient.phone }}</small>
+                            </td>
+                            <td>
+                                {{ app.consultation_reason.name|default:"-" }}
+                                <br>
+                                <small class="text-muted">{{ app.notes|truncatechars:20 }}</small>
+                            </td> (modifié)
+
+                            <td>{{ app.duration }} min</td>
+                            <td>
+                                <span class="badge bg-{{ app.get_status_class }}">
+                                    {{ app.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if app.payment_status == 'paid' %}success{% else %}warning{% endif %}">
+                                    {{ app.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if app.is_emergency %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-triangle"></i> Urgence
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">Normal</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn btn-sm btn-primary" title="Détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if app.status == 'pending' %}
+                                <a href="#" class="btn btn-sm btn-success" title="Confirmer">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center">Aucun rendez-vous trouvé</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- DataTables -->
+<script src="{% static 'admin/js/datatables-demo.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,10 @@
+<h2>Planning de la semaine (heure par heure)</h2>
+
+{% for jour in planning %}
+    <h3>{{ jour.jour }}</h3>
+    <ul>
+        {% for creneau in jour.creneaux %}
+            <li>{{ creneau.heure }} → {{ creneau.status }}</li>
+        {% endfor %}
+    </ul>
+{% endfor %}

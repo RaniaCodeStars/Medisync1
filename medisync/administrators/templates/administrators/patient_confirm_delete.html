@@ -1,0 +1,38 @@
+{% extends 'administrators/base_admin.html' %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-danger text-white">
+        <h3 class="card-title">
+            <i class="fas fa-exclamation-triangle"></i> Confirmer la suppression
+        </h3>
+    </div>
+    <div class="card-body">
+        <p>Êtes-vous sûr de vouloir supprimer définitivement ce patient ?</p>
+        <div class="alert alert-warning">
+            <strong>Attention :</strong> Cette action supprimera également le compte utilisateur associé et toutes ses données. Cette opération est irréversible.
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Détails du patient</h5>
+                <ul class="list-unstyled">
+                    <li><strong>Nom complet :</strong> {{ object.nom }} {{ object.prenom }}</li>
+                    <li><strong>Email :</strong> {{ object.user.email }}</li>
+                    <li><strong>Groupe sanguin :</strong> {{ object.get_blood_group_display }}</li>
+                </ul>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Confirmer la suppression
+            </button>
+            <a href="{% url 'administrators:admin_patients_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Annuler
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

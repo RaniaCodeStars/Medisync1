@@ -1,0 +1,231 @@
+{% extends 'administrators/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Médecin validé avec succès
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-xl mx-auto mb-3">
+                            {% if doctor.user.profile_picture %}
+                            <img src="{{ doctor.user.profile_picture.url }}" alt="{{ doctor.nom }}" class="rounded-circle">
+                            {% else %}
+                            <img src="{% static 'image/profil-inicial.jpg' %}" alt="{{ doctor.nom }}" class="rounded-circle">
+                            {% endif %}
+                        </div>
+                        <h3>Dr. {{ doctor.nom }} {{ doctor.prenom }}</h3>
+                        <p class="text-muted">{{ doctor.specialty.nom }}</p>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">Validation réussie</h5>
+                                <p class="mb-0">Le médecin a été approuvé et peut maintenant recevoir des patients.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">Informations</h6>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2">
+                                            <i class="fas fa-envelope me-2 text-muted"></i>
+                                            {{ doctor.user.email }}
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                                            {{ doctor.location }}
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-briefcase me-2 text-muted"></i>
+                                            {{ doctor.experience }} ans d'expérience
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">Actions</h6>
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'administrators:doctor_validation' %}" class="btn btn-outline-primary">
+                                            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                                        </a>
+                                        <a href="{% url 'administrators:doctor_detail' doctor.id %}" class="btn btn-primary">
+                                            <i class="fas fa-eye me-1"></i> Voir le profil
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Un email de confirmation a été envoyé au médecin.
+                    </small>
+                </div>
+                {% if not email_sent %}
+<div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <div>
+            <strong>Attention :</strong> L'email de confirmation n'a pas pu être envoyé au médecin.
+            Veuillez le contacter manuellement à l'adresse {{ doctor.user.email }}.
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% block styles %}
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .avatar-xl img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+        background: linear-gradient(135deg, #198754, #157347);
+        color: white;
+        padding: 1rem 1.25rem;
+    }
+
+    .card-body h6.card-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .list-unstyled li {
+        font-size: 0.95rem;
+        color: #495057;
+    }
+
+    .btn {
+        font-weight: 600;
+        padding: 0.6rem 1.1rem;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-outline-primary {
+        color: #0d6efd;
+        border: 2px solid #0d6efd;
+        background: transparent;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+        transform: translateY(-1px);
+    }
+
+    .alert-success {
+        background-color: rgba(25, 135, 84, 0.08);
+        border-left: 5px solid #198754;
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .alert-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        border-left: 5px solid #ffc107;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .card-footer {
+        background-color: #f1f3f5;
+        border-radius: 0 0 0.75rem 0.75rem;
+    }
+
+    .card-footer small {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+
+    p.text-muted {
+        font-size: 1rem;
+    }
+
+    .fa-2x {
+        font-size: 1.5rem;
+        color: #198754;
+    }
+
+    .btn-close {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .gap-2 .btn {
+        width: 100%;
+    }
+
+    @media (max-width: 576px) {
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        .avatar-xl img {
+            width: 100px;
+            height: 100px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% endblock %}

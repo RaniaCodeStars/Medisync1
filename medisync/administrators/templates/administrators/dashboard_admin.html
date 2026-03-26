@@ -1,0 +1,470 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+{% block title %}Tableau de Bord Administrateur{% endblock %}
+
+{% block content %}
+<!-- Dashboard Content -->
+<div class="container-fluid">
+    <h4 class="mb-4 fade-in">Tableau de Bord Administrateur</h4>
+
+
+
+
+    <!-- Stats Cards -->
+    <div class="row fade-in delay-1">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card">
+                <div class="card-body">
+                    <div class="card-icon primary">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="card-value">{{ doctor_stats.active }} / {{ total_doctors }}</div>
+                    <div class="card-title">Médecins Actifs  </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card">
+                <div class="card-body">
+                    <div class="card-icon success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-value">{{ patient_stats.active }} / {{ patient_stats.total }}</div>
+                    <div class="card-title">Patients Actifs ({{ patient_stats.period }} j)</div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card">
+                <div class="card-body">
+                    <div class="card-icon warning">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="card-value">{{ appointment_stats.total }}</div>
+                    <div class="card-title">Rendez-vous</div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card">
+                <div class="card-body">
+                    <div class="card-icon warning">
+    <i class="fas fa-hospital"></i>
+</div>
+                    <div class="card-value"> {{ clinic_stats.approved }}</div>
+                    <div class="card-title">Clinics</div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    <div>
+
+<!-- Tables Row -->
+<div class="row fade-in delay-3">
+    <!-- Médecins à valider -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card card">
+            <div class="card-header">
+                <span>Médecins à Valider</span>
+                <a href="{% url 'administrators:doctor_validation'%}" class="btn btn-sm btn-primary">Voir Tous
+                    <i class="fas fa-chevron-right ms-1"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table doctor-table">
+                        <thead>
+                            <tr>
+                                <th>Médecin</th>
+                                <th>Spécialité</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doctor in latest_pending_doctors %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{% static 'image/profil-inicial.jpg' %}" alt="Avatar">
+                                        <div class="ms-3">
+                                            <div class="fw-bold">Dr. {{ doctor.prenom }} {{ doctor.nom }}</div>
+                                            <small class="text-muted">{{doctor.user.email}}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ doctor.specialty.nom }}</td>
+                                <td>
+                                    <span class="badge-pending">
+                                        <i class="fas fa-hourglass-half me-1"></i>{{doctor.status}}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">Aucun médecin en attente de validation</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cliniques à valider -->
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card card">
+            <div class="card-header">
+                <span>Cliniques à Valider</span>
+                <a href="{% url 'administrators:pending_clinics' %}" class="btn btn-sm btn-primary">Voir Tous
+                    <i class="fas fa-chevron-right ms-1"></i></a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table clinic-table">
+                        <thead>
+                            <tr>
+                                <th>Clinique</th>
+                                <th>Localisation</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for clinic in latest_pending_clinics %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{% static 'image/profil-inicial.jpg' %}" alt="Clinique" width="40" height="40">
+                                        <div class="ms-3">
+                                            <div class="fw-bold">{{ clinic.name }}</div>
+                                            <small class="text-muted">{{ clinic.email|default:"-" }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ clinic.location }}</td>
+                                <td>
+                                    <span class="badge-pending">
+                                        <i class="fas fa-hourglass-half me-1"></i>
+                                        {{ clinic.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">Aucune clinique en attente de validation</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Recent Appointments -->
+            <div class="row fade-in delay-4">
+                <div class="col-12 mb-4">
+                    <div class="dashboard-card card">
+                        <div class="card-header">
+                            <span>Rendez-vous Récents</span>
+                            <a href="{% url 'administrators:appointment_list'%}" class="btn btn-sm btn-primary">Voir
+                                Tous <i class="fas fa-chevron-right ms-1"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="recentAppointmentsTable">
+                                    <thead>
+                                        <tr>
+
+                                            <th>Patient</th>
+                                            <th>Médecin</th>
+                                            <th>Date/Heure</th>
+                                            <th>Spécialité</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for app in recent_appointments %}
+                                        <tr>
+
+                                            <td>{{ app.patient.patient_profile.nom }}  {{ app.patient.patient_profile.prenom }}</td>
+                                            <td>Dr. {{ app.doctor.nom }} {{ app.doctor.prenom }}</td>
+                                            <td>{{ app.date|date:"d/m/Y" }}~{{ app.time|time:"H:i" }}</td>
+                                            <td>{{ app.doctor.specialty }}</td>
+                                            <td> <span class="badge bg-{{ app.get_status_class }}">
+                                                    {{ app.get_status_display }}
+                                                </span></td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="table-btn view" title="Voir détails"><i
+                                                            class="fas fa-eye"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">Aucun rendez-vous trouvé</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        
+        .chart-container {
+            position: relative;
+            min-height: 300px;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
+        }
+    </style>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+
+            const activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ activity_stats.months | safe }},
+            datasets: [
+            {
+                label: 'Nouveaux Patients',
+                data: {{ activity_stats.patients | safe }},
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.3,
+            fill: true
+                },
+            {
+                label: 'Rendez-vous',
+                data: {{ activity_stats.appointments | safe }},
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            tension: 0.3,
+            fill: true
+                }
+        ]
+        },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 10
+                    }
+                }
+            }
+        }
+    });
+});
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Gestion du filtre des rendez-vous
+            const filterButtons = document.querySelectorAll('#recentAppointmentsDropdown ~ .dropdown-menu .dropdown-item');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const period = this.textContent.trim();
+                    document.getElementById('recentAppointmentsDropdown').textContent = period;
+
+                    // Ici vous pourriez faire une requête AJAX pour filtrer les données
+                    // ou recharger la page avec le paramètre de période
+                    window.location.href = window.location.pathname + '?period=' +
+                        encodeURIComponent(period.toLowerCase());
+                });
+            });
+
+            // Gestion des actions
+            document.querySelectorAll('.table-btn.view').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const appointmentId = this.closest('tr').querySelector('td:first-child').textContent.replace('#AP-', '');
+                    window.location.href = '/appointments/' + appointmentId + '/';
+                });
+            });
+
+            document.querySelectorAll('.table-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const appointmentId = this.closest('tr').querySelector('td:first-child').textContent.replace('#AP-', '');
+                    window.location.href = '/appointments/' + appointmentId + '/edit/';
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Doctors Chart
+            const doctorsCtx = document.getElementById('doctorsChart').getContext('2d');
+            const doctorsCard = document.getElementById('doctorsChart').closest('.dashboard-card');
+            const active = parseInt(doctorsCard.querySelector('.card-value').textContent);
+            const total = {{ doctor_stats.total }
+        };
+        const inactive = total - active;
+
+        new Chart(doctorsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Actifs', 'Inactifs'],
+                datasets: [{
+                    data: [active, inactive],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(220, 53, 69, 0.2)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Issues Chart
+        const issuesCtx = document.getElementById('issuesChart').getContext('2d');
+        const issuesChartData = {
+            labels: ['Ouverts', 'Résolus'],
+            datasets: [{
+                data: [
+                    parseInt(document.getElementById('issuesChart').dataset.open),
+                    parseInt(document.getElementById('issuesChart').dataset.resolved)
+                ],
+                backgroundColor: [
+                    '#dc3545',
+                    '#28a745'
+                ]
+            }]
+        };
+
+        new Chart(issuesCtx, {
+            type: 'doughnut',
+            data: issuesChartData,
+            options: {
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Appointments Chart
+        const appointmentsCtx = document.getElementById('appointmentsChart').getContext('2d');
+        const appointmentsCanvas = document.getElementById('appointmentsChart');
+        const confirmed = parseInt(appointmentsCanvas.dataset.confirmed);
+        const pending = parseInt(appointmentsCanvas.dataset.pending);
+        const cancelled = parseInt(appointmentsCanvas.dataset.cancelled);
+
+        new Chart(appointmentsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Confirmés', 'En attente', 'Annulés'],
+                datasets: [{
+                    data: [confirmed, pending, cancelled],
+                    backgroundColor: [
+                        '#28a745',
+                        '#ffc107',
+                        '#dc3545'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutoutPercentage: 70,
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    enabled: false
+                },
+                maintainAspectRatio: false
+            }
+        });
+
+        // Patients Chart
+        const patientsCtx = document.getElementById('patientsChart').getContext('2d');
+        const patientsChart = new Chart(patientsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Actifs', 'Inactifs'],
+                datasets: [{
+                    data: [{{ patient_stats.active }}, {{ patient_stats.inactive }}],
+            backgroundColor: [
+                'rgba(40, 167, 69, 0.8)',
+                'rgba(220, 53, 69, 0.8)'
+            ],
+            borderWidth: 1
+        }]
+            },
+        options: {
+            responsive: true,
+                maintainAspectRatio: false,
+                    cutout: '70%',
+                        plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+        });
+
+        // Logout confirmation
+        document.getElementById("confirmLogout").addEventListener("click", function () {
+            window.location.href = "{% url 'accounts:login' %}";
+        });
+    });
+    </script>
+    {% endblock %}

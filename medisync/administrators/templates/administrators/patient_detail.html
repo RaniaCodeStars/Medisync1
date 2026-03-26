@@ -1,0 +1,613 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+
+{% block title %}Détails Patient - {{ patient.nom }} {{ patient.prenom }}{% endblock %}
+
+{% block content %}
+<div class="patient-detail-container">
+    <!-- Section En-tête -->
+    <div class="detail-header">
+        <div class="header-title">
+            <h1>
+                <i class="fas fa-user-injured"></i> 
+                Dossier Patient : {{ patient.nom|upper }} {{ patient.prenom }}
+            </h1>
+            <div class="patient-id">ID: {{ patient.id|stringformat:"06d" }}</div>
+        </div>
+        
+        <div class="header-actions">
+            <div class="action-group">
+                <a href="{% url 'administrators:patient_update' patient.pk %}" class="btn btn-edit">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <button class="btn btn-print" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimer
+                </button>
+            </div>
+            <a href="{% url 'administrators:admin_patients_list' %}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Carte Principale Patient -->
+    <div class="card patient-card">
+        <!-- Section Profil -->
+        <div class="patient-profile">
+            {% load static %}
+
+            <div class="patient-profile">
+              <div class="profile-avatar">
+                {% if patient.user.profile_picture %}
+                  <img
+                    src="{{ patient.user.profile_picture.url }}"
+                    alt="Photo de {{ patient.nom }}"
+                    class="avatar-img"
+                  >
+                {% else %}
+                  {% if patient.sex == 'F' %}
+                    <img
+                      src="https://www.w3schools.com/howto/img_avatar2.png"
+                      alt="Avatar Femme"
+                      class="avatar-img"
+                    >
+                  {% else %}
+                    <img
+                      src="https://www.w3schools.com/howto/img_avatar.png"
+                      alt="Avatar Homme"
+                      class="avatar-img"
+                    >
+                  {% endif %}
+                {% endif %}
+            
+                <div class="status-badge {% if activity_stats.active %}active{% else %}inactive{% endif %}">
+                  {% if activity_stats.active %}
+                    <i class="fas fa-circle"></i> Actif
+                  {% else %}
+                    <i class="fas fa-circle"></i> Inactif
+                  {% endif %}
+                </div>
+              </div>
+            
+              <!-- le reste de ton détail patient… -->
+            </div>
+            
+            
+            <div class="profile-info">
+                <h2>{{patient.nom }} {{ patient.prenom }}</h2>
+                <div class="info-meta">
+                    <span><i class="fas fa-envelope"></i> {{ patient.user.email }}</span>
+                    <span><i class="fas fa-phone"></i> {{ patient.telephone|default:"Non renseigné" }}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> {{ patient.adresse|default:"Non renseignée" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation par onglets -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="infos">Informations</button>
+            <button class="tab-btn" data-tab="medical">Dossier Médical</button>
+            <button class="tab-btn" data-tab="documents">Documents</button>
+            <button class="tab-btn" data-tab="historique">Historique</button>
+        </div>
+
+        <!-- Contenu des onglets -->
+        <div class="tab-content">
+            <!-- Onglet Informations -->
+            <div id="infos" class="tab-pane active">
+                <div class="detail-grid">
+                    <div class="detail-section">
+                        <h3><i class="fas fa-id-card"></i> État Civil</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Date de naissance :</span>
+                            <span class="detail-value">{{ patient.date_naissance|date:"d/m/Y" }} ({{ patient.age }} ans)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Lieu de naissance :</span>
+                            <span class="detail-value">{{ patient.lieu_naissance|default:"Non renseigné" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Sexe :</span>
+                            <span class="detail-value">{{ patient.get_sex_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3><i class="fas fa-tint"></i> Données Médicales</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Groupe sanguin :</span>
+                            <span class="detail-value blood-group {{ patient.blood_group }}">
+                                {{ patient.blood_group|default:"Non renseigné" }}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Poids/Taille :</span>
+                            <span class="detail-value">
+                                {% if patient.poids and patient.taille %}
+                                    {{ patient.poids }}kg / {{ patient.taille }}cm
+                                    (IMC: {{ patient.imc|floatformat:1 }})
+                                {% else %}
+                                    Non renseigné
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3><i class="fas fa-file-alt"></i> Informations Administratives</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Numéro RIP :</span>
+                            <span class="detail-value">{{ patient.compte_RIP|default:"Non attribué" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date inscription :</span>
+                            <span class="detail-value">{{ patient.user.date_joined|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Dernière connexion :</span>
+                            <span class="detail-value">
+                                {% if patient.user.last_login %}
+                                    {{ patient.user.last_login|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    Jamais connecté
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Médical (vide par défaut) -->
+            <div id="medical" class="tab-pane">
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <p>Le dossier médical complet apparaîtra ici</p>
+                </div>
+            </div>
+
+            <!-- Onglet Documents (vide par défaut) -->
+            <div id="documents" class="tab-pane">
+                <div class="empty-state">
+                    <i class="fas fa-file-upload"></i>
+                    <p>Aucun document n'a été uploadé pour ce patient</p>
+                </div>
+            </div>
+
+            <!-- Onglet Historique (vide par défaut) -->
+            <div id="historique" class="tab-pane">
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>L'historique des consultations apparaîtra ici</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styles de base */
+    .patient-detail-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    /* En-tête amélioré */
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header-title h1 {
+        color: #2c3e50;
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .header-title h1 i {
+        margin-right: 10px;
+        color: #3498db;
+    }
+
+    .patient-id {
+        background: #e9ecef;
+        color: #495057;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: monospace;
+        margin-top: 5px;
+        display: inline-block;
+    }
+
+    /* Boutons d'action */
+    .header-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn i {
+        font-size: 14px;
+    }
+
+    .btn-edit {
+        background: #3498db;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #2980b9;
+    }
+
+    .btn-print {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-print:hover {
+        background: #5a6268;
+    }
+
+    .btn-back {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+
+    .btn-back:hover {
+        background: #e9ecef;
+    }
+
+    /* Carte Patient */
+    .patient-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    /* Section Profil */
+    .patient-profile {
+        display: flex;
+        gap: 25px;
+        margin-bottom: 30px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .profile-avatar {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        min-width: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-default {
+        font-size: 100px;
+        color: #ced4da;
+    }
+
+    .status-badge {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.inactive {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .status-badge i {
+        font-size: 8px;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-info h2 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .info-meta {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .info-meta span {
+        color: #6c757d;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-meta i {
+        width: 16px;
+        color: #adb5bd;
+    }
+
+    /* Navigation par onglets */
+    .tab-navigation {
+        display: flex;
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        font-weight: 500;
+        color: #6c757d;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+        color: #495057;
+    }
+
+    .tab-btn.active {
+        color: #3498db;
+        border-bottom-color: #3498db;
+    }
+
+    /* Contenu des onglets */
+    .tab-pane {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .tab-pane.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Grille de détails */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .detail-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+    }
+
+    .detail-section h3 {
+        color: #2c3e50;
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .detail-section h3 i {
+        color: #3498db;
+        font-size: 14px;
+    }
+
+    .detail-item {
+        margin-bottom: 12px;
+    }
+
+    .detail-label {
+        display: block;
+        font-size: 13px;
+        color: #6c757d;
+        margin-bottom: 3px;
+    }
+
+    .detail-value {
+        font-size: 15px;
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .blood-group {
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .blood-group.A { background-color: #fee2e2; color: #dc2626; }
+    .blood-group.B { background-color: #dbeafe; color: #1d4ed8; }
+    .blood-group.AB { background-color: #ecfccb; color: #65a30d; }
+    .blood-group.O { background-color: #fef3c7; color: #d97706; }
+
+    /* État vide */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #adb5bd;
+    }
+
+    .empty-state i {
+        font-size: 40px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 15px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .patient-profile {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .info-meta {
+            align-items: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .detail-header {
+            flex-direction: column;
+        }
+        
+        .header-actions {
+            width: 100%;
+        }
+        
+        .action-group {
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .tab-navigation {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .patient-card {
+            padding: 20px 15px;
+        }
+        
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des onglets
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Mettre à jour les boutons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Afficher le contenu correspondant
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Animation des éléments
+    const animateOnScroll = () => {
+        const elements = document.querySelectorAll('.detail-section, .patient-profile');
+        elements.forEach((el, index) => {
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    };
+    
+    // Initialisation
+    animateOnScroll();
+    
+    // Gestion de l'impression
+    const printBtn = document.querySelector('.btn-print');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            // Masquer les éléments non nécessaires à l'impression
+            const elementsToHide = document.querySelectorAll('.tab-navigation, .btn');
+            elementsToHide.forEach(el => el.style.display = 'none');
+            
+            // Afficher tous les onglets pour l'impression
+            tabPanes.forEach(pane => pane.style.display = 'block');
+            
+            // Appliquer des styles spécifiques pour l'impression
+            const style = document.createElement('style');
+            style.textContent = `
+                @media print {
+                    body { padding: 20px; }
+                    .patient-card { box-shadow: none; border: 1px solid #ddd; }
+                    .detail-section { break-inside: avoid; }
+                    .header-actions { display: none !important; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    }
+});
+</script>
+{% endblock %}

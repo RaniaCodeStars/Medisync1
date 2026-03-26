@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil_clinic</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/clinic_profil.css' %}?v=1.1">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/headeraside.css' %}?v=1.1">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/clinic_profil.css' %}?v=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
     
-    <header>
+    <header style="width: 100%;">
         <nav class="navbar section-content">
             <a href="#" class="nav-logo">
                 <h2 class="logo-text">Medisync</h2>
@@ -20,7 +21,7 @@
             <ul class="nav-menu">
                 <button id="menu-close-button" class="fas fa-times" ></button>
                 <li class="nav-item">
-                    <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="nav-link2">Acceuil</a>
+                    <a href="{% url 'clinics:clinic_dashboard'  %}" class="nav-link2">Acceuil</a>
                 </li>
                 
                 <li class="nav-item">
@@ -30,7 +31,7 @@
                     <a href="#about" class="nav-link2">Mes messages</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+                    <a href="{% url 'clinics:mes_demandes' %}" class="nav-link2">Mes rendez-vous</a>
                 </li>
                 <li class="nav-item">
                     <a href="#doctor" class="nav-link2">Mes document</a>
@@ -41,6 +42,7 @@
                 {% else %}
                     <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
                 {% endif %} 
+                
                    <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
                 </li>
             </ul>
@@ -160,67 +162,49 @@
             <div id="horaire">
                 <h4>Horaires et coordonnées </h4>
                 <div class="clinic-calendar">
-                    <p>horaires d'ouverture d'Aujourd'hui</p>
-                    <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
-                    {% now "l" as today_en %}
+                    <p>Horaires d'ouverture d'Aujourd'hui :</p>
                     <div class="week-container" id="today-schedule">
                         <!-- Le contenu sera rempli par JavaScript -->
                     </div>
-                    
+            
                     <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        // Correspondance des jours (JS: 0=Dimanche, 1=Lundi...)
                         const joursSemaine = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
                         const aujourdhui = new Date();
                         const jourActuel = joursSemaine[aujourdhui.getDay()];
                         
-                        // Trouver l'élément correspondant dans le bloc more-text2
-                        const horairesContainer = document.getElementById('more-text2');
-                        const horairesItems = horairesContainer.querySelectorAll('.horaire-item');
-                        
-                        let horairesTrouves = null;
-                        
-                        horairesItems.forEach(item => {
-                            const label = item.querySelector('label');
-                            if (label && label.textContent.includes(jourActuel)) {
-                                horairesTrouves = item.cloneNode(true);
-                                // Mettre à jour le label pour "Aujourd'hui"
-                                const newLabel = horairesTrouves.querySelector('label');
-                            }
-                        });
-                        
-                        // Afficher dans le conteneur
+                        // Convertir le JSON des horaires en objet JavaScript
+                        const horaires = JSON.parse('{{ horaires_json|safe }}');
+            
+                        // Rechercher les horaires pour le jour actuel
                         const todayContainer = document.getElementById('today-schedule');
-                        todayContainer.style="    font-size: 13px;color: #4e759c;font-weight: 600;"
-                        if (horairesTrouves) {
-                            todayContainer.appendChild(horairesTrouves);
+                        let horairesTrouves = horaires[jourActuel] ? horaires[jourActuel] : null;
+            
+                        if (horairesTrouves && horairesTrouves.length > 0) {
+                            horairesTrouves.forEach(slot => {
+                                const div = document.createElement('div');
+                                div.textContent = `${slot.ouverture} - ${slot.fermeture}`;
+                                todayContainer.appendChild(div);
+                            });
                         } else {
-                            todayContainer.innerHTML = `<div class="today-horaire">
-                                
-                                <span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">
-                                    Pas d'horaire disponible
-                                </span>
-                            </div>`;
+                            todayContainer.innerHTML = `<span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">Pas d'horaire disponible</span>`;
                         }
                     });
                     </script>
-                    
-                    
-                    
-                    
-                    
-
-                    <p>horaires d'ouverture pour les autres jours:</p> <button onclick="toggleText2()" class="voir-plus">▾ Voir plus</button><br>
+            
+                    <p>Horaires d'ouverture pour les autres jours :</p>
+                    <button onclick="toggleText2()" class="voir-plus">▾ Voir plus</button><br>
                     <div id="more-text2" style="display:none;">
-                        {% if clinic.horaires %}
-                            {% for day, slots in clinic.horaires.items %}
-                                <div class="horaire-item" >
+                        {% if horaires_struct %}
+                        {% for day, slots in horaires_struct.items %}
+                    
+                                <div class="horaire-item">
                                     <label>⮚ {{ day|capfirst }} :</label>
                                     {% if slots %}
                                         {% for slot in slots %}
                                             <span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">
                                                 {{ slot.ouverture }} - {{ slot.fermeture }}
-                                            </span>
+                                            </span><br>
                                         {% endfor %}
                                     {% else %}
                                         <span style="font-size: 13px; color: #565656; font-weight: 600; padding: 7px 10px;">Fermé</span>
@@ -230,89 +214,1502 @@
                         {% else %}
                             <p>Aucun horaire disponible pour cette clinique.</p>
                         {% endif %}
-                        <a href="{% url 'edit_horaires' clinic.id %}" class="btn btn-warning">Modifier les horaires</a>
+                        <a href="{% url 'clinics:edit_horaires'%}" class="btn btn-warning">Modifier les horaires</a>
                     </div>
-                    
-                    
-                    
-                    
-                    
-                    
-            </div>
-            
-            </div>
-
-             <!-- nos medcins -->
-             <div id="Nos-Medcins">
-                <h4 style="margin-bottom: 15px; color: #333;">Nos Médecins</h4>
-                <hr><br>
-                <div class="doctor-list">
-                    {% for doctor in doctors %}
-                    <div class="doctor-card">
-                        <img src="{{ doctor.profile_image.url }}" alt="Photo de {{ doctor.name }}" >
-                        <h3>{{ doctor.name }}</h3><br>
-                        <p>Spécialité : {{ doctor.speciality }}</p>
-                    </div>
-                    {% empty %}
-                        <p>Aucun médecin enregistré pour cette clinique.</p>
-                    {% endfor %}
                 </div>
             </div>
-            
-            
-            <!-- Avis des patients -->
-<!-- templates/clinics/clinic_profile.html -->
-<div id="Avis">
-    <h3>Avis des patients</h3> 
-    <hr><br>
-    <div class="review-container">
-        {% for review in reviews %}
-            <div class="review">
-                <p><strong>
-                    {% if review.user %}
-                        {{ review.user.email }}
-                    {% else %}
-                        Anonyme
-                    {% endif %}
-                </strong><br> 
-                <span class="stars">
-                    {% for _ in "12345"|slice:review.rating %}
-                        ⭐
-                    {% endfor %}
-                </span>
-                </p>
-                <p>{{ review.comment }}</p>
-            </div>
-        {% empty %}
-            <p>Aucun avis pour cette clinique.</p>
-        {% endfor %}
+            <script>
+                function toggleText2() {
+                    const moreText = document.getElementById('more-text2');
+                    moreText.style.display = (moreText.style.display === "none" || moreText.style.display === "") ? "block" : "none";
+                }
+            </script>
+             <!-- nos medcins -->
+            {% load split_filter %}
+            <div id="Nos-Medcins">
+            <div class="doctor-list">
+                {% for doctor in doctors %}
+<div class="doctor-card" style="width: 700px;padding-right: 300px;">
+    <div >
+    {% if doctor.profile_image %}
+        <img src="{{ doctor.profile_image.url }}" alt="Photo de {{ doctor.name }}"  style="margin-bottom: 140px;">
+    {% else %}
+        <img src="{% static 'images/default_doctor.png' %}" alt="Photo par défaut de {{ doctor.name }}"  style="margin-bottom: 140px;">
+    {% endif %}
     </div>
 
-    <hr>
-    <h4>Ajouter un avis</h4>
-    <form method="post" style="display:flex;">
+    
+    <div class="doctor-details">
+        <h3 style="cursor:pointer;" onclick="openDoctorModal('{{ doctor.id }}')">
+            <i class="fas fa-user-md icon"></i> {{ doctor.name }}
+        </h3>
+        <p><i class="fas fa-stethoscope icon"></i> {{ doctor.speciality.nom }}</p>
+        
+        <p>
+            <i class="fas fa-phone icon"></i>
+            {% if doctor.telephone %}
+                {{ doctor.telephone }}
+            {% else %}
+                Téléphone non renseigné
+            {% endif %}
+        </p>
+        
+        <p>
+            <i class="fas fa-money-bill icon"></i>
+            {% if doctor.consultation_fee %}
+                {{ doctor.consultation_fee }} DZD
+            {% else %}
+                Frais non définis
+            {% endif %}
+        </p>
+    
+        <!-- Bouton Prendre Rendez-vous -->
+        <a onclick="openModal2('{{ doctor.id }}')" class="appointment-btn" style="width: 200px;padding-left: 0px;padding-right: 0px;margin-top: 0.5rem;">Prendre un rendez-vous</a>
+
+        <!-- Lien vers le Profil complet -->
+        <a onclick="openDoctorModal('{{ doctor.id }}')" class="appointment-btn"style="width: 190px;margin-top: 0.5rem;">Voir le Profil </a>
+    </div>
+</div>
+
+        
+                <!-- Enhanced Modal -->
+                <div id="doctor-modal-{{ doctor.id }}" class="doctor-modal">
+                    <div class="doctor-modal-content">
+                        <span class="close" onclick="closeDoctorModal('{{ doctor.id }}')">×</span>
+                        <div class="profile-section">
+                            {% if doctor.profile_image %}
+                                <img class="profile-image" src="{{ doctor.profile_image.url }}" alt="Photo de {{ doctor.name }}">
+                            {% else %}
+                                <img class="profile-image" src="{% static 'images/default_doctor.png' %}" alt="Photo par défaut de {{ doctor.name }}">
+                            {% endif %}
+                            <div class="social-links">
+                                <a href="#"><i class="fab fa-linkedin"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fas fa-globe"></i></a>
+                            </div>
+                        </div>
+                        <div class="info-section">
+                            <h2>{{ doctor.name }}</h2>
+                            <p><strong><i class="fas fa-stethoscope"></i> Spécialité :</strong> {{ doctor.speciality.nom }}</p>
+                            <p><strong><i class="fas fa-envelope"></i> Email :</strong> {{ doctor.email }}</p>
+                            <p><strong><i class="fas fa-phone"></i> Téléphone :</strong> {{ doctor.telephone }}</p>
+                            <p><strong><i class="fas fa-money-bill"></i> Frais de consultation :</strong> {{ doctor.consultation_fee }} DA</p>
+                            <p><strong><i class="fas fa-briefcase"></i> Années d'expérience :</strong> {{ doctor.years_of_experience }}</p>
+                            <p><strong><i class="fas fa-check-circle"></i> Disponible :</strong> {% if doctor.disponible %}Oui{% else %}Non{% endif %}</p>
+                            <p style="display: block;"><strong><i class="fas fa-book-medical"></i> Biographie :</strong> {{ doctor.biographie }}</p>
+                            <p><strong><i class="fas fa-check-circle" ></i> Disponible :</strong>
+                            <ul>
+                                {% for h in doctor.horaires.all %}
+                                <li>{{ h.jour|title }} : de {{ h.heure_debut }} à {{ h.heure_fin }}</li>
+                                {% empty %}
+                                <li>Aucun horaire défini</li>
+                                {% endfor %}
+                            </ul>
+                            
+                            <a class="appointment-btn" href="#" onclick="openModal2('{{ doctor.id }}')">Prendre un rendez-vous</a>
+                            
+                            <div id="modal-container"></div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        
+            </div>
+            <div class="modal" id="modalRdv1">
+                <div class="modal-content">
+                    <span onclick="document.getElementById('modalRdv1').style.display='none'; document.querySelector('.nav-container').style.display='block'; document.querySelector('.right-part').style.display='none';" 
+                    style="position:absolute;top:10px;right:15px;cursor:pointer;font-size:20px;">&times;</span>
+                    
+        
+                    <h3>Prendre un rendez-vous</h3>
+                    <form method="post" action="{% url 'clinics:envoyez-rendez-vous' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="clinic_id" value="{{ clinic.id }}">
+        
+                        <label>Choisir un médecin :</label>
+                        <select name="doctor" id="id_doctor" required>
+                            <option value="" disabled hidden selected>-- Choisir un médecin --</option>
+                            {% if doctors %}
+                                {% for doctor in doctors %}
+                                    <option value="{{ doctor.id }}">{{ doctor.name }} — {{ doctor.speciality.nom }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option disabled>Aucun médecin disponible</option>
+                            {% endif %}
+                        </select>
+                        
+                        
+                        
+                        
+                        
+            
+                        <!-- Nom complet -->
+                        <label>Nom complet :</label>
+                        <input type="text" name="nom" required placeholder="Nom et prénom">
+            
+                        <!-- Numéro de téléphone -->
+                        <label>Numéro de téléphone :</label>
+                        <input type="tel" name="telephone" required pattern="^0[5-7][0-9]{8}$" placeholder="07XXXXXXXX">
+            
+                        <!-- Jour -->
+<!-- Jour -->
+<label>Choisir un jour :</label>
+<select name="jour" id="jour_select" required onchange="updateHeures()">
+    <option value="" disabled selected>-- Choisir un jour --</option>
+</select>
+
+<!-- Heure -->
+<label>Choisir une heure :</label>
+<select name="heure" id="heure_select" required>
+    <option value="" disabled selected>-- Choisir une heure --</option>
+</select>
+                        <script>
+                            const horairesDoctors = JSON.parse('{{ horaires_doctors_json | safe }}');
+                        
+                            // Mettre à jour les jours disponibles quand un médecin est sélectionné
+                            document.getElementById('id_doctor').addEventListener('change', function() {
+                                const doctorId = this.value;
+                                const jourSelect = document.getElementById('jour_select');
+                                jourSelect.innerHTML = '<option value="" disabled selected>-- Choisir un jour --</option>';
+                        
+                                if (doctorId && horairesDoctors[doctorId]) {
+                                    horairesDoctors[doctorId].forEach(horaire => {
+                                        const option = document.createElement('option');
+                                        option.value = horaire.jour;
+                                        option.text = `${horaire.jour} (${horaire.heure_debut} - ${horaire.heure_fin})`;
+                                        jourSelect.appendChild(option);
+                                    });
+                                }
+                                updateHeures(); // Réinitialiser les heures
+                            });
+                        
+                            // Mettre à jour les heures disponibles quand un jour est sélectionné
+                            function updateHeures() {
+                                const doctorId = document.getElementById('id_doctor').value;
+                                const jour = document.getElementById('jour_select').value;
+                                const heureSelect = document.getElementById('heure_select');
+                                heureSelect.innerHTML = '<option value="" disabled selected>-- Choisir une heure --</option>';
+                        
+                                if (doctorId && jour && horairesDoctors[doctorId]) {
+                                    const horaire = horairesDoctors[doctorId].find(h => h.jour === jour);
+                                    if (horaire) {
+                                        let currentTime = new Date(`1970-01-01T${horaire.heure_debut}:00`);
+                                        const endTime = new Date(`1970-01-01T${horaire.heure_fin}:00`);
+                        
+                                        while (currentTime < endTime) {
+                                            const timeStr = currentTime.toTimeString().slice(0, 5);
+                                            const option = document.createElement('option');
+                                            option.value = timeStr;
+                                            option.text = timeStr;
+                                            heureSelect.appendChild(option);
+                                            currentTime.setMinutes(currentTime.getMinutes() + 30); // Créneaux de 30 min
+                                        }
+                                    }
+                                }
+                            }
+                        </script>
+                        
+            
+        
+                        <!-- Motif -->
+                        <label>Motif du rendez-vous :</label>
+                        <textarea name="motif" rows="3" placeholder="Expliquez le motif..." required></textarea>
+            
+                        <button type="submit">Confirmer</button>
+                    </form>
+                </div>
+                
+            </div>
+            <script>
+            function openDoctorModal(doctorId) {
+                document.getElementById('doctor-modal-' + doctorId).style.display = 'flex';
+                document.getElementById('doctor-modal-' + doctorId).style.zIndex = '50';
+                const navv = document.querySelector(".nav-container");
+                const right = document.querySelector(".right-part");
+
+
+                navv.style.zIndex = 50;
+                right.style.zIndex = 50;
+                right.style.display = "none";
+                navv.style.display = "none";
+            }
+        
+            function closeDoctorModal(doctorId) {
+                document.getElementById('doctor-modal-' + doctorId).style.display = 'none';
+                const navv = document.querySelector(".nav-container");
+                const right = document.querySelector(".right-part");
+
+                right.style.display = "block";
+                navv.style.display = "block";
+            }
+        
+            function openModal2(doctorId) {
+    const form = document.querySelector("#modalRdv1");
+    const navv = document.querySelector(".nav-container");
+    const right = document.querySelector(".right-part");
+    const form2 = document.querySelector(".doctor-modal");
+
+    form2.style.display = "none";
+    form.style.display = "block";
+    form.style.zIndex = 1000;
+    navv.style.zIndex = 50;
+    right.style.zIndex = 50;
+
+    // Remplir le champ du médecin et déclencher les mises à jour
+    const doctorSelect = document.querySelector("#id_doctor");
+    if (doctorSelect) {
+        doctorSelect.value = doctorId;
+        // Déclencher l'événement change manuellement
+        const event = new Event('change');
+        doctorSelect.dispatchEvent(event);
+    }
+}
+            </script>
+            <style>
+/* Sleek and professional medical-themed modal styles using root variables */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85));
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.modal-content {
+    background: var(--bg-light);
+    padding: 35px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 620px;
+    position: relative;
+    box-shadow: var(--card-shadow), 0 0 15px rgba(55, 95, 164, 0.15);
+    border: 1px solid var(--primary-light);
+    animation: slideIn 0.4s ease-out;
+    overflow: hidden;
+}
+
+.modal-content::before {
+    content: '🩺';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    font-size: 60px;
+    color: var(--primary-color);
+    opacity: 0.1;
+    animation: pulse 3s infinite;
+}
+
+
+.modal-content::after {
+    content: '💊';
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    font-size: 60px;
+    color: var(--primary-color);
+    opacity: 0.1;
+    animation: pulse 3.5s infinite;
+}
+
+.modal-content h3 {
+    margin: 0 0 25px;
+    font-size: 28px;
+    color: var(--text-dark);
+    text-align: center;
+    font-weight: 700;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background: linear-gradient(to right, var(--primary-color), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text; /* pour compatibilité */
+    transition: var(--transition);
+}
+.modal-content h3:hover {
+    transform: scale(1.02);
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-content label {
+    font-size: 16px;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    position: relative;
+    transition: var(--transition);
+}
+
+.modal-content label::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: var(--transition);
+}
+
+.modal-content label:hover::after {
+    width: 100%;
+}
+
+.modal-content select,
+.modal-content input,
+.modal-content textarea {
+    padding: 14px;
+    border: 1px solid var(--primary-light);
+    border-radius: 10px;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    transition: var(--transition);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.modal-content select:hover,
+.modal-content input:hover,
+.modal-content textarea:hover {
+    border-color: var(--success);
+    box-shadow: 0 0 10px rgba(55, 95, 164, 0.25);
+}
+
+.modal-content select:focus,
+.modal-content input:focus,
+.modal-content textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 12px rgba(55, 95, 164, 0.35);
+}
+
+.modal-content textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.modal-content button {
+    background: linear-gradient(90deg, var(--primary-color), var(--warning));
+    color: #fff;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    cursor: pointer;
+    position: Simulating relative;
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(55, 95, 164, 0.2);
+}
+
+.modal-content button:hover {
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(55, 95, 164, 0.3);
+}
+
+.modal-content button::before {
+    content: '📅';
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.modal-content button:hover::before {
+    left: 15px;
+    opacity: 1;
+}
+
+.modal-content .close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 26px;
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: var(--transition);
+}
+
+.modal-content .close:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        padding: 25px;
+    }
+
+    .modal-content h3 {
+        font-size: 24px;
+    }
+
+    .modal-content button {
+        font-size: 15px;
+        padding: 14px;
+    }
+}
+
+/* Keyframe animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.1); }
+    100% { opacity: 0.1; transform: scale(1); }
+}
+
+
+:root {
+    --primary: #375fa4c4;
+    --success: #2ca4f5;   /* bleu clair à la place du cyan */
+    --warning: #1e7df8;   /* inchangé car déjà bleu */
+    --danger: #2e3a98;    /* bleu foncé à la place du rose */
+    --accent-color: #1f4db3;
+    --primary-color: #375fa4;
+    --primary-light: #6da5ff;
+    --bg-light: #f0f4ff;
+    --text-dark: #1a1f36;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --transition: all 0.3s ease-in-out;
+}
+
+.clinic-dashboard-container {
+    width: 83vw;
+    margin: 0 auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin-left: 200px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.clinic-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+}
+
+.header-content {
+    max-width: 60%;
+}
+
+.clinic-dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: rgb(56 95 152);
+    margin: 0 0 0.5rem 0;
+    margin-left: 20px;
+    line-height: 1.2;
+}
+
+.clinic-name {
+    color: var(--primary-color);
+    position: relative;
+    display: inline-block;
+}
+
+.clinic-name::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 3px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: underlineGrow 1s ease-out forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes underlineGrow {
+    to { transform: scaleX(1); }
+}
+
+.clinic-welcome {
+    color: rgba(43, 45, 66, 0.7);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.clinic-rating-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.clinic-rating-badge:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+}
+
+.stars-container {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.star {
+    width: 24px;
+    height: 24px;
+    fill: #e0e0e0;
+    transition: var(--transition);
+}
+
+.star.filled {
+    fill: #6da5ff;
+}
+
+
+
+
+.star.animate {
+    animation: starPop 0.5s ease-out;
+}
+
+@keyframes starPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.rating-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    opacity: 0.8;
+}
+
+.stats-grid-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-bottom: 1rem;
+}
+
+.stat-card-clinic {
+    width: 300px;
+    height: 130px;
+    background:rgb(74 114 175 / 3%);;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-clinic:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-icon-dashboard {
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.stat-card-clinic:hover .stat-icon-dashboard {
+    transform: scale(1.1) rotate(0deg);
+}
+
+.stat-icon-dashboard svg {
+    width: 32px;
+}
+
+.doctor-card .stat-icon-dashboard {
+    background: rgba(67, 97, 238, 0.1);
+    fill: var(--primary-color);
+}
+
+
+.request-card .stat-icon-dashboard {
+    background: rgba(58, 12, 163, 0.1);
+    fill: rgb(56 95 152);
+}
+.appointment-card .stat-icon-dashboard {
+    background: rgba(30, 125, 248, 0.1);
+    fill: var(--accent-color);
+}
+.stat-value-dashboard {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, rgb(56 95 152), rgba(56, 94, 152, 0.759));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: var(--transition);
+}
+
+.stat-card-clinic:hover .stat-value-dashboard {
+    transform: scale(1.05);
+}
+
+.stat-label-dashboard {
+    color: var(--text-dark);
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+.stat-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease-out;
+}
+
+.stat-card-clinic:hover .stat-wave {
+    transform: scaleX(1);
+}
+
+.dashboard-section-card {
+    background: rgb(74 114 175 / 26%);
+    border-radius: 16px;
+    height: 135px;
+    padding: 0.8rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.dashboard-section-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-top: 0;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary-color);
+}
+
+.requests-stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.request-stat-badge {
+    padding: 0.rem;
+    border-radius: 12px;
+    font-weight: 600;
+    background: white;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.request-stat-badge:hover {
+    transform: translateY(-5px);
+}
+
+.pending-status {
+    border-top: 4px solid rgb(56 95 152);
+}
+
+.request-stat-count {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: rgb(56 95 152);
+}
+
+.request-stat-label {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dark);
+    opacity: 0.7;
+}
+
+.progress-ring {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 60px;
+    height: 60px;
+}
+
+.progress-circle {
+    transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 4;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: var(--primary-color);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+}
+
+@media (max-width: 1200px) {
+    .clinic-dashboard-container {
+        width: 85vw;
+        margin-left: 180px;
+    }
+}
+
+@media (max-width: 992px) {
+    .clinic-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .header-content {
+        max-width: 100%;
+    }
+    
+    .clinic-rating-badge {
+        flex-direction: row;
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .clinic-dashboard-container {
+        padding: 1.5rem;
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .clinic-dashboard-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .clinic-dashboard-header {
+        padding-bottom: 1rem;
+    }
+    
+    .dashboard-section-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-card-clinic {
+        padding: 1.5rem;
+    }
+    
+    .request-stat-badge {
+        padding: 1.5rem;
+    }
+}
+    /* Import Premium Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
+:root {
+    --primary: #375fa4;
+    --success: #6cdbff;
+    --warning: #4b9eff;
+    --danger: #70e0ff;
+    --light: #f9fafb;
+    --dark: #343a40;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--light), #e9ecef);
+}
+
+#Nos-Medcins {
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, var(--light), #d1e3f5);
+    border-radius: 2rem;
+    max-width: 1600px;
+    margin: 3rem auto;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+#Nos-Medcins::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
+    z-index: 0;
+    animation: pulse 10s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.5; }
+}
+
+#Nos-Medcins h4 {
+    font-size: 3rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--dark);
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#Nos-Medcins hr {
+    border: 0;
+    height: 6px;
+    background: linear-gradient(to right, var(--primary), var(--success));
+    width: 200px;
+    margin: 0 auto 2.5rem;
+    border-radius: 10px;
+}
+
+.doctor-list {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 2rem;
+    padding: 1.5rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.doctor-list::-webkit-scrollbar {
+    display: none;
+}
+
+.doctor-card {
+    flex: 0 0 280px;
+    background: var(--light);
+    border-radius: 1.5rem;
+    padding: 0.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.doctor-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.doctor-card img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 2px solid var(--primary);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.doctor-card:hover img {
+    transform: scale(1.1);
+    border-color: var(--success);
+}
+
+.doctor-card h3 {
+    font-size: 1rem;
+    color: var(--dark);
+    font-weight: 600;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.doctor-card h3:hover {
+    color: var(--warning);
+}
+
+.doctor-card p {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.doctor-card .icon {
+    color: var(--primary);
+    margin-right: 0.5rem;
+}
+
+.doctor-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.4s ease;
+    position: fixed; /* ou absolute */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5); 
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.doctor-modal-content {
+    background: var(--light);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    max-width: 800px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transform: scale(0.9);
+    animation: modalPop 0.5s ease forwards;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+
+@keyframes modalPop {
+    to { transform: scale(1); }
+}
+
+.doctor-modal-content .close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: var(--primary);
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.doctor-modal-content .close:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+.doctor-modal-content .profile-section {
+    text-align: center;
+}
+
+.doctor-modal-content .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid var(--primary);
+    margin-bottom: 1rem;
+    margin-right: 150px;
+    transition: transform 0.3s ease;
+}
+
+.doctor-modal-content .profile-image:hover {
+    transform: scale(1.1);
+}
+
+.doctor-modal-content .social-links a {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.doctor-modal-content .social-links a:hover {
+    color: var(--success);
+}
+
+.doctor-modal-content .info-section h2 {
+    font-size: 2rem;
+    color: var(--dark);
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1.5rem;
+}
+
+.doctor-modal-content .info-section p {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin: 0.75rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.doctor-modal-content .info-section p strong {
+    color: var(--primary);
+    margin-right: 0.5rem;
+}
+
+.doctor-modal-content .schedule-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #e9ecef;
+    border-radius: 1rem;
+}
+
+.doctor-modal-content .schedule-section h3 {
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.doctor-modal-content .schedule-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.doctor-modal-content .schedule-section ul li {
+    font-size: 1rem;
+    color: #4b5563;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.doctor-modal-content .schedule-section ul li i {
+    color: var(--success);
+    margin-right: 0.5rem;
+}
+
+.appointment-btn {
+    color: #0f76ba;
+    display: inline-block;
+    background: linear-gradient(to right, var(--primary), var(--success));
+    color: var(--light);
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    text-align: center;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.appointment-btn:hover {
+    background: linear-gradient(to right, var(--warning), var(--danger));
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .doctor-card {
+        flex: 0 0 240px;
+    }
+
+    .doctor-card img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .doctor-modal-content {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+    }
+
+    .doctor-modal-content .profile-image {
+        width: 150px;
+        height: 150px;
+    }
+
+    .doctor-modal-content .info-section h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #Nos-Medcins h4 {
+        font-size: 2.2rem;
+    }
+
+    .doctor-card {
+        flex: 0 0 200px;
+    }
+
+    .doctor-card img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .doctor-modal-content .info-section h2 {
+        font-size: 1.6rem;
+    }
+
+    .doctor-modal-content .info-section p {
+        font-size: 0.9rem;
+    }
+}
+
+
+            </style>
+
+
+<!--Avis-->
+<div class="reviews-modern-container">
+    <h2 class="reviews-modern-title">Laisser un avis</h2>
+
+    {% if user.is_authenticated %}
+    <form class="reviews-modern-form" method="post" action="{% url 'clinics:add_review' clinic.slug %}">
         {% csrf_token %}
-        <label for="rating">Note :</label>
-        <select name="rating" required>
-            <option value="5">⭐⭐⭐⭐⭐</option>
-            <option value="4">⭐⭐⭐⭐</option>
-            <option value="3">⭐⭐⭐</option>
-            <option value="2">⭐⭐</option>
-            <option value="1">⭐</option>
-        </select>
-        <br>
-        <label for="comment">Commentaire :</label>
-        <input name="comment" required></input>
-        <br>
-        <button type="submit">Envoyer</button>
+        <div class="form-group">
+            <label for="rating">Votre note</label>
+            <div class="rating-stars">
+                <input type="radio" id="star5" name="rating" value="5" required><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="comment">Votre commentaire</label>
+            <textarea name="comment" id="comment" rows="4" placeholder="Décrivez votre expérience..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Publier votre avis</button>
     </form>
+    {% else %}
+        <p class="login-prompt">Veuillez vous <a href="{% url 'login' %}">connecter</a> pour laisser un avis.</p>
+    {% endif %}
+
+    <div class="reviews-modern-list">
+        <h2 class="reviews-modern-title">Avis des clients</h2>
+      
+        {% if reviews %}
+          {% for review in reviews %}
+            <div class="review-modern-card">
+              <div class="review-header">
+                <div class="user-rating">
+                    <span class="user-name">{{ review.user.email|default:"Utilisateur anonyme" }}</span>
+                    <div class="display-rating" data-rating="{{ review.rating }}"></div>
+                </div>
+                <span class="review-date">{{ review.created_at|date:"d/m/Y" }}</span>
+              </div>
+              <p class="review-content">{{ review.comment }}</p>
+      
+              {% if review.reply %}
+                <div class="admin-reply">
+                  <span class="reply-label">Réponse de la clinique :</span>
+                  <p class="reply-content">{{ review.reply }}</p>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="no-reviews">Aucun avis pour cette clinique pour le moment.</p>
+        {% endif %}
+    </div>
 </div>
+<style>
+    /* Style moderne avec palette bleu nuit et gris bleuté */
+.reviews-modern-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    color: #2c3e50;
+}
+
+.reviews-modern-title {
+    color: #1a365d;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.reviews-modern-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 152px;
+    height: 3px;
+    background: #4299e1;
+}
+
+.reviews-modern-form {
+    background: #f8fafc;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
 
 
-            
-            
-            
-</div>
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.rating-stars input {
+    display: none;
+}
+
+.rating-stars label {
+    color: #cbd5e0;
+    font-size: 2rem;
+    padding: 0 0.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.rating-stars input:checked ~ label,
+.rating-stars input:hover ~ label {
+    color: #f6ad55;
+}
+
+.rating-stars label:hover,
+.rating-stars label:hover ~ label {
+    color: #f6ad55;
+}
+
+textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    font-family: inherit;
+    color: #4a5568;
+    transition: border 0.3s;
+    resize: vertical;
+    max-height:50px;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.submit-btn {
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background: #2c5282;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 6px;
+    color: #4a5568;
+}
+
+.login-prompt a {
+    color: #3182ce;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+.reviews-modern-list {
+    margin-top: 2rem;
+}
+
+.review-modern-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #edf2f7;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.user-rating {
+    display: flex;
+    align-items: center;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #2d3748;
+    margin-right: 1rem;
+}
+
+.display-rating {
+    color: #f6ad55;
+    letter-spacing: 0.2rem;
+}
+
+.display-rating::before {
+    content: '★★★★★';
+    display: inline-block;
+    position: relative;
+}
+
+.display-rating[data-rating="1"]::before { width: 20%; }
+.display-rating[data-rating="2"]::before { width: 40%; }
+.display-rating[data-rating="3"]::before { width: 60%; }
+.display-rating[data-rating="4"]::before { width: 80%; }
+.display-rating[data-rating="5"]::before { width: 100%; }
+
+.review-date {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.review-content {
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+.admin-reply {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.reply-label {
+    display: block;
+    font-weight: 500;
+    color: #2b6cb0;
+    margin-bottom: 0.5rem;
+}
+
+.reply-content {
+    background: #ebf8ff;
+    padding: 1rem;
+    border-radius: 6px;
+    color: #2c3e50;
+}
+
+.no-reviews {
+    text-align: center;
+    color: #718096;
+    padding: 2rem;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+/* Animation pour les étoiles */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.rating-stars label:hover {
+    animation: pulse 0.5s ease-in-out;
+}
+</style>
+        </div>
+
+
+
+
+
+
+
         <div class="right-part">
             <section class="clinic-summary">
                 <div class="summary-container">
@@ -336,20 +1733,31 @@
                         </div>
                     </div>
                     
-                    <a href="{% url 'prendre_rdv' clinic_id=clinic.id %}">
+                    <a class="appointment-btn" href="#" onclick="openModal2()">
                         Prendre un rendez-vous
                     </a>
                     
+                    <div id="modal-container"></div>
                     
+                    <script>
+                        function openModal() {
+                            // Ici, on fait une requête pour récupérer les informations de la clinique liée à l'utilisateur connecté
+                            fetch('/clinic/modal-info/')
+                                .then(response => response.text())
+                                .then(html => {
+                                    document.getElementById('modal-container').innerHTML = html;
+                                    document.getElementById('modalRdv').style.display = 'block';  // Assurez-vous d'avoir un modal avec ce `id`
+                                });
+                        }
+                    </script>
                     
-                    
-                      
+                                        
                     <div class="feature-item">
                         <i class="fas fa-user-md" style="color:#4299e1;"></i>
                         <span>si vous voulez inscrire comme soignant  </span>
                     </div>
                     
-                    <button class="appointment-btn" id="inscrire-btn"><a href="{% url 'add_clinic_doctor' clinic.id %} " style="color: #fff;">Inscrire Soignant</a></button>
+                    <button class="appointment-btn" id="inscrire-btn"><a href="{% url 'clinics:add_clinic_doctor' %} " style="color: #fff;">Inscrire Soignant</a></button>
 
                     <!-- Formulaire caché initialement -->
                                     
@@ -409,7 +1817,747 @@
 
 
 
+<!--
+            <style>
+                
 
+
+
+
+:root {
+    --primary: #375fa4c4;
+    --success: #2ca4f5;   /* bleu clair à la place du cyan */
+    --warning: #1e7df8;   /* inchangé car déjà bleu */
+    --danger: #2e3a98;    /* bleu foncé à la place du rose */
+    --accent-color: #1f4db3;
+    --primary-color: #375fa4;
+    --primary-light: #6da5ff;
+    --bg-light: #f0f4ff;
+    --text-dark: #1a1f36;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --transition: all 0.3s ease-in-out;
+}
+
+
+/* Base moderne avec polices élégantes */
+.clinic-dashboard-container {
+    width: 83vw;
+    margin: 0 auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin-left: 200px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* En-tête stylé avec flexbox */
+.clinic-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+}
+
+.header-content {
+    max-width: 60%;
+}
+
+.clinic-dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: rgb(56 95 152);
+    margin: 0 0 0.5rem 0;
+    margin-left: 20px;
+    line-height: 1.2;
+}
+
+.clinic-name {
+    color: var(--primary-color);
+    position: relative;
+    display: inline-block;
+}
+
+.clinic-name::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 3px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: underlineGrow 1s ease-out forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes underlineGrow {
+    to { transform: scaleX(1); }
+}
+
+.clinic-welcome {
+    color: rgba(43, 45, 66, 0.7);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Badge de notation avec étoiles SVG */
+.clinic-rating-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.clinic-rating-badge:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+}
+
+.stars-container {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.star {
+    width: 24px;
+    height: 24px;
+    fill: #e0e0e0;
+    transition: var(--transition);
+}
+
+.star.filled {
+    fill: #6da5ff;
+}
+
+
+
+
+.star.animate {
+    animation: starPop 0.5s ease-out;
+}
+
+@keyframes starPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.rating-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    opacity: 0.8;
+}
+
+/* Grille de stats moderne avec effets */
+.stats-grid-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-bottom: 1rem;
+}
+
+.stat-card-clinic {
+    width: 300px;
+    height: 130px;
+    background:rgb(74 114 175 / 3%);;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-clinic:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-icon-dashboard {
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.stat-card-clinic:hover .stat-icon-dashboard {
+    transform: scale(1.1) rotate(0deg);
+}
+
+.stat-icon-dashboard svg {
+    width: 32px;
+}
+
+.doctor-card .stat-icon-dashboard {
+    background: rgba(67, 97, 238, 0.1);
+    fill: var(--primary-color);
+}
+
+
+.request-card .stat-icon-dashboard {
+    background: rgba(58, 12, 163, 0.1);
+    fill: rgb(56 95 152);
+}
+.appointment-card .stat-icon-dashboard {
+    background: rgba(30, 125, 248, 0.1);
+    fill: var(--accent-color);
+}
+.stat-value-dashboard {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, rgb(56 95 152), rgba(56, 94, 152, 0.759));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: var(--transition);
+}
+
+.stat-card-clinic:hover .stat-value-dashboard {
+    transform: scale(1.05);
+}
+
+.stat-label-dashboard {
+    color: var(--text-dark);
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+.stat-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease-out;
+}
+
+.stat-card-clinic:hover .stat-wave {
+    transform: scaleX(1);
+}
+
+/* Section des demandes */
+.dashboard-section-card {
+    background: rgb(74 114 175 / 26%);
+    border-radius: 16px;
+    height: 135px;
+    padding: 0.8rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.dashboard-section-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-top: 0;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary-color);
+}
+
+.requests-stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.request-stat-badge {
+    padding: 0.rem;
+    border-radius: 12px;
+    font-weight: 600;
+    background: white;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.request-stat-badge:hover {
+    transform: translateY(-5px);
+}
+
+.pending-status {
+    border-top: 4px solid rgb(56 95 152);
+}
+
+.request-stat-count {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: rgb(56 95 152);
+}
+
+.request-stat-label {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dark);
+    opacity: 0.7;
+}
+
+.progress-ring {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 60px;
+    height: 60px;
+}
+
+.progress-circle {
+    transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 4;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: var(--primary-color);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .clinic-dashboard-container {
+        width: 85vw;
+        margin-left: 180px;
+    }
+}
+
+@media (max-width: 992px) {
+    .clinic-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    
+    .header-content {
+        max-width: 100%;
+    }
+    
+    .clinic-rating-badge {
+        flex-direction: row;
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .clinic-dashboard-container {
+        padding: 1.5rem;
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .clinic-dashboard-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .clinic-dashboard-header {
+        padding-bottom: 1rem;
+    }
+    
+    .dashboard-section-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-card-clinic {
+        padding: 1.5rem;
+    }
+    
+    .request-stat-badge {
+        padding: 1.5rem;
+    }
+}
+    /* Import Premium Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
+:root {
+    --primary: #375fa4;
+    --success: #6cdbff;
+    --warning: #4b9eff;
+    --danger: #70e0ff;
+    --light: #f9fafb;
+    --dark: #343a40;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--light), #e9ecef);
+}
+
+#Nos-Medcins {
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, var(--light), #d1e3f5);
+    border-radius: 2rem;
+    max-width: 1600px;
+    margin: 3rem auto;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+#Nos-Medcins::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 70%);
+    z-index: 0;
+    animation: pulse 10s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.5; }
+}
+
+#Nos-Medcins h4 {
+    font-size: 3rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--dark);
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#Nos-Medcins hr {
+    border: 0;
+    height: 6px;
+    background: linear-gradient(to right, var(--primary), var(--success));
+    width: 200px;
+    margin: 0 auto 2.5rem;
+    border-radius: 10px;
+}
+
+.doctor-list {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 2rem;
+    padding: 1.5rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.doctor-list::-webkit-scrollbar {
+    display: none;
+}
+
+.doctor-card {
+    flex: 0 0 280px;
+    background: var(--light);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.doctor-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.doctor-card img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 4px solid var(--primary);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.doctor-card:hover img {
+    transform: scale(1.1);
+    border-color: var(--success);
+}
+
+.doctor-card h3 {
+    font-size: 1.5rem;
+    color: var(--dark);
+    font-weight: 600;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.doctor-card h3:hover {
+    color: var(--warning);
+}
+
+.doctor-card p {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.doctor-card .icon {
+    color: var(--primary);
+    margin-right: 0.5rem;
+}
+
+/* Modal Styles */
+.doctor-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.doctor-modal-content {
+    background: var(--light);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    max-width: 800px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transform: scale(0.9);
+    animation: modalPop 0.5s ease forwards;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+
+@keyframes modalPop {
+    to { transform: scale(1); }
+}
+
+.doctor-modal-content .close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: var(--primary);
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.doctor-modal-content .close:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+.doctor-modal-content .profile-section {
+    text-align: center;
+}
+
+.doctor-modal-content .profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid var(--primary);
+    margin-bottom: 1rem;
+    margin-right: 150px;
+    transition: transform 0.3s ease;
+}
+
+.doctor-modal-content .profile-image:hover {
+    transform: scale(1.1);
+}
+
+.doctor-modal-content .social-links a {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.doctor-modal-content .social-links a:hover {
+    color: var(--success);
+}
+
+.doctor-modal-content .info-section h2 {
+    font-size: 2rem;
+    color: var(--dark);
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1.5rem;
+}
+
+.doctor-modal-content .info-section p {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin: 0.75rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.doctor-modal-content .info-section p strong {
+    color: var(--primary);
+    margin-right: 0.5rem;
+}
+
+.doctor-modal-content .schedule-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #e9ecef;
+    border-radius: 1rem;
+}
+
+.doctor-modal-content .schedule-section h3 {
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.doctor-modal-content .schedule-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.doctor-modal-content .schedule-section ul li {
+    font-size: 1rem;
+    color: #4b5563;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.doctor-modal-content .schedule-section ul li i {
+    color: var(--success);
+    margin-right: 0.5rem;
+}
+
+.appointment-btn {
+    display: inline-block;
+    background: linear-gradient(to right, var(--primary), var(--success));
+    color: var(--light);
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 1.5rem;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.appointment-btn:hover {
+    background: linear-gradient(to right, var(--warning), var(--danger));
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .doctor-card {
+        flex: 0 0 240px;
+    }
+
+    .doctor-card img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .doctor-modal-content {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+    }
+
+    .doctor-modal-content .profile-image {
+        width: 150px;
+        height: 150px;
+    }
+
+    .doctor-modal-content .info-section h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #Nos-Medcins h4 {
+        font-size: 2.2rem;
+    }
+
+    .doctor-card {
+        flex: 0 0 200px;
+    }
+
+    .doctor-card img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .doctor-modal-content .info-section h2 {
+        font-size: 1.6rem;
+    }
+
+    .doctor-modal-content .info-section p {
+        font-size: 0.9rem;
+    }
+}
+
+            </style>
+-->
 
 
 

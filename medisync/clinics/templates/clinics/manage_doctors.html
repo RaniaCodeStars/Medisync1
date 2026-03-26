@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/manage_doctors.css' %}?v=1.2">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/headeraside.css' %}?">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/manage_doctors.css' %}?v=1.1">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <title>Gérer les médecins - {{ clinic.name }}</title>
 </head>
 <body>
-    <header>
+    <header  style="background-color: #375fa4;width: 100%;position: fixed;" >
         <nav class="navbar section-content">
             <a href="#" class="nav-logo">
                 <h2 class="logo-text">Medisync</h2>
@@ -28,144 +29,1011 @@
                 <li class="nav-item">
                     <a href="#doctor" class="nav-link2">Mes document</a>
                 </li>
-                <li class="nav-item" >
-                    {% if clinic.photos %}
-                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
-                {% else %}
-                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
-                {% endif %} 
-                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                <li class="nav-item">
+                    <a href="{% url 'clinics:clinic_profile' %}">
+                        {% if clinic.photos %}
+                            <img src="{{ clinic.photos.url }}" alt="Photo de la clinique" style="height: 40px; width: 40px; border-radius: 120px; border: solid 3px #FFF;">
+                        {% else %}
+                            <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de la clinique" style="height: 60px; width: 60px; border-radius: 120px; border: solid 5px #FFF;">
+                        {% endif %}
+                    </a>
                 </li>
+                
             </ul>
 
             <button id="menu-open-button" class="fas fa-bars" ></button>
         </nav>
         </div>
     </header>
-    <aside>
+    <aside style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
         <div class="sidebar">
-            <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="active">
+            <a href="{% url 'clinics:clinic_dashboard' %}" class="{% if request.resolver_match.url_name == 'clinic_dashboard' %}active{% endif %}">
                 <span class="material-icons">dashboard</span>
                 <h3>Tableau de bord</h3>
-            </a>
-            
-            <a href="#">
+            </a>   
+            <a href="{% url 'clinics:mes_demandes' %}" class="{% if request.resolver_match.url_name == 'mes_demandes' %}active{% endif %}">
                 <span class="material-icons">calendar_month</span>
                 <h3>Mes rendez-vous</h3>
             </a>
-            <a href="{% url 'confirm_doctor' clinic_id=clinic.id %}">
+            <a href="{% url 'clinics:confirm_doctor' %}" class="{% if request.resolver_match.url_name == 'confirm_doctor' %}active{% endif %}">
                 <span class="material-icons">description</span>
-                <h3>Gérer Médecins</h3>
+                <h3>Docs à valider</h3>
             </a>
-            
-            <a href="#">
+            <a href="#" class="{% if 'messages' in request.path %}active{% endif %}">
                 <span class="material-icons">sms</span>
                 <h3>Messages</h3>
                 <!-- <span class="message-count">26</span> -->
             </a>
-            <a href="#">
+            
+            <a href="#" class="{% if 'teleconsultation' in request.path %}active{% endif %}">
                 <span class="material-icons">videocam</span>
                 <h3>Téléconsultation</h3>
             </a>
-            <a href="{% url 'manage_doctors' clinic_id=clinic.id %}">
-                <span class="material-icons">bar_chart</span> <!-- Icône Statistiques -->
-                <h3>Nos médecins</h3>
+            
+            <a href="{% url 'clinics:manage_doctors' %}" class="{% if request.resolver_match.url_name == 'manage_doctors' %}active{% endif %}">
+                <span class="material-icons">bar_chart</span>
+                <h3>Gérer Médecins</h3>
             </a>
-            <a href="{% url 'clinic_profile' clinic_id=clinic.id %}">
-                <span class="material-icons">person</span> <!-- Icône de profil -->
+            
+            <a href="{% url 'clinics:clinic_profile' %}" class="{% if request.resolver_match.url_name == 'clinic_profile' %}active{% endif %}">
+                <span class="material-icons">person</span>
                 <h3>Profil</h3> 
             </a>
-            <a href="{% url 'clinic_edit' clinic_id=clinic.id %}">
-                <span class="material-icons">edit</span> <!-- Icône de modification -->
+            
+            <a href="{% url 'clinics:clinic_edit' %}" class="{% if request.resolver_match.url_name == 'clinic_edit' %}active{% endif %}">
+                <span class="material-icons">edit</span>
                 <h3>Modifier Profil</h3> 
             </a> 
-
+    
             {% if clinic %}
-            <a href="{% url 'edit_horaires' clinic.id %}">
-                <span class="material-icons">schedule</span>
-                <h3>Modifier Horaires</h3>
-            </a>
-        {% else %}
-            <p>Aucune clinique sélectionnée.</p>
-        {% endif %} 
-        <a href="{% url 'clinic_settings' clinic.id %}">
-            <span class="material-icons">settings</span>
-            <h3>Paramètres</h3>
-        </a>
-        <br><br><br>
+                <a href="{% url 'clinics:edit_horaires' %}" class="{% if request.resolver_match.url_name == 'edit_horaires' %}active{% endif %}">
+                    <span class="material-icons">schedule</span>
+                    <h3>Modifier Horaires</h3>
+                </a>
+            {% else %}
+                <p class="no-clinic-message">Aucune clinique sélectionnée.</p>
+            {% endif %} 
             
-        <a href="#">
-            <span class="material-icons">logout</span>
-            <h3>Déconnexion</h3>
-        </a>
+            <a href="{% url 'clinics:clinic_settings' %}" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            
+            <div class="modal fade logout-modal" id="logoutModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-footer">
+                            
+                            <a href="#" id="confirmLogout" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                                <span class="material-icons">logout</span>
+                                <h3>Déconnexion</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <script>
+                    document.getElementById("confirmLogout").addEventListener("click", function() {
+                        window.location.href = "{% url 'accounts:login' %}";
+                    });
+                </script>
+                  <!-- Bootstrap JS Bundle avec Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+    <script>
+        // Optionnel: Animation supplémentaire
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatar = document.querySelector('.avatar-container');
+            
+            avatar.addEventListener('click', function() {
+                // Animation au clic (optionnel)
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Gestion personnalisée de la déconnexion (optionnel)
+            const confirmLogout = document.querySelector('.logout-btn.confirm');
+            confirmLogout.addEventListener('click', function() {
+                // Vous pouvez ajouter ici un préchargement ou animation
+                console.log('Déconnexion en cours...');
+            });
+        });
+    </script>
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+
         </div>
     </aside>
-    <div class="doctor-management-container">
+    
+
+    <div class="doctor-management-container" style="margin-left: 200px; margin-top: 75px;">
         <!-- Header fixe -->
-        <header class="dashboard-header">
-          <h1 class="dashboard-title">Gestion des Médecins</h1>
-          <div class="header-actions">
-            <button class="btn btn-edit">
-              <i class="material-icons">filter_alt</i> Filtrer
-            </button>
-          </div>
+        <header class="dashboard-header" >
+            <h1 class="dashboard-title">Notre Équipe Médicale</h1>
+            <div class="header-actions">
+                <a href="{% url 'clinics:add_doctor' %}" class="btn btn-add">
+                    <i class="material-icons">person_add</i>
+                    <span>Ajouter un médecin</span>
+                </a>
+            </div>
         </header>
-      
+    
         <!-- Contenu scrollable -->
         <div class="doctors-scroll-container">
-          <div class="doctors-list">
-            {% if doctors %}
-              {% for doctor in doctors %}
-              <div class="doctor-card">
-                <div class="doctor-info">
-                    {% if doctor.profile_image %}
-                    <img src="{{ doctor.profile_image.url }}" alt="Photo du Dr. {{ doctor.name }}" class="doctor-avatar">
-                    {% else %}
-                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
-                {% endif %} 
-                  <div class="doctor-details">
-                    <h3>Dr. {{ doctor.prenom }} {{ doctor.name }}</h3>
-                    <p>
-                        <i class="material-icons medical-icon" style="cursor: pointer;">health_and_safety</i>
-                        <span class="specialty-badge"  style="cursor: pointer;">{{ doctor.speciality }}</span>
-                      </p>
-                      
-                  </div>
-                </div>
-                <div class="action-buttons">
-                    <a href="{% url 'edit_doctor' doctor.id %}" class="btn btn-edit">
-                        <i class="material-icons">edit</i> Modifier
-                    </a>
-
-                    <button class="btn btn-danger"><i class="material-icons">delete</i> <a href="{% url 'delete_doctor' doctor.id %}" onclick="return confirm('Voulez-vous vraiment supprimer ce médecin ?');">
-                        Supprimer
-                    </a>   </button>
-                </div>
-              </div>
-              {% endfor %}
-            {% else %}
-              <div class="empty-state">
-                <div class="empty-icon">
-                  <i class="material-icons">group_off</i>
-                </div>
-                <h3>Aucun médecin enregistré</h3>
-                <p>Commencez par ajouter des médecins à votre équipe pour qu'ils apparaissent dans cette liste.</p>
-                <a href="{% url 'add_doctor_to_clinic' clinic.id %}" class="btn btn-edit">
-                  <i class="material-icons">person_add</i> Ajouter un médecin
-                </a>
-              </div>
-            {% endif %}
-          </div>
-        </div>
-      
-        <!-- Bouton flottant -->
-        <a href="{% url 'add_doctor' clinic_id=clinic.id %}" class="floating-btn">
-            <i class="material-icons">add</i>
+            <!-- Groupes par spécialité -->
+            {% regroup doctors by speciality as doctors_by_speciality %}
+            
+            {% if doctors_by_speciality %}
+                {% for speciality in doctors_by_speciality %}
+                <section class="speciality-section" aria-labelledby="speciality-{{ forloop.counter }}">
+                    <div class="speciality-header">
+                        <h2 id="speciality-{{ forloop.counter }}" class="speciality-title">
+                            <i class="material-icons">medical_services</i>
+                            {{ speciality.grouper }}
+                        </h2>
+                        <span class="doctor-count">{{ speciality.list|length }} médecin{{ speciality.list|length|pluralize:"s" }}</span>
+                    </div>
+                    
+                    <div class="doctors-grid">
+                        {% for doctor in speciality.list %}
+                        <article class="doctor-card">
+                            <div class="card-content">
+                                <div class="doctor-header">
+                                    {% if doctor.profile_image %}
+                                    <img src="{{ doctor.profile_image.url }}" alt="Photo du Dr. {{ doctor.name }}" class="doctor-avatar" loading="lazy">
+                                    {% else %}
+                                    <div class="avatar-placeholder">
+                                        <i class="material-icons">person</i>
+                                    </div>
+                                    {% endif %}
+                                    <div class="doctor-badge" title="Médecin vérifié">
+                                        <i class="material-icons">verified</i>
+                                    </div>
+                                </div>
+                                
+                                <div class="doctor-body">
+                                    <h3>
+                                        <a href="#" style="font-size: 18px;font-weight: 600;" onclick="event.preventDefault(); openDoctorModal('{{ doctor.id }}')">
+                                            Dr. {{ doctor.prenom }} {{ doctor.name }}
+                                        </a>
+                                    </h3>
+                                    
+                                    <div class="doctor-stats">
+                                        <div class="stat-item">
+                                            <i class="material-icons">calendar_today</i>
+                                            <span>{{ doctor.appointment_count|default:"0" }} RDV</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <i class="material-icons">star</i>
+                                            <span>{{ doctor.average_rating|default:"-" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="doctor-footer">
+                                    <a href="{% url 'clinics:edit_doctor' doctor.id %}" class="btn-action edit" title="Modifier">
+                                        <i class="material-icons">edit</i>
+                                    </a>
+                                    <a href="{% url 'clinics:doctor_rendezvous' doctor.id %}" class="btn-action calendar" title="RDV">
+                                        <i class="material-icons">calendar_month</i>
+                                    </a>
+                                    <a href="{% url 'clinics:delete_doctor' doctor.id %}" class="btn-action delete" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer ce médecin ?');">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+    
+                        <!-- Modal pour ce médecin -->
+                        <div id="doctor-modal-{{ doctor.id }}" class="doctor-modal" style="display: none;">
+                            <div class="doctor-modal-content">
+                                <span class="close" onclick="closeDoctorModal('{{ doctor.id }}')">×</span>
+                                <div class="profile-section" style="height: auto;">
+                                    {% if doctor.profile_image %}
+                                        <img class="profile-image" src="{{ doctor.profile_image.url }}" alt="Photo de {{ doctor.name }}">
+                                    {% else %}
+                                        <img class="profile-image" src="{% static 'images/default_doctor.png' %}" alt="Photo par défaut">
+                                    {% endif %}
+                                    <div class="social-links">
+                                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                                        <a href="#"><i class="fab fa-twitter"></i></a>
+                                        <a href="#"><i class="fas fa-globe"></i></a>
+                                    </div>
+                                </div>
+                                <div class="info-section">
+                                    <h2 style="padding: 15px;">Dr. {{ doctor.prenom }} {{ doctor.name }}</h2>
+                                    <p><strong><i class="fas fa-stethoscope"></i> Spécialité :</strong> {{ doctor.speciality }}</p>
+                                    <p><strong><i class="fas fa-envelope"></i> Email :</strong> {{ doctor.email }}</p>
+                                    <p><strong><i class="fas fa-phone"></i> Téléphone :</strong> {{ doctor.telephone }}</p>
+                                    <p><strong><i class="fas fa-money-bill"></i> Frais de consultation :</strong> {{ doctor.consultation_fee }} DA</p>
+                                    <p><strong><i class="fas fa-briefcase"></i> Expérience :</strong> {{ doctor.years_of_experience }} ans</p>
+                                    <p><strong><i class="fas fa-check-circle"></i> Disponible :</strong> {% if doctor.disponible %}Oui{% else %}Non{% endif %}</p>
+                                    <p><strong><i class="fas fa-book-medical"></i> Biographie :</strong> {{ doctor.biographie }}</p>
+                                    <h3 style="color: #05173d;"><strong><i class="fas fa-clock"></i> Horaires de travail :</strong></h3>
+                                    <ul class="doctor-schedule-list">
+    {% for h in doctor.horaires.all %}
+    <li class="schedule-item">
+        {{ h.jour|title }} : de {{ h.heure_debut }} à {{ h.heure_fin }}
+        <a href="{% url 'clinics:modifier_horaire' doctor_id=doctor.id horaire_id=h.id %}" class="schedule-edit-btn">
+            Modifier
         </a>
-        
-      </div>
-    
+    </li>
+    {% empty %}
+    <li class="schedule-empty">Aucun horaire défini</li>
+    {% endfor %}
+    <a href="{% url 'clinics:ajouter_horaire' doctor_id=doctor.id %}" class="schedule-add-link">
+        <button type="button" class="schedule-add-btn" style="font-weight: 400px;">Emplois de temps de médecin</button>
+    </a>
+</ul>
 
+
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="material-icons">medical_services</i>
+                    </div>
+                    <h3>Aucun médecin enregistré</h3>
+                    <p>Commencez par constituer votre équipe médicale</p>
+                    <a href="{% url 'clinics:add_doctor' %}" class="btn btn-primary">
+                        <i class="material-icons">person_add</i> Ajouter un médecin
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
     
+    <script>
+    function openDoctorModal(doctorId) {
+        event.preventDefault();
+        document.getElementById('doctor-modal-' + doctorId).style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Empêche le défilement de la page
+        
+        // Masquer les éléments si nécessaire
+        const navv = document.querySelector(".nav-container");
+        const right = document.querySelector(".right-part");
+        if(navv) navv.style.zIndex = '40';
+        if(right) right.style.zIndex = '40';
+    }
+    
+    function closeDoctorModal(doctorId) {
+        document.getElementById('doctor-modal-' + doctorId).style.display = 'none';
+        document.body.style.overflow = 'auto'; // Rétablit le défilement
+        
+        // Afficher à nouveau les éléments si nécessaire
+        const navv = document.querySelector(".nav-container");
+        const right = document.querySelector(".right-part");
+        if(navv) navv.style.zIndex = '50';
+        if(right) right.style.zIndex = '50';
+    }
+    
+    // Fermer la modale en cliquant à l'extérieur
+    window.onclick = function(event) {
+        document.querySelectorAll('.doctor-modal').forEach(modal => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+    </script>
+</div>
+
+<style>
+:root {
+    --primary: #406eae;
+    --primary-light: #406eae;
+    --primary-dark: #002984;
+    --secondary: #40c9ff;
+    --success: #4c82af;
+    --warning: #20489f;
+    --danger: #36aef4;
+    --light: #f5f5f5;
+    --dark: #212121;
+    --gray: #757575;
+    --light-gray: #e0e0e0;
+    --speciality-bg: #f8f9fa;
+}
+
+/* Reset et polices */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* Container principal */
+.doctor-management-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+.dashboard-header {
+    padding: 1rem 2rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 20;
+    width: 1050px;
+    z-index: 100;
+    position: fixed;
+}
+
+.dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--primary-dark);
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-add {
+    background-color: #406eae;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-add:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Contenu scrollable */
+.doctors-scroll-container {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    overflow-y: auto;
+}
+
+/* Sections par spécialité */
+.speciality-section {
+    margin-bottom: 2.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-top: 80px;
+}
+
+.speciality-header {
+    background-color: var(--speciality-bg);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.speciality-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--primary-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.speciality-title i {
+    color: var(--primary);
+}
+
+.doctor-count {
+    font-size: 0.9rem;
+    color: var(--gray);
+    background: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Grille des médecins */
+.doctors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: #216cac21;
+}
+
+/* Carte médecin */
+.doctor-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.card-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.doctor-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.doctor-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+    color: #9e9e9e;
+    font-size: 2.5rem;
+}
+
+.doctor-badge {
+    position: absolute;
+    top: 0;
+    right: 25%;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.doctor-body {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.doctor-body h3 {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.doctor-body h3 a {
+    color: var(--dark);
+    text-decoration: none;
+}
+
+.doctor-body h3 a:hover {
+    color: var(--primary);
+}
+
+.doctor-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--gray);
+}
+
+.stat-item i {
+    font-size: 1rem;
+    color: var(--primary-light);
+}
+
+.doctor-footer {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--light-gray);
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+}
+
+.btn-action.edit { background: var(--primary); }
+.btn-action.calendar { background: var(--warning); }
+.btn-action.delete { background: var(--danger); }
+
+.btn-action[title]::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+}
+
+.btn-action:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: -25px;
+}
+
+/* État vide */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 2rem auto;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--primary-light);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+}
+
+.empty-state p {
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Barre de défilement */
+.doctors-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.doctors-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.doctors-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .doctors-scroll-container {
+        padding: 1rem;
+    }
+    
+    .doctors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .speciality-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+    /* Styles pour la modale */
+    .doctor-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .doctor-modal-content {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        border-radius: 12px;
+        width: 80%;
+        max-width: 800px;
+        max-height:500px;
+        overflow-y: auto;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        display: flex;
+        position: relative;
+        animation: slideUp 0.4s ease-out;
+    }
+    
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        color: #aaa;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .close:hover {
+        color: #333;
+    }
+    
+    .profile-section {
+        height: auto;
+        flex: 1;
+        padding: 2rem;
+        padding-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px 0 0 12px;
+    }
+    
+    .profile-image {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .social-links a {
+        color: #4a5568;
+        font-size: 1.2rem;
+        transition: color 0.3s, transform 0.3s;
+    }
+    
+    .social-links a:hover {
+        color: var(--primary);
+        transform: translateY(-3px);
+    }
+    
+    .info-section {
+        background-color: #fff;
+        flex: 2;
+        margin-left: 20px;
+        color: #2d3748;
+        height: auto;
+        padding-bottom: 20px;
+
+    }
+    
+    .info-section h2 {
+        color: var(--primary-dark);
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+        padding-left: 15px
+        
+    }
+    
+    .info-section h3 {
+        color: var(--primary);
+        margin: 1.5rem 0 1rem;
+        font-size: 1.3rem;
+    }
+    
+    .info-section p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        display: flex;
+        align-items: flex-start;
+        padding-left: 1px
+    }
+    
+    .info-section strong {
+        min-width: 180px;
+        display: inline-block;
+        color: #4a5568;
+        padding-left: 25px
+    }
+    
+    .info-section i {
+        margin-right: 10px;
+        color: var(--primary-light);
+        width: 20px;
+        text-align: center;
+    }
+    
+    .info-section ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 0 1.5rem 0;
+        padding-bottom: 30px;
+        padding-left: 30px;
+    }
+    
+    .info-section li {
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed #e2e8f0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-section li i {
+        color: var(--primary-light);
+        margin-right: 10px;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from { 
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to { 
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .doctor-modal-content {
+            flex-direction: column;
+            width: 90%;
+            max-height: 85vh;
+        }
+        
+        .profile-section {
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .profile-image {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .info-section {
+            padding: 1.5rem;
+        }
+        
+        .info-section p {
+            flex-direction: column;
+        }
+        
+        .info-section strong {
+            min-width: auto;
+            margin-bottom: 0.3rem;
+        }
+    }
+    
+    /* Effet de zoom au survol des images */
+    .profile-image {
+        transition: transform 0.3s ease;
+    }
+    
+    .profile-image:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Style pour le bouton de contact */
+    .contact-btn {
+        display: inline-block;
+        background: var(--primary);
+        color: white;
+        padding: 0.7rem 1.5rem;
+        border-radius: 30px;
+        text-decoration: none;
+        margin-top: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .contact-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Style pour la biographie */
+    .bio-text {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary);
+        font-style: italic;
+        line-height: 1.7;
+    }
+    /* Liste des horaires - Styles spécifiques */
+.doctor-schedule-list {
+    background-color: #fff;
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+    max-width: 600px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.schedule-item {
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 4px solid #3f7fb5;
+    transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+    background-color: #e9f5ff;
+    transform: translateX(5px);
+}
+
+.schedule-edit-btn {
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background-color: #3f7fb5;
+    color: white;
+    border: none;
+}
+
+.schedule-edit-btn:hover {
+    background-color: #2c5d8a;
+    box-shadow: 0 2px 8px rgba(63, 127, 181, 0.3);
+}
+
+.schedule-empty {
+    padding: 15px;
+    color: #6c757d;
+    font-style: italic;
+    background-color: #f8f9fa;
+    border-left: 4px solid #dee2e6;
+}
+
+.schedule-add-btn {
+    width: 300px;
+    height: 50px;
+    background-color: #3f7fb5;
+    color: #fff;
+    margin-top: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.schedule-add-btn:hover {
+    background-color: #2c5d8a;
+    box-shadow: 0 4px 12px rgba(63, 127, 181, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Version responsive */
+@media (max-width: 768px) {
+    .schedule-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .schedule-edit-btn {
+        align-self: flex-end;
+    }
+}
+</style>
 </body>
 </html>

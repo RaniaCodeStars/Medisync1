@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Médecins</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/recherche_resultat.css' %}?v=1.1">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/rechercheresultat.css' %}?v=1.1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
@@ -15,174 +16,288 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- CSS de Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
-<!-- JS de Leaflet -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- JS de Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
 </head>
+
 <body>
     <header>
         <nav class="navbar section-content">
             <a href="#" class="nav-logo">
                 <h2 class="logo-text">Medisync</h2>
             </a>
-            <ul class="nav-menu">
-                <button id="menu-close-button" class="fas fa-times" ></button>
+            <ul class="nav-menu" style="display: flex;flex-direction: row; align-items: center; gap: 15px;flex-wrap: nowrap;">
+                <button id="menu-close-button" class="fas fa-times"></button>
                 <li class="nav-item">
-                    <a href="#home" class="nav-link">Centre d'aide </a>
+                    <a href="http://127.0.0.1:8000/" class="nav-link" style="margin-top: 20px;">Accueil</a>
                 </li>
-                <li class="nav-item">
-                    <a href="#about" class="nav-link">Mes messages</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#patient" class="nav-link">Mes rendez-vous</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#doctor" class="nav-link">Mes document</a>
-                </li>
-                <li class="nav-item">
-                    <p>Hilem sirine</p>
-                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
-                </li>
-            </ul>
 
-            <button id="menu-open-button" class="fas fa-bars" ></button>
+<li class="nav-item">
+{% if user.is_authenticated %}
+    <div style="
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 3px 12px;
+        background-color: white;
+        border: 2px solid #375fa4;
+        border-radius: 34px;
+        box-shadow: 0 4px 20px rgba(15, 118, 186, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        max-width: 300px;
+        ">
+        
+        {% if user.clinic_profile and user.clinic_profile.photos %}
+            <img src="{{ user.clinic_profile.photos.url }}"
+                 alt="Photo de profil"
+                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #375fa4;">
+        {% elif user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}"
+                 alt="Photo de profil"
+                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #375fa4;">
+        {% else %}
+            <img src="{% static 'image/profil-inicial.jpg' %}"
+                 alt="Photo de profil"
+                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #375fa4;">
+        {% endif %}
+
+        <div style="display: flex; flex-direction: column;">
+            {% if user.patient_profile %}
+                <a href="{% url 'patients:dashboard' %}"
+                   style="font-weight: 600; font-size: 12px; color: #375fa4; text-decoration: none;">
+                   {{ user.patient_profile.nom }} {{ user.patient_profile.prenom }}
+                </a>
+
+            {% elif user.clinic_profile %}
+                <a href="{% url 'clinics:clinic_dashboard' %}"
+                   style="font-weight: 600; font-size: 12px; color: #375fa4; text-decoration: none;">
+                   {{ user.clinic_profile.name }}
+                </a>
+
+            {% elif user.doctor_profile %}
+                <a href="#"
+                   style="font-weight: 600; font-size: 12px; color:#375fa4; text-decoration: none;">
+                   Dr. {{ user.doctor_profile.nom }} {{ user.doctor_profile.prenom }}
+                </a>
+
+            {% else %}
+                <a href="#"
+                   style="font-weight: 600; font-size: 12px; color: #375fa4; text-decoration: none;">
+                   {{ user.username }}
+                </a>
+            {% endif %}
+
+            <span style="font-size: 11px; color: #777;">Connecté</span>
+        </div>
+    </div>
+
+{% else %}
+    <a href="{% url 'accounts:login' %}"
+       style="
+        color: #0f76ba;
+        background-color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: 2px solid #0f76ba;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;"
+       onmouseover="this.style.backgroundColor='#0f76ba'; this.style.color='white'"
+       onmouseout="this.style.backgroundColor='white'; this.style.color='#0f76ba'">
+       Se connecter
+    </a>
+{% endif %}
+
+
+</li>
+
+                
+                </ul>
+
+            <button id="menu-open-button" class="fas fa-bars"></button>
         </nav>
         <div class="buttons">
-            <form method="GET" action="{% url 'doctor_list' %}" class="search-container">
+            <form method="GET" action="{% url 'medecins:doctor_list' %}" class="search-container">
                 <div class="search-box">
-                    <input type="text" name="recherche" placeholder="Rechercher médecin" class="search-input" >
+                    <input type="text" name="recherche" placeholder="Rechercher médecin" class="search-input">
                     <button type="submit" class="search-button"><i class="fas fa-search"></i></button>
                 </div>
                 <div class="search-box">
-                    <input type="text" name="location" placeholder="Localisation..." class="location-input" >
+                    <input type="text" name="location" placeholder="Localisation..." class="location-input">
                     <button type="submit" class="location-button">
                         <i class="fas fa-map-marker-alt"></i>
                     </button>
                 </div>
-                
+
                 <button type="submit" class="button_recherche">Rechercher</button>
             </form>
-    
+
         </div>
         </div>
     </header>
     <main>
         <section class="search-results-section">
             <div class="section-title">
-                <a class="doct"><i class="fas fa-stethoscope"></i><!--{{ doctors.count }}--> médecins </a> <a class="clin"> <!--{{ clinics.count }} --><i class="fas fa-clinic-medical"></i> cliniques</a>
+                <a class="doct"><i class="fas fa-stethoscope"></i><!--{{ doctors.count }}--> médecins </a> <a
+                    class="clin"> <!--{{ clinics.count }} --><i class="fas fa-clinic-medical"></i> cliniques</a>
             </div>
-            <div class="partieAB" >
+            <div class="partieAB">
                 <div class="partieA">
-                <div class="section-content">
-                    <div class="list-doctor">   
-                        {% if doctors %}
+                    <div class="section-content">
+                        <div class="list-doctor">
+                            {% if doctors %}
                             <div class="doctor-cards-container">
                                 {% for doctor in doctors %}
-    
-                                    <div class="doctor-card" data-lat="48.8566" data-lng="2.3522" data-name="{{ doctor.name }}">
-                                        <div class="doctor-info" onmouseenter="showDoctorLocation(this)" 
-                                        data-lat="{{ doctor.latitude }}" 
-                                        data-lng="{{ doctor.longitude }}" 
-                                        data-name="{{ doctor.name }}" >
-                                            <div style="display: flex;">
-                                                <div>
-                                                    <img src="{% static 'image/profil-inicial.jpg' %}" class="doctor-photo" alt="Photo du médecin">
-                                                </div>                                                
-                                                <div>
-                                                    <h3 style="cursor: pointer;">Dr.{{ doctor.nom }} {{doctor.prenom}}</h3>
-                                                </div>
+
+                                <div class="doctor-card" data-lat="48.8566" data-lng="2.3522"
+                                    data-name="{{ doctor.name }}">
+                                    <div class="doctor-info" onmouseenter="showDoctorLocation(this)"
+                                        data-lat="{{ doctor.latitude }}" data-lng="{{ doctor.longitude }}"
+                                        data-name="{{ doctor.name }}">
+                                        <div style="display: flex;">
+                                            <div>
+                                                {% if doctor.user.profile_picture %}
+                                                <img src="{{ doctor.user.profile_picture.url }}" class="doctor-photo"
+                                                    alt="Photo du médecin">
+                                                {% else %}
+                                                <img src="{% static 'image/profil-inicial.jpg' %}" class="doctor-photo"
+                                                    alt="Photo du médecin">
+                                                {% endif %}
                                             </div>
-                                            <p class="address">{{ doctor.location }}</p>
-                                            <p class="specialty">{{ doctor.specialty }}</p><br>
-                                            <p class="rating">⭐️ 4.8 (120 avis)</p>
-                                            <a href="#" class="btn">Prendre rendez-vous</a>
-                                        </div>
-                                        <div class="doctor-calendar">
-                                            <h4>Calendrier de disponibilités</h4>
-                                            <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
-                                            <div class="week-container">
-                                                <div class="day-box">Lundi</div>
-                                                <div class="day-box">Mardi</div>
-                                                <div class="day-box">Mercredi</div>
-                                                <div class="day-box">Jeudi</div>
-                                                <div class="day-box">Vendredi</div>
-                                                <div class="day-box">Samedi</div>
-                                                <div class="day-box">Dimanche</div>
+                                            <div>
+                                                <h3 style="cursor: pointer;">Dr.{{ doctor.nom }} {{doctor.prenom}}</h3>
                                             </div>
                                         </div>
+                                        <p class="address">{{ doctor.location }}</p>
+                                        <p class="specialty">{{ doctor.specialty }}</p><br>
+                                        <p class="rating">⭐️ 4.8 (120 avis)</p>
+                                        <a href="{% url 'appointments:book_appointment' doctor.id %}"
+                                            class="btn">Prendre rendez-vous</a>
                                     </div>
+                                    <div class="doctor-calendar">
+                                    <h4>Calendrier de disponibilités</h4>
+                                    <div class="week-container">
+                                        <!-- Première ligne (Lundi-Jeudi) -->
+                                        {% for day in doctor.week_availability|slice:":4" %}
+                                        <div class="day-box">
+                                            <span class="day-name">{{ day.day_name }}</span>
+                                            {% if day.availabilities %}
+                                            {% for slot in day.availabilities %}
+                                            <span
+                                                class="time-slot {% if slot.type == 'specific' %}specific-slot{% endif %}">
+                                                {{ slot.start_time }}-{{ slot.end_time }}
+                                            </span>
+                                            {% endfor %}
+                                            {% else %}
+                                            <span class="unavailable">Fermé</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+
+                                        <!-- Deuxième ligne (Vendredi-Dimanche) -->
+                                        {% for day in doctor.week_availability|slice:"4:" %}
+                                        <div class="day-box">
+                                            <span class="day-name">{{ day.day_name }}</span>
+                                            {% if day.availabilities %}
+                                            {% for slot in day.availabilities %}
+                                            <span
+                                                class="time-slot {% if slot.type == 'specific' %}specific-slot{% endif %}">
+                                                {{ slot.start_time }}-{{ slot.end_time }}
+                                            </span>
+                                            {% endfor %}
+                                            {% else %}
+                                            <span class="unavailable">Fermé</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    </div>
+                                </div>
                                 {% endfor %}
                             </div>
                             {% else %}
                             <p>Aucune méedcin trouvée pour cette recherche.</p>
-                        {% endif %}
+                            {% endif %}
+                        </div>
+
                     </div>
-                    
-                </div>
-                <div class="section-content">
-                    <div class="list-clinic">
-                        {% if clinics %}
+                    <div class="section-content">
+                        <div class="list-clinic">
+                            {% if clinics %}
                             <div class="clinic-cards-container">
                                 {% for clinic in clinics %}
-                               
-                                    <div class="clinic-card" data-lat="48.8566" data-lng="2.3522" data-name="{{ clinic.name }}">
-                                        <div class="clinic-info" onmouseenter="showDoctorLocation(this)" 
-                                        data-lat="{{ clinic.latitude }}" 
-                                        data-lng="{{ clinic.longitude }}" 
+
+                                <div class="clinic-card" data-lat="48.8566" data-lng="2.3522"
+                                    data-name="{{ clinic.name }}">
+                                    <div class="clinic-info" onmouseenter="showDoctorLocation(this)"
+                                        data-lat="{{ clinic.latitude }}" data-lng="{{ clinic.longitude }}"
                                         data-name="{{ clinic.name }}">
                                         <div style="display: flex;">
-                                            <div>
-                                                <img src="{% static 'image/profil-inicial.jpg' %}" class="doctor-photo" alt="Photo du médecin">
-                                            </div> 
-                                            <div>
-                                                <h3 style="cursor: pointer;">{{ clinic.name }}</h3>
+                                            <div> {% if clinic.photos %}
+                            <img src="{{ clinic.photos.url }}" alt="Photo de la clinique" class="doctor-photo">
+                        {% else %}
+                            <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de la clinique" class="doctor-photo">
+                        {% endif %}
                                             </div>
+<div>
+    <h3 style="cursor: pointer;">
+        <a href="{% url 'clinics:clinic_profile' %}?slug={{ clinic.slug }}" style="text-decoration: none; color: inherit;">
+            {{ clinic.name }}
+        </a>
+    </h3>
+</div>
+
+
                                         </div>
-                                            
-                                            <p class="address">{{ clinic.location }}  </p>
-                                            <p class="phone">{{ clinic.phone }}</p>
-                                            <p class="address">{{ doctor.location }}</p>
-                                            <p class="rating">⭐️ 4.8 (120 avis)</p>
-                                            <a href="#" class="btn">Prendre rendez-vous</a>
-                                        </div>
-                                        <div class="doctor-calendar">
-                                            <h4>Calendrier de disponibilités</h4>
-                                            <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
-                                            <div class="week-container">
-                                                <div class="day-box">Lundi</div>
-                                                <div class="day-box">Mardi</div>
-                                                <div class="day-box">Mercredi</div>
-                                                <div class="day-box">Jeudi</div>
-                                                <div class="day-box">Vendredi</div>
-                                                <div class="day-box">Samedi</div>
-                                                <div class="day-box">Dimanche</div>
-                                            </div>
+
+                                        <p class="address">{{ clinic.location }} </p>
+                                        <p class="phone">{{ clinic.phone }}</p>
+                                        <p class="rating">⭐️ 4.8 (120 avis)</p>
+                                    
+                                        <a href="#" class="btn">Prendre rendez-vous</a>
+                                    </div>
+                                    <div class="doctor-calendar">
+                                        <h4>Calendrier de disponibilités</h4>
+                                        <!-- Insérez ici un calendrier interactif (ex: FullCalendar) -->
+                                        <div class="week-container">
+                                            <div class="day-box">Lundi</div>
+                                            <div class="day-box">Mardi</div>
+                                            <div class="day-box">Mercredi</div>
+                                            <div class="day-box">Jeudi</div>
+                                            <div class="day-box">Vendredi</div>
+                                            <div class="day-box">Samedi</div>
+                                            <div class="day-box">Dimanche</div>
                                         </div>
                                     </div>
-                                        {% empty %}
-                                        <p>Aucune clinique trouvée.</p>
-                                    
+                                </div>
+                                {% empty %}
+                                <p>Aucune clinique trouvée.</p>
+
                                 {% endfor %}
 
                             </div>
-                        {% else %}
+                            {% else %}
                             <p>Aucune clinique trouvée pour cette recherche.</p>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
+                <div class="partieB">
+                    <div id="map"></div>
                 </div>
-                <div class="partieB" >
-                <div id="map" ></div>
-                </div>
-            </div>    
+            </div>
         </section>
     </main>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=TA_CLE_API&callback=initMap"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{% static 'js/recherche_resultat.js' %}"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=TA_CLE_API&callback=initMap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{% static 'js/recherche_resultat.js' %}"></script>
 </body>
+
 </html>

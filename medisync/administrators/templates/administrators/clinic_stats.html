@@ -1,0 +1,117 @@
+{% extends 'administrators/base_admin.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid fade-in">
+    <h4 class="mb-4">Statistiques des Cliniques</h4>
+
+    <!-- Statistiques principales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card text-center">
+                <div class="card-body">
+                    <div class="card-icon info">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <div class="card-value">{{ total_clinics }}</div>
+                    <div class="card-title">Total des Cliniques</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card text-center">
+                <div class="card-body">
+                    <div class="card-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-value">{{ pending_clinics }}</div>
+                    <div class="card-title">En Attente</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card text-center">
+                <div class="card-body">
+                    <div class="card-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-value">{{ approved_clinics }}</div>
+                    <div class="card-title">Approuvées</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="dashboard-card card text-center">
+                <div class="card-body">
+                    <div class="card-icon danger">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="card-value">{{ rejected_clinics }}</div>
+                    <div class="card-title">Rejetées</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Moyenne et spécialités -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="dashboard-card card">
+                <div class="card-header">Répartition par Wilaya</div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for item in clinics_by_location %}
+                            <li><strong>{{ item.location }}</strong> : {{ item.count }} clinique(s)</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="dashboard-card card">
+                <div class="card-header">Médecins par Spécialité</div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        {% for item in doctors_by_specialty %}
+                            <li><strong>{{ item.speciality__nom|default:"Spécialité inconnue" }}</strong> : {{ item.count }} médecin(s)</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="mt-3"><strong>Moyenne de médecins/clinique :</strong> {{ avg_doctors_per_clinic }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+<style>.dashboard-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    background: #fff;
+}
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+.card-icon.info { color: #17a2b8; }
+.card-icon.success { color: #28a745; }
+.card-icon.warning { color: #ffc107; }
+.card-icon.danger { color: #dc3545; }
+
+.card-value {
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.card-title {
+    font-size: 0.95rem;
+    color: #666;
+}
+</style>

@@ -27,43 +27,39 @@ admin.site.register(Clinic ,ClinicAdmin)
 
 
 
+from django.contrib import admin
+from .models import Clinic, ClinicDoctor, RendezVous
+
+# Enregistrer le modèle ClinicDoctor dans l'admin
+class ClinicDoctorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'speciality', 'clinic', 'get_rendezvous')
+    search_fields = ('name', 'speciality', 'clinic__name')
+    list_filter = ('clinic', 'speciality')
+
+    def get_rendezvous(self, obj):
+        return f"{obj.rendezvous.count()} rendez-vous" if obj.rendezvous.exists() else "Aucun rendez-vous"
+    get_rendezvous.short_description = 'Rendez-vous'
+
+admin.site.register(ClinicDoctor, ClinicDoctorAdmin)
+
+
+
+
+
 
 
 
 
 from django.contrib import admin
-from .models import Clinic, ClinicDoctor
+from .models import Review
 
-class ClinicDoctorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'speciality', 'clinic')  # Colonnes affichées dans l'admin
-    search_fields = ('name', 'speciality', 'clinic__name')  # Ajoute une barre de recherche
-    list_filter = ('clinic', 'speciality')  # Ajoute des filtres par clinique et spécialité
-
-admin.site.register(ClinicDoctor, ClinicDoctorAdmin)  # Enregistre le modèle
-
-
-
-
-
-
-
-
-
-
-
-
-
-@admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    """
-    Configuration de l'interface admin pour Review.
-    """
-    list_display = ('clinic', 'rating', 'comment')  # Colonnes principales affichées
-    search_fields = ('clinic__name', 'comment')  # Recherche par nom de clinique ou commentaire
-    list_filter = ('rating', 'clinic')  # Filtrage par note et clinique
+    list_display = ('user', 'clinic', 'rating', 'created_at', 'reply')  # Champs à afficher dans la liste
+    list_filter = ('clinic', 'rating')  # Ajouter des filtres
+    search_fields = ('user__email', 'clinic__name', 'comment')  # Rechercher par email de l'utilisateur, nom de la clinique, ou commentaire
+    date_hierarchy = 'created_at'  # Trier les avis par date
 
-
-
+admin.site.register(Review, ReviewAdmin)  # Enregistrer le modèle avec sa configuration
 
 
 
@@ -84,14 +80,105 @@ class DemandeDeParticipationAdmin(admin.ModelAdmin):
 
 
 
-
-
-# clinics/admin.py
 from django.contrib import admin
-from .models import Appointment
+from .models import HoraireClinic
 
-@admin.register(Appointment)
-class AppointmentAdmin(admin.ModelAdmin):
-    list_display = ('patient', 'clinic', 'speciality', 'date', 'time_slot', 'status')
-    list_filter = ('status', 'clinic', 'speciality')
-    search_fields = ('patient__email', 'patient__first_name', 'patient__last_name')
+@admin.register(HoraireClinic)
+class HoraireClinicAdmin(admin.ModelAdmin):
+    list_display = ('clinic', 'jour', 'heure_ouverture', 'heure_fermeture', 'est_ferme', 'date')
+    list_filter = ('clinic', 'jour', 'est_ferme')
+    search_fields = ('clinic__name', 'jour')
+
+
+
+
+# admin.py
+from django.contrib import admin
+from .models import HoraireTravail
+from .forms import HoraireTravailForm
+
+@admin.register(HoraireTravail)
+class HoraireTravailAdmin(admin.ModelAdmin):
+    form = HoraireTravailForm
+    list_display = ('doctor', 'jour', 'heure_debut', 'heure_fin')
+    list_filter = ('jour', 'doctor')
+    search_fields = ('doctor__name',)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.contrib import admin
+from .models import DemandeRendezVous, RendezVous
+
+@admin.register(DemandeRendezVous)
+class DemandeRendezVousAdmin(admin.ModelAdmin):
+    list_display = ('id', 'doctor', 'nom', 'clinic', 'get_speciality', 'jour', 'heure', 'status')
+    list_filter = ('clinic', 'speciality', 'jour', 'status')
+    search_fields = ('nom', 'doctor__name', 'clinic__name', 'speciality__nom')
+
+    def get_speciality(self, obj):
+        return obj.speciality.nom if obj.speciality else "-"
+    get_speciality.short_description = "Spécialité"
+
+
+
+from django.contrib import admin
+from .models import RendezVous
+# Enregistrer le modèle RendezVous dans l'admin
+class RendezVousAdmin(admin.ModelAdmin):
+    list_display = ('id', 'doctor', 'nom', 'clinic', 'get_speciality', 'jour', 'heure', 'status')
+    list_filter = ('clinic', 'speciality', 'jour', 'status')
+    search_fields = ('nom', 'doctor__name', 'clinic__name', 'speciality__nom')
+
+    def get_speciality(self, obj):
+        return obj.speciality.nom if obj.speciality else "-"
+    get_speciality.short_description = "Spécialité"
+
+admin.site.register(RendezVous, RendezVousAdmin)
+
+
+
+
+
+
+
+
+

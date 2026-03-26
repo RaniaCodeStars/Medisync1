@@ -1,0 +1,389 @@
+{% extends "administrators/base_admin.html" %}
+{% load static %}
+
+{% block title %}Liste des patients{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="header">
+        <h1 class="mb-4">Liste des Patients</h1>
+        <a href="{% url 'administrators:admin_patient_create' %}" class="create-btn">
+            <i class="icon-plus"></i> Créer un Patient
+        </a>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">Recherche</label>
+                        <input type="text" class="form-control" id="search" name="q" 
+                               value="{{ request.GET.q }}" placeholder="Nom, prénom ou email">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="gender" class="form-label">Sexe</label>
+                        <select class="form-select" id="gender" name="gender">
+                            <option value="">Tous</option>
+                            <option value="M" {% if request.GET.gender == "M" %}selected{% endif %}>Masculin</option>
+                            <option value="F" {% if request.GET.gender == "F" %}selected{% endif %}>Féminin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="blood_group" class="form-label">Groupe Sanguin</label>
+                        <select class="form-select" id="blood_group" name="blood_group">
+                            <option value="">Tous</option>
+                            <option value="A+" {% if request.GET.blood_group == "A+" %}selected{% endif %}>A+</option>
+                            <option value="A-" {% if request.GET.blood_group == "A-" %}selected{% endif %}>A-</option>
+                            <option value="B+" {% if request.GET.blood_group == "B+" %}selected{% endif %}>B+</option>
+                            <option value="B-" {% if request.GET.blood_group == "B-" %}selected{% endif %}>B-</option>
+                            <option value="AB+" {% if request.GET.blood_group == "AB+" %}selected{% endif %}>AB+</option>
+                            <option value="AB-" {% if request.GET.blood_group == "AB-" %}selected{% endif %}>AB-</option>
+                            <option value="O+" {% if request.GET.blood_group == "O+" %}selected{% endif %}>O+</option>
+                            <option value="O-" {% if request.GET.blood_group == "O-" %}selected{% endif %}>O-</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Filtrer</button>
+                        {% if request.GET.q %}
+                            <a href="{% url 'administrators:admin_patients_list' %}" class="btn btn-secondary ms-2">Réinitialiser</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Liste des patients -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Photo</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Sexe</th>
+                            <th>Groupe Sanguin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in page_obj %}
+                        <tr>
+                            <td>
+                                <div class="avatar">
+                                    {% if patient.user.profile_picture %}
+                                        <img src="{{ patient.user.profile_picture.url }}" alt="{{ patient.nom }}" class="rounded-circle" width="50" height="50">
+                                    {% else %}
+                                        <img src="{% static 'image/profil-inicial.jpg' %}" alt="Default" class="rounded-circle" width="50" height="50">
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ patient.nom }}</td>
+                            <td>{{ patient.prenom }}</td>
+                            <td>{{ patient.user.email }}</td>
+                            <td>
+                                <span class="badge bg-{% if patient.sex == 'M' %}info{% else %}primary{% endif %}">
+                                    {{ patient.get_sex_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ patient.blood_group }}</span>
+                            </td>
+                            <td>
+                                <a href="{% url 'administrators:admin_patient_detail' patient.pk %}"
+                                    class="btn-detail"><i class="fas fa-eye"></i> </a> 
+                            
+                                <a href="{% url 'administrators:patient_update' patient.pk %}"
+                                class="btn-modifier"><i class="fas fa-edit"></i></a> 
+                                
+                                <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                    data-patient-id="{{ patient.pk }}"
+                                    data-patient-name="{{ patient.nom }} {{ patient.prenom }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucun patient trouvé</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Précédent</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deletePatientModal" tabindex="-1" aria-labelledby="deletePatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" id="deletePatientForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePatientModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    Voulez-vous vraiment supprimer <strong id="deletePatientName"></strong> ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-btn");
+    const deleteForm = document.getElementById("deletePatientForm");
+    const deletePatientName = document.getElementById("deletePatientName");
+
+    deleteButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            const patientId = button.dataset.patientId;
+            const patientName = button.dataset.patientName;
+
+            deleteForm.action = `/administrators/patients/${patientId}/delete/`;
+            deletePatientName.textContent = patientName;
+
+            const deleteModal = new bootstrap.Modal(document.getElementById('deletePatientModal'));
+            deleteModal.show();
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --primary: #4e73df;
+    --secondary: #1cc88a;
+    --danger: #e74a3b;
+    --warning: #f6c23e;
+    --dark: #343a40;
+    --light: #f8f9fc;
+    --gray: #858796;
+}
+
+/* Container principal */
+.container {
+    max-width: 1200px;
+    margin-top: 30px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.create-btn {
+    background-color: var(--primary);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+    background-color: #2e59d9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Filtres */
+.card .form-label {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.875rem;
+}
+
+.card .form-control,
+.card .form-select {
+    font-size: 0.875rem;
+    border-radius: 6px;
+}
+
+/* Table */
+.table {
+    font-size: 0.875rem;
+}
+
+.table thead th {
+    background-color: var(--light);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #eef1f9;
+}
+
+.badge-primary {
+    background-color: var(--primary);
+    font-weight: 500;
+}
+
+.badge-info {
+    background-color: var(--info);
+    font-weight: 500;
+}
+
+.badge-secondary {
+    background-color: var(--secondary);
+    font-weight: 500;
+}
+
+/* Avatar */
+.avatar {
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    transition: transform 0.3s ease;
+}
+
+.avatar img:hover {
+    transform: scale(1.1);
+}
+
+/* Boutons actions */
+.btn-detail,
+.btn-modifier,
+.delete-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.btn-detail {
+    background-color: #1976d2;
+    color: white;
+}
+.btn-detail:hover {
+    background-color: #1565c0;
+}
+
+.btn-modifier {
+    background-color: #17a2b8;
+    color: white;
+}
+.btn-modifier:hover {
+    background-color: #138496;
+}
+
+.delete-btn {
+    background-color: var(--danger);
+    color: white;
+}
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: var(--primary);
+    border-radius: 6px;
+    font-size: 0.875rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .create-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+{% endblock %}

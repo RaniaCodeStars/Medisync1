@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/mes_demandes.css' %}?v=1.1">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/headeraside.css' %}?v=1.2">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Tableau de bord</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header style="background-color: #375fa4; position: fixed;">
+        <nav class="navbar section-content">
+            <a href="#" class="nav-logo">
+                <h2 class="logo-text">Medisync</h2>
+            </a>
+            <ul class="nav-menu">
+                <button id="menu-close-button" class="fas fa-times" ></button>
+                <li class="nav-item">
+                    <a href="#home" class="nav-link2">Acceuil </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link2">Mes Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#patient" class="nav-link2">Mes rendez-vous</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#doctor" class="nav-link2">Mes document</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'clinics:clinic_profile' %}">
+                        {% if clinic.photos %}
+                            <img src="{{ clinic.photos.url }}" alt="Photo de la clinique" style="height: 40px; width: 40px; border-radius: 120px; border: solid 3px #FFF;">
+                        {% else %}
+                            <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de la clinique" style="height: 60px; width: 60px; border-radius: 120px; border: solid 5px #FFF;">
+                        {% endif %}
+                    </a>
+                </li>
+                
+            </ul>
+
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+        </nav>
+        </div>
+    </header>
+    <aside style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+        <div class="sidebar" style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+            <a href="{% url 'clinics:clinic_dashboard' %}" class="{% if request.resolver_match.url_name == 'clinic_dashboard' %}active{% endif %}">
+                <span class="material-icons">dashboard</span>
+                <h3>Tableau de bord</h3>
+            </a>   
+            <a href="{% url 'clinics:mes_demandes' %}" class="{% if request.resolver_match.url_name == 'mes_demandes' %}active{% endif %}">
+                <span class="material-icons">calendar_month</span>
+                <h3>Mes rendez-vous</h3>
+            </a>
+            <a href="{% url 'clinics:confirm_doctor' %}" class="{% if request.resolver_match.url_name == 'confirm_doctor' %}active{% endif %}">
+                <span class="material-icons">description</span>
+                <h3>Docs à valider</h3>
+            </a>
+            <a href="#" class="{% if 'messages' in request.path %}active{% endif %}">
+                <span class="material-icons">sms</span>
+                <h3>Messages</h3>
+                <!-- <span class="message-count">26</span> -->
+            </a>
+            
+            <a href="#" class="{% if 'teleconsultation' in request.path %}active{% endif %}">
+                <span class="material-icons">videocam</span>
+                <h3>Téléconsultation</h3>
+            </a>
+            
+            <a href="{% url 'clinics:manage_doctors' %}" class="{% if request.resolver_match.url_name == 'manage_doctors' %}active{% endif %}">
+                <span class="material-icons">bar_chart</span>
+                <h3>Gérer Médecins</h3>
+            </a>
+            
+            <a href="{% url 'clinics:clinic_profile' %}" class="{% if request.resolver_match.url_name == 'clinic_profile' %}active{% endif %}">
+                <span class="material-icons">person</span>
+                <h3>Profil</h3> 
+            </a>
+            
+            <a href="{% url 'clinics:clinic_edit' %}" class="{% if request.resolver_match.url_name == 'clinic_edit' %}active{% endif %}">
+                <span class="material-icons">edit</span>
+                <h3>Modifier Profil</h3> 
+            </a> 
+    
+            {% if clinic %}
+                <a href="{% url 'clinics:edit_horaires' %}" class="{% if request.resolver_match.url_name == 'edit_horaires' %}active{% endif %}">
+                    <span class="material-icons">schedule</span>
+                    <h3>Modifier Horaires</h3>
+                </a>
+            {% else %}
+                <p class="no-clinic-message">Aucune clinique sélectionnée.</p>
+            {% endif %} 
+            
+            <a href="{% url 'clinics:clinic_settings' %}" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            
+            <div class="modal fade logout-modal" id="logoutModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-footer">
+                            
+                            <a href="#" id="confirmLogout" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                                <span class="material-icons">logout</span>
+                                <h3>Déconnexion</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <script>
+                    document.getElementById("confirmLogout").addEventListener("click", function() {
+                        window.location.href = "{% url 'accounts:login' %}";
+                    });
+                </script>
+                  <!-- Bootstrap JS Bundle avec Popper -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+                <script>
+        // Optionnel: Animation supplémentaire
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatar = document.querySelector('.avatar-container');
+            
+            avatar.addEventListener('click', function() {
+                // Animation au clic (optionnel)
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Gestion personnalisée de la déconnexion (optionnel)
+            const confirmLogout = document.querySelector('.logout-btn.confirm');
+            confirmLogout.addEventListener('click', function() {
+                // Vous pouvez ajouter ici un préchargement ou animation
+                console.log('Déconnexion en cours...');
+            });
+        });
+                </script>
+                <button id="menu-open-button" class="fas fa-bars" ></button>
+
+        </div>
+    </aside>
+    <div class="demande-container" style="margin-left: 240px; margin-top: 100px;">
+        <h2>Mes Rendez-Vous à {{ clinic.name }} </h2>
+<br>
+
+        {% if rendezvous %}
+    <!-- Ajout de la barre de recherche -->
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="rdv-search" class="search-input" placeholder="Rechercher un rendez-vous...">
+        <select id="search-criteria" class="search-select">
+            <option value="all">Tous les champs</option>
+            <option value="user">Utilisateur</option>
+            <option value="nom">Nom patient</option>
+            <option value="speciality">Spécialité</option>
+            <option value="jour">Jour</option>
+            <option value="status">Statut</option>
+        </select>
+    </div>
+
+    <div class="rdv-container">
+        <table class="rdv-table">
+            <thead>
+                <tr class="rdv-header">
+                    <th>user</th>
+                    <th>Nom</th>
+                    <th>Doctor</th>
+                    <th>Spécialité</th>
+                    <th>Jour</th>
+                    <th>Heure</th>
+                    <th>Status</th>
+                    <th>Téléphone</th>
+                    <th>Motif</th>
+                    <th>Gérer</th>
+                </tr>
+            </thead>
+            <tbody class="rdv-body" id="rdv-table-body">
+                {% for rdv in rendezvous %}
+                <tr class="rdv-row">
+                    <td>{{ rdv.user.username }}</td>
+                    <td>{{ rdv.nom }}</td>
+                    <td style="color: #132b5e; font-weight: 600;font-size: 14px;">{{ rdv.doctor.name }}</td>
+                    <td>{{ rdv.speciality }}</td>
+                    <td>{{ rdv.jour }}</td>
+                    <td class="rdv-time">{{ rdv.heure }}</td>
+                    <td><span class="rdv-status rdv-status-{{ rdv.status }}">{{ rdv.get_status_display }}</span></td>
+                    <td>{{ rdv.telephone }}</td>
+                    <td class="rdv-motif">{{ rdv.motif }}</td>
+                    <td class="action-buttons">
+                        <a href="{% url 'clinics:modifier_rendez_vous' rdv.pk %}" class="modifier-btn">Modifier</a>
+                        <a href="{% url 'clinics:supprimer_rendez_vous' rdv.pk %}" class="delete-btn">Supprimer</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="rdv-empty">Aucun rendez-vous trouvé.</p>
+{% endif %}
+    
+<br><br><br><br>
+
+<h2>Demandes Rendez-Vous {{ clinic.name }} pour la semaine </h2>
+<br><br>
+        {% if demandes %}
+            {% for d in demandes %}
+            <div class="demande-card">
+                <div class="demande-info">
+                    <p class="essential"><strong>Docteur :</strong> {{ d.doctor.name }}</p>
+                    <p class="essential"><strong>Spécialité :</strong> {{ d.speciality }}</p>
+                    <p class="essential"><strong>Nom :</strong> {{ d.nom }}</p>
+                    <p><strong>Téléphone :</strong> {{ d.telephone }}</p>
+                    <p><strong>Jour :</strong> {{ d.jour }}</p>
+                    <p><strong>Heure :</strong> {{ d.heure|time:"H:i" }}</p>
+                    <p class="essential"><strong>Statut :</strong> {{ d.status }}</p>
+                    <p><strong>Date création :</strong> {{ d.date_creation|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Motif :</strong> {{ d.motif }}</p>
+
+                </div>
+    
+                <div class="action-buttons">
+                    <form action="{% url 'clinics:confirmer_demande' d.id  %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-confirm">
+                            <i class="material-icons">check_circle</i> Confirmer
+                        </button>
+                    </form>
+    
+                    <form action="{% url 'clinics:supprimer_demande' d.id  %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-delete">
+                            <i class="material-icons">delete</i> Supprimer
+                        </button>
+                    </form>
+    
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-demandes">Aucune demande de rendez-vous pour le moment</p>
+        {% endif %}
+        {% for demande in demandes %}
+    
+        {% endfor %}
+    
+    <script>
+    document.querySelectorAll('.btn-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const card = button.closest('.demande-card');
+            const info = card.querySelector('.demande-info');
+            info.classList.toggle('show-all');
+            button.innerHTML = info.classList.contains('show-all') 
+                ? '<i class="material-icons">visibility_off</i> Voir moins' 
+                : '<i class="material-icons">visibility</i> Voir plus';
+        });
+    });
+    </script>
+
+<style>
+    :root {
+    --primary: #375fa4;
+    --secondary: #2c3e50;
+    --light: #f8f9fa;
+    --bg: #ecf3fc;
+    --text-dark: #2c3e50;
+    --text-light: #ffffff;
+    --accent: #6da5ff;
+    --danger: #6bb8ff;
+    --success: #132b5e;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --transition: all 0.3s ease-in-out;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+}
+
+.demande-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    background: var(--light);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.demande-container h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 0.5rem;
+}
+
+.demande-card {
+    background: white;
+    border-left: 5px solid var(--primary);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.2rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.demande-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.demande-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1.5rem;
+    flex: 1 1 70%;
+}
+
+.demande-info p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.demande-info p strong {
+    color: var(--primary);
+    font-weight: 600;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+    flex: 1 1 25%;
+}
+
+.action-buttons form {
+    margin: 0;
+}
+
+.btn {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.btn-confirm {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: var(--success);
+}
+
+.btn-delete {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #3c8ce7;
+}
+
+.material-icons {
+    font-size: 1rem;
+}
+
+.no-demandes {
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 1.2rem;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: var(--shadow);
+    color: var(--secondary);
+    margin-top: 2rem;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .demande-info {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.9rem;
+    }
+}
+
+</style>
+
+<br><br><br>
+
+<style>
+    /* Style Français Élégant pour Tableau Médical */
+    :root {
+        --primary-blue: #375fa4;
+        --primary-dark: #2c3e50;
+        --accent-blue: #4b9eff;
+        --light-gray: #f8f9fa;
+        --border-color: #e0e0e0;
+        --text-dark: #333333;
+        --text-light: #f8f9fa;
+    }
+    
+    /* Tableau Compact */
+    .rdv-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+    }
+    
+    .rdv-header {
+        background: linear-gradient(to right, #375fa4, #2c3e50);
+        color: white;
+        border-radius: 20px;
+
+        
+    }
+    
+    .rdv-header th {
+        
+        padding: 10px 12px;
+        text-align: left;
+        font-weight: 500;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .rdv-row {
+        border-bottom: 1px solid var(--border-color);
+        height: 40px; /* Hauteur fixe réduite */
+        transition: all 0.2s ease;
+    }
+    
+    .rdv-row:nth-child(even) {
+        background-color: #f9fafc; /* Rayure subtile */
+    }
+    
+    .rdv-row:hover {
+        background-color: #f0f4ff !important; /* Bleu très clair au survol */
+    }
+    
+    .rdv-row td {
+        padding: 8px 12px;
+        vertical-align: middle;
+        color: var(--text-dark);
+        font-weight: 400;
+    }
+    
+    /* Style Français pour les boutons */
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+    }
+    
+    .modifier-btn, .delete-btn {
+        padding: 4px 10px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    
+    .modifier-btn {
+        width: 82px;
+        padding-left: 15px;
+        background-color: #2a5ba4;
+        color: white;
+    }
+    
+    .modifier-btn:hover {
+        background-color: #0e3058;
+        transform: translateY(-1px);
+    }
+    
+    .delete-btn {
+        background-color: #8cacd1;
+        color: white;
+    }
+    
+    .delete-btn:hover {
+        background-color: #48a4ea;
+        transform: translateY(-1px);
+    }
+    
+    /* Badges de statut élégants */
+    .rdv-status {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        min-width: 70px;
+        text-align: center;
+    }
+    
+    .rdv-status-pending {
+        background-color: #fff3e0;
+        color: #8cacd1;
+        border: 1px solid #ffe0b2;
+    }
+    
+    .rdv-status-confirmed {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+    
+    .rdv-status-canceled {
+        background-color: #ffebee;
+        color: #8cacd1;
+        border: 1px solid #ffcdd2;
+    }
+    
+    /* Barre de recherche française */
+    .search-container {
+        display: flex;
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+        max-width: 600px;
+    }
+    
+    .search-icon {
+        padding: 8px 12px;
+        background: #f5f5f5;
+        color: #757575;
+    }
+    
+    .search-input {
+        flex: 1;
+        border: none;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .search-select {
+        border: none;
+        border-left: 1px solid #e0e0e0;
+        padding: 0 12px;
+        font-size: 13px;
+        background: #f5f5f5;
+        color: #616161;
+    }
+    
+    /* Message vide stylisé */
+    .rdv-empty {
+        text-align: center;
+        padding: 20px;
+        color: #757575;
+        font-style: italic;
+        border: 1px dashed #e0e0e0;
+        border-radius: 4px;
+        margin-top: 20px;
+    }
+    </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('rdv-search');
+        const searchCriteria = document.getElementById('search-criteria');
+        const tableBody = document.getElementById('rdv-table-body');
+        const rows = tableBody.getElementsByClassName('rdv-row');
+    
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const criteria = searchCriteria.value;
+    
+            Array.from(rows).forEach(function(row) {
+                let matchFound = false;
+                const cells = row.getElementsByTagName('td');
+                
+                if (criteria === 'all') {
+                    // Search all columns except actions
+                    for (let i = 0; i < cells.length - 1; i++) {
+                        if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                } else {
+                    // Search specific column
+                    const columnIndex = getColumnIndex(criteria);
+                    if (columnIndex !== -1 && cells[columnIndex].textContent.toLowerCase().includes(searchTerm)) {
+                        matchFound = true;
+                    }
+                }
+    
+                row.style.display = matchFound ? '' : 'none';
+            });
+        });
+    
+        function getColumnIndex(criteria) {
+            const headers = document.querySelectorAll('.rdv-header th');
+            const headerTextMap = {
+                'user': 'user',
+                'nom': 'Nom',
+                'speciality': 'Spécialité',
+                'jour': 'Jour',
+                'status': 'Status'
+            };
+    
+            const headerText = headerTextMap[criteria];
+            for (let i = 0; i < headers.length; i++) {
+                if (headers[i].textContent.trim() === headerText) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+    });
+    </script>
+<style>
+    /* Styles pour la barre de recherche */
+    .search-container {
+        display: flex;
+        margin-bottom: 20px;
+        align-items: center;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 8px 15px;
+        max-width: 1000px;
+    }
+
+    .search-icon {
+        color: #7f8c8d;
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        font-size: 15px;
+        outline: none;
+        background: transparent;
+    }
+
+    .search-select {
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin-left: 10px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('rdv-search');
+        const searchCriteria = document.getElementById('search-criteria');
+        const tableBody = document.getElementById('rdv-table-body');
+        const rows = tableBody.getElementsByClassName('rdv-row');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const criteria = searchCriteria.value;
+
+            Array.from(rows).forEach(function(row) {
+                let matchFound = false;
+                const cells = row.getElementsByTagName('td');
+                
+                if (criteria === 'all') {
+                    // Recherche dans toutes les colonnes sauf la dernière (actions)
+                    for (let i = 0; i < cells.length - 1; i++) {
+                        if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                } else {
+                    // Recherche dans une colonne spécifique
+                    const columnIndex = getColumnIndex(criteria);
+                    if (columnIndex !== -1 && cells[columnIndex].textContent.toLowerCase().includes(searchTerm)) {
+                        matchFound = true;
+                    }
+                }
+
+                row.style.display = matchFound ? '' : 'none';
+            });
+        });
+
+        function getColumnIndex(criteria) {
+            const headers = document.querySelectorAll('.rdv-header th');
+            const headerTextMap = {
+                'user': 'user',
+                'nom': 'Nom',
+                'speciality': 'Spécialité',
+                'jour': 'Jour',
+                'status': 'Status'
+            };
+
+            const headerText = headerTextMap[criteria];
+            for (let i = 0; i < headers.length; i++) {
+                if (headers[i].textContent.trim() === headerText) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+    });
+</script>
+
+
+
+    <!-- Bouton -->
+<!-- Bouton pour ouvrir le modal 
+<button class="appointment-btn" onclick="document.getElementById('modalRdv2').style.display='block'"> 
+    Prendre un rendez-vous
+</button>
+<div class="header">
+    <h1><i class="icon-user"></i> Liste des patients</h1>
+    <a href="{% url 'administrators:admin_patient_create' %}" class="create-btn">
+      <i class="icon-plus"></i> Créer un patient
+    </a>
+  </div>-->
+<!-- Modal -->
+<div class="modal" id="modalRdv2" style="display:none;">
+    <div class="modal-content">
+        <span onclick="document.getElementById('modalRdv2').style.display='none'" 
+              style="position:absolute;top:10px;right:15px;cursor:pointer;">&times;</span>
+
+        <h3>Prendre un rendez-vous</h3>
+        
+        <form method="post" action="{% url 'clinics:ajouter_rendez_vous' %}">
+            {% csrf_token %}
+            <input type="hidden" name="clinic_id" value="{{ clinic.id }}">
+            
+            {{ form.as_p }}
+
+            <button type="submit">Confirmer</button>
+        </form>
+    </div>
+</div>
+
+
+
+<style>
+    /* Style de la modale */
+    #modalRdv2 {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        overflow: auto;
+    }
+    
+    /* Contenu de la modale */
+    #modalRdv2 .modal-content {
+        background-color: #f8f9fa;
+        margin: 10% auto;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+    }
+    
+    /* Style du bouton fermer */
+    #modalRdv2 .modal-content span {
+        font-size: 28px;
+        font-weight: bold;
+        color: #6c757d;
+        transition: color 0.3s;
+    }
+    
+    #modalRdv2 .modal-content span:hover {
+        color: #343a40;
+    }
+    
+    /* Style du titre */
+    #modalRdv2 .modal-content h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        text-align: center;
+    }
+    
+    /* Style du formulaire */
+    #modalRdv2 .modal-content form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    /* Style des paragraphes du formulaire (form.as_p) */
+    #modalRdv2 .modal-content form p {
+        margin: 0 0 15px 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Style des labels */
+    #modalRdv2 .modal-content form label {
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    /* Style des champs de formulaire */
+    #modalRdv2 .modal-content form input,
+    #modalRdv2 .modal-content form select,
+    #modalRdv2 .modal-content form textarea {
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    
+    #modalRdv2 .modal-content form input:focus,
+    #modalRdv2 .modal-content form select:focus,
+    #modalRdv2 .modal-content form textarea:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+    
+    /* Style du bouton de soumission */
+    #modalRdv2 .modal-content form button[type="submit"] {
+        background-color: #051d46;
+        margin-left: 120px;
+        color: white;
+        width: 200px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+    }
+    
+    #modalRdv2 .modal-content form button[type="submit"]:hover {
+        background-color: #80bdff;
+    }
+</style>
+
+    <div id="modal-container"></div>
+    
+    <script>
+        function openModal() {
+            // Ici, on fait une requête pour récupérer les informations de la clinique liée à l'utilisateur connecté
+            fetch('/clinic/modal-info/')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('modal-container').innerHTML = html;
+                    document.getElementById('modalRdv').style.display = 'block';  // Assurez-vous d'avoir un modal avec ce `id`
+                });
+        }
+    </script>
+        
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajoute des effets au survol
+        const rows = document.querySelectorAll('.rdv-row');
+        
+        rows.forEach(row => {
+            // Effet de zoom au survol
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.01)';
+                this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+            
+            // Cliquable (optionnel)
+            row.addEventListener('click', function() {
+                // Ici vous pouvez ajouter une logique pour voir les détails
+                console.log('RDV cliqué:', this);
+            });
+        });
+        
+        // Tri des colonnes (optionnel)
+        const headers = document.querySelectorAll('.rdv-header th');
+        headers.forEach(header => {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', function() {
+                console.log('Tri par:', this.textContent);
+                // Implémentez votre logique de tri ici
+            });
+        });
+    });
+    </script>
+   </div>
+
+</body>
+</html>
+
+
+     

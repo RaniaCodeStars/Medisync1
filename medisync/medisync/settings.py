@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'accounts',
+    'accounts',
     'core',
     'medecins',
     'patients',
@@ -47,6 +47,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'appointments',
     'clinics.templatetags',
+    'administrators',
+    'widget_tweaks',
+    'django_apscheduler',
+    'messaging',
+    
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -84,6 +89,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'administrators.context_processors.base_context',
             ],
         },
     },
@@ -125,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr'
 
 TIME_ZONE = 'UTC'
 
@@ -155,3 +161,19 @@ MEDIA_ROOT = BASE_DIR / 'media'           # Dossier pour les fichiers uploadés
 
 AUTH_USER_MODEL = 'accounts.User'  # Remplacez 'accounts.User' par le chemin de votre modèle User
 TIME_ZONE = 'Africa/Algiers'  # Fuseau horaire pour l'Algérie
+ADMINS = [('Admin Name', 'admin@example.com')]
+DEFAULT_FROM_EMAIL = 'noreply@example.com'
+LOGIN_URL = '/accounts/login/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'medisyncsite@gmail.com'
+EMAIL_HOST_PASSWORD = 'snuavhjmrpchnfhl'
+
+# Paramètres supplémentaires recommandés pour Gmail
+EMAIL_TIMEOUT = 10  # seconds
+DEFAULT_FROM_EMAIL = 'Medisync <medisyncsite@gmail.com>'
+SERVER_EMAIL = 'medisyncsite@gmail.com'
+SITE_URL = 'http://localhost:8000'

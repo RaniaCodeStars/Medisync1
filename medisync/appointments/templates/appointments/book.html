@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prise de Rendez-Vous</title>
-    <link rel="stylesheet" href="{% static 'css/Rv.css' %}">
+    <link rel="stylesheet" href="{% static 'css/rr----rr.css' %}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
-<body>
+
+<!-- Template Django -->
+
+<body data-doctor-id="{{ doctor.id }}" data-doctor-name="{{ doctor.user.get_full_name }}">
+    {% csrf_token %}
     <!-- header / navbar -->
     <header>
         <nav class="navbar section-content">
@@ -37,13 +42,13 @@
                     <a href="http://127.0.0.1:8000/" class="nav-link">Accueil</a>
                 </li>
                 {% if request.user.is_authenticated and user_nom and user_prenom %}
-                    <li class="nav-item">
-                        <a href="#" class="nav-link connect">{{ user_nom }} {{ user_prenom }}</a>
-                    </li>
+                <li class="nav-item">
+                    <a href="{% url 'patients:dashboard' %}" class="nav-link connect">{{ user_nom }} {{ user_prenom }}</a>
+                </li>
                 {% else %}
-                    <li class="nav-item">
-                        <a href="{% url 'accounts:login' %}" class="nav-link connect">Se connecter</a>
-                    </li>
+                <li class="nav-item">
+                    <a href="{% url 'accounts:login' %}" class="nav-link connect">Se connecter</a>
+                </li>
                 {% endif %}
             </ul>
             <button id="menu-open-button" class="fas fa-bars"></button>
@@ -56,53 +61,123 @@
             <div class="quiz-header">
                 <p id="question">Quel est le motif principal de votre consultation ?</p>
                 <ul id="quiz-options">
-                    <!-- Options insérées dynamiquement ici -->
+                    <!-- Options dynamiques ici -->
+                </ul>
+                <ul>
+                    <div id="normal" style="display:none">
+                        <li>
+                            <label>
+                                <input type="checkbox" id="normal-checkbox">
+                                Consultation normale
+                            </label>
+                        </li>
+                    </div>
+                </ul>
+                <ul>
+                    <li>
+                        <div class="urgence-section">
+                            <label>
+                                <input type="checkbox" id="urgence-checkbox">
+                                C'est une urgence médicale🚨
+                            </label>
+                            <div id="urgence-details" style="display:none; margin-top:10px;">
+                                <textarea id="urgence-raison" placeholder="Décrivez votre urgence..."
+                                    required></textarea>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
-            <button id="submit">Envoyer</button>
+            <button id="submit">Suivant</button>
         </div>
 
         <!-- Calendrier Section -->
         <div class="calendrier-container" style="display: none;">
             <h2 class="call-title">Calendrier du Médecin !</h2>
             <div class="calendar" id="calendar"></div>
-            
+
         </div>
-        <div class="calendar-navigation">
+        <div class="calendar-navigation" style="display:none">
             <button id="prev-btn" class="btn-p"><span class="material-icons">keyboard_double_arrow_left</span></button>
             <button id="next-btn" class="btn-s"><span class="material-icons">keyboard_double_arrow_right</span></button>
         </div>
         <!-- Section pour les heures -->
-        <div class="hours" id="hours"></div> 
+        <div class="hours" id="hours"></div>
 
         <!-- Confirmation Section -->
         <div class="heure-confirm">
-            <div id="selected-slot"></div> <!-- Créneau sélectionné -->
+            <div id="selected-slot"></div>
             <br>
-            <button id="confirm-slot-btn" style="display: none;" onclick="afficherFormulaireRendezVous()">Confirmer mon créneau</button>
+            <button id="confirm-slot-btn" style="display: none;">Confirmer mon créneau</button>
         </div>
 
         <!-- Formulaire Modal -->
-        <div id="modal-rdv" class="modal">
+
+        <!-- Modal de Confirmation -->
+        <div id="confirmation-modal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span class="close-btn" onclick="fermerFormulaire()">&times;</span>
-                <h2 class="modal-title">Confirmer votre Rendez-vous</h2>
-                <form id="rdv-form" class="rdv-form">
-                    <div class="form-group">
-                        <label for="nom" class="form-label">Nom complet :</label>
-                        <input type="text" id="nom" name="nom" class="form-input" required>
+                <span class="close-modal">&times;</span>
+                <h2 class="modal-title">Confirmer le Rendez-vous</h2>
+                <div id="confirmation-details">
+                    <p style="font-size: 5px; padding: 0px; margin-bottom: -20px;"><strong></strong> <span
+                            id="confirmation-doctor"></span></p>
+                    <p><strong>Date:</strong> <span id="confirmation-date"></span></p>
+                    <p><strong>Heure:</strong> <span id="confirmation-time"></span></p>
+                    <p><strong>Type:</strong> <span id="confirmation-type"></span></p>
+                    <div id="confirmation-reason" style="display: none;">
+                        <p><strong>Motif:</strong> <span id="confirmation-reason-text"></span></p>
                     </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email :</label>
-                        <input type="email" id="email" name="email" class="form-input" required>
+                    <div id="confirmation-emergency" style="display: none;">
+                        <p><strong>Urgence:</strong> <span id="confirmation-emergency-text"></span></p>
                     </div>
-                    <button type="submit" class="btn-submit" id="confirm-btn">Confirmer rendez-vous</button>
-                </form>
+                    <!-- Dans le modal de confirmation -->
+                    <div id="online-consultation-section" class="form-section">
+                        <!-- Case à cocher améliorée -->
+                        <div id="online-checkbox-container" class="checkbox-container">
+                            <label class="custom-checkbox">
+                                <input type="checkbox" id="online-checkbox">
+                                <span class="checkmark"></span>
+                                <span class="label-text">Consultation en ligne</span>
+                            </label>
+        
+                            <!-- Info-bulle explicative -->
+                            <div class="info-tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="tooltip-content">
+                                    <h4>Comment ça marche ?</h4>
+                                    <ul>
+                                        <li>✅ Visioconférence sécurisée avec le médecin</li>
+                                        <li>✅ Économisez du temps de déplacement</li>
+                                        <li>⚠️ Nécessite une connexion internet stable</li>
+                                    </ul>
+                                    <div class="video-icon">
+                                        <i class="fas fa-video"></i> Mode d'emploi vidéo
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <!-- Version alternative si non disponible -->
+                        <div id="consultation-fixed-text" class="presentiel-info">
+                            <span>Consultation en présentiel uniquement</span>
+                            <small>(Le médecin ne propose pas les consultations à distance)</small>
+                        </div>
+                    </div>
+        
+                    <!-- Dans votre modal ou formulaire de confirmation -->
+                    <div class="form-group">
+                        <label for="appointment-notes">Notes (facultatif) :</label>
+                        <textarea id="appointment-notes" name="appointment-notes" rows="4"
+                            placeholder="Ajoutez des informations importantes..."></textarea>
+                    </div>
+                </div>
+                <button id="final-confirmation-btn" class="btn-submit">Confirmer définitivement</button>
             </div>
         </div>
-    </main>
+        </main>
+        
+        <!-- JavaScript -->
+        <script src="{% static 'js/rr-------r.js' %}"></script>
+        </body>
 
-    <!-- JavaScript -->
-    <script src="{% static 'js/bo_ok.js' %}"></script>
-</body>
 </html>

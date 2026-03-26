@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load custom_tags %}
+
+</head>
+<style>
+    /* Conteneur principal de la modale */
+#modalRdv {
+    display: none; /* Caché par défaut */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Contenu de la modale */
+#modalRdv .modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    position: relative;
+    transform: translateY(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Titre */
+#modalRdv h3 {
+    margin: 0 0 25px 0;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Formulaire */
+#modalRdv form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#modalRdv label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+    font-size: 0.95rem;
+}
+
+#modalRdv select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+#modalRdv select:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+/* Options désactivées (jours fermés) */
+#modalRdv select option:disabled {
+    color: #aaa;
+    background-color: #f5f5f5;
+}
+
+/* Bouton de confirmation */
+#modalRdv button[type="submit"] {
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+#modalRdv button[type="submit"]:hover {
+    background-color: #3367d6;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    #modalRdv .modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    #modalRdv h3 {
+        font-size: 1.3rem;
+    }
+    
+    #modalRdv select, 
+    #modalRdv button[type="submit"] {
+        padding: 10px 12px;
+    }
+}
+</style>
+<body>
+    
+<!-- Template HTML -->
+<div class="modal" id="modalRdv">
+    <div class="modal-content">
+        <span onclick="document.getElementById('modalRdv').style.display='none'" 
+              style="position:absolute;top:10px;right:15px;cursor:pointer;font-size:20px;">&times;</span>
+
+        <h3>Prendre un rendez-vous</h3>
+        <form method="post" action="{% url 'clinics:envoyez-rendez-vous' %}" id="rdvForm">
+            {% csrf_token %}
+            <input type="hidden" name="clinic_id" value="{{ clinic.id }}">
+
+            <!-- Spécialité -->
+            <label>Spécialité :</label>
+            <select name="speciality" id="id_speciality" required>
+                <option value="">Choisir une spécialité</option>
+                {% for spec in specialties %}
+                    <option value="{{ spec.id }}">{{ spec.nom }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Médecin -->
+            <label>Médecin :</label>
+            <select name="doctor" id="id_doctor" required>
+                <option value="">Choisir un médecin</option>
+                {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}" data-speciality="{{ doctor.speciality.id }}">
+                        {{ doctor.name }} — {{ doctor.speciality.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Jour -->
+            <label>Jour :</label>
+            <select name="jour" id="id_jour" required>
+                <option value="">Choisir un jour</option>
+                {% for horaire in horaires %}
+                    {% if not horaire.est_ferme %}
+                        <option value="{{ horaire.jour }}" 
+                                data-doctor-id="{{ horaire.doctor.id }}"
+                                data-start="{{ horaire.heure_debut|time:'H:i' }}"
+                                data-end="{{ horaire.heure_fermeture|time:'H:i' }}">
+                            {{ horaire.jour }} ({{ horaire.heure_debut|time:"H:i" }} - {{ horaire.heure_fermeture|time:"H:i" }})
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            <!-- Heure -->
+            <label>Heure :</label>
+            <select name="heure" id="id_heure" required>
+                <option value="">Choisir une heure</option>
+                <!-- Les créneaux seront ajoutés dynamiquement -->
+            </select>
+
+            <!-- Nom complet -->
+            <label>Nom complet :</label>
+            <input type="text" name="nom" required placeholder="Nom et prénom">
+
+            <!-- Téléphone -->
+            <label>Téléphone :</label>
+            <input type="tel" name="telephone" required pattern="^0[5-7][0-9]{8}$" placeholder="07XXXXXXXX">
+
+            <!-- Motif -->
+            <label>Motif :</label>
+            <textarea name="motif" rows="3" placeholder="Expliquez le motif..." required></textarea>
+
+            <button type="submit">Confirmer</button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Filtre les médecins par spécialité
+function filterDoctors() {
+    const specialityId = document.getElementById('id_speciality').value;
+    const doctorSelect = document.getElementById('id_doctor');
+    
+    // Réinitialiser les options
+    doctorSelect.innerHTML = '<option value="">Choisir un médecin</option>';
+    
+    if (specialityId) {
+        // Afficher seulement les médecins de la spécialité sélectionnée
+        document.querySelectorAll('#id_doctor option[data-speciality]').forEach(option => {
+            if (option.getAttribute('data-speciality') === specialityId) {
+                doctorSelect.appendChild(option.cloneNode(true));
+            }
+        });
+    }
+    updateAvailableDays();
+}
+
+// Met à jour les jours disponibles pour le médecin sélectionné
+function updateAvailableDays() {
+    const doctorId = document.getElementById('id_doctor').value;
+    const jourSelect = document.getElementById('id_jour');
+    
+    // Réinitialiser les options
+    jourSelect.innerHTML = '<option value="">Choisir un jour</option>';
+    
+    if (doctorId) {
+        // Afficher seulement les jours disponibles pour ce médecin
+        document.querySelectorAll('#id_jour option[data-doctor-id]').forEach(option => {
+            if (option.getAttribute('data-doctor-id') === doctorId) {
+                jourSelect.appendChild(option.cloneNode(true));
+            }
+        });
+    }
+    updateTimeSlots();
+}
+
+// Génère les créneaux horaires disponibles
+function updateTimeSlots() {
+    const jourSelect = document.getElementById('id_jour');
+    const selectedOption = jourSelect.options[jourSelect.selectedIndex];
+    const heureSelect = document.getElementById('id_heure');
+    
+    // Réinitialiser les options
+    heureSelect.innerHTML = '<option value="">Choisir une heure</option>';
+    
+    if (selectedOption && selectedOption.value) {
+        const startTime = selectedOption.getAttribute('data-start');
+        const endTime = selectedOption.getAttribute('data-end');
+        
+        if (startTime && endTime) {
+            // Convertir en objets Date pour faciliter les calculs
+            const [startHours, startMins] = startTime.split(':').map(Number);
+            const [endHours, endMins] = endTime.split(':').map(Number);
+            
+            let currentHour = startHours;
+            let currentMin = startMins;
+            
+            // Générer des créneaux de 30 minutes
+            while (currentHour < endHours || (currentHour === endHours && currentMin < endMins)) {
+                const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`;
+                const option = document.createElement('option');
+                option.value = timeStr;
+                option.textContent = timeStr;
+                heureSelect.appendChild(option);
+                
+                // Ajouter 30 minutes
+                currentMin += 30;
+                if (currentMin >= 60) {
+                    currentMin -= 60;
+                    currentHour += 1;
+                }
+            }
+        }
+    }
+}
+
+// Écouteurs d'événements
+document.getElementById('id_speciality').addEventListener('change', filterDoctors);
+document.getElementById('id_doctor').addEventListener('change', updateAvailableDays);
+document.getElementById('id_jour').addEventListener('change', updateTimeSlots);
+</script>
+    
+
+</body>
+</html>

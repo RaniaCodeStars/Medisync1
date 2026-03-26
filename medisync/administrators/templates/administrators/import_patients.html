@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importer les Patients</title>
+</head>
+<body>
+
+<h1>Importer des patients depuis un fichier CSV</h1>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <label for="file">Sélectionner un fichier CSV :</label>
+  <input type="file" name="file" accept=".csv" required>
+  <button type="submit">Importer</button>
+</form>
+
+</body>
+</html>

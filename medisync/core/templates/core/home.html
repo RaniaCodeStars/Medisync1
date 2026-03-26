@@ -8,7 +8,7 @@
     <title>{% block title %}MediSync{% endblock %}</title>
     <!-- Liens vers les fichiers CSS et les polices -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/styleshome.css' %}"> 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 <body>
@@ -36,10 +36,22 @@
                         <a href="#teleconsultation" class="nav-link">Téléconsultation</a>
                     </li>
                     <li class="nav-item">
+                        <a href="#urgence" class="nav-link">Urgence</a>
+                    </li>
+                    <li class="nav-item">
                         <a href="#footer" class="nav-link">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'accounts:login' %}"  class="nav-link connect">Se connecter</a>
+                    {% if user.is_authenticated %}
+                    {% if user.profile.role == 'PATIENT' and user.patient_profile %}
+                    <a href="{% url 'patients:dashboard' %}" class="nav-link connect">{{ user.patient_profile.nom }} {{ user.patient_profile.prenom }}</a>
+                    {% elif user.profile.role == 'MEDECIN' and user.doctor_profile %}
+                    <a href="#" class="nav-link connect">Dr. {{ user.doctor_profile.nom }} {{ user.doctor_profile.prenom }}</a>
+                    {% else %}
+                    <a href="#" class="nav-link connect">{{ user.username }}</a>                    {% endif %}
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="nav-link connect">Se connecter</a>
+                    {% endif %}
                     </li>
                 </ul>
                 <button id="menu-open-button" class="fas fa-bars"></button>
@@ -52,7 +64,7 @@
                 <h3 class="subtitle">Facilitez votre quotidien avec notre plateforme de rendez-vous médicaux</h3>
                 <p class="description">Accédez rapidement aux meilleurs médecins, planifiez vos consultations en ligne et bénéficiez d’un suivi simplifié pour une meilleure santé.</p>
                 <div class="buttons">
-                    <form method="GET" action="{% url 'doctor_list' %}" class="search-container">
+                    <form method="GET" action="{% url 'medecins:doctor_list' %}" class="search-container">
                         <div class="search-box">
                             <input type="text" name="recherche" placeholder="Rechercher médecin" class="search-input">
                             <button type="submit" class="search-button"><i class="fas fa-search"></i></button>
@@ -139,6 +151,40 @@
             </div>
         </div>
     </section>
+
+
+<!-- Section Urgence -->
+<section class="urgence-section" id="urgence">
+    <div class="urgence-section-content">
+        <div class="urgence-details">
+            <h2>🚨 Urgence médicale</h2>
+            
+            <div class="urgence-message">
+                <p class="urgence-alert"><strong>En cas d'urgence médicale immédiate</strong>, contactez le SAMU en composant le <span class="urgence-number">14</span>, disponible 24h/24.</p>
+                
+                <div class="urgence-divider"></div>
+                
+                <p class="urgence-info"><strong>⚠️ Pas de créneau d'urgence disponible ?</strong></p>
+                <p class="urgence-info">Si vous avez sélectionné une urgence mais qu’aucun créneau spécifique n'est disponible, 
+                    vous pouvez choisir le créneau normal le plus tôt pour être pris en charge dans les plus brefs délais.
+                    <strong>Votre santé est notre priorité !</strong></p>
+            </div>
+            
+            <!-- <div class="urgence-buttons">
+                <a href="tel:14" class="urgence-btn btn-call">
+                    <i class="fas fa-phone-alt"></i> Appeler le 14
+                </a>
+                <a href="{% url 'medecins:doctor_list' %}" class="urgence-btn btn-rdv">
+                    <i class="fas fa-calendar-alt"></i> Prendre RDV
+                </a>
+            </div> -->
+        </div>
+        
+        <!-- <div class="urgence-image-wrapper">
+            <img src="{% static 'images/urgence-img.png' %}" alt="Service d'urgence médicale">
+        </div> -->
+    </div>
+</section>
 
     <!-- Section Sécurité -->
     <section class="security-section" id="security">

@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/clinic_edit.css' %}?v=1.1" />
+    
+    <link rel="stylesheet" type="text/css" href="{% static 'css/headeraside.css' %}?v=1.0" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Tableau de bord</title>
+    <title>Modifier Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <header>
+    <header style="background-color: #375fa4; position: fixed;">
         <nav class="navbar section-content">
             <a href="#" class="nav-logo">
                 <h2 class="logo-text">Medisync</h2>
@@ -19,10 +20,10 @@
             <ul class="nav-menu">
                 <button id="menu-close-button" class="fas fa-times" ></button>
                 <li class="nav-item">
-                    <a href="#home" class="nav-link2">Centre d'aide </a>
+                    <a href="#home" class="nav-link2">Acceuil </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#about" class="nav-link2">Mes messages</a>
+                    <a href="#about" class="nav-link2">Mes Messages</a>
                 </li>
                 <li class="nav-item">
                     <a href="#patient" class="nav-link2">Mes rendez-vous</a>
@@ -30,191 +31,588 @@
                 <li class="nav-item">
                     <a href="#doctor" class="nav-link2">Mes document</a>
                 </li>
-                <li class="nav-item" >
-                    {% if clinic.photos %}
-                    <img src="{{ clinic.photos.url }}"  alt="Photo de la clinique" style="height: 40px; width: 40px;border-radius: 120px;border:solid 3px #FFF;">
-                {% else %}
-                    <img src="{% static 'image/profil-inicial.jpg' %}"  alt="Photo de la clinique" style="height: 60px; width: 60px;border-radius: 120px; border:solid 5px #FFF;">
-                {% endif %} 
-                   <!-- <a href="login.html" class="nav-link connect">Se connecter</a>-->
+                <li class="nav-item">
+                    <a href="{% url 'clinics:clinic_profile' %}">
+                        {% if clinic.photos %}
+                            <img src="{{ clinic.photos.url }}" alt="Photo de la clinique" style="height: 40px; width: 40px; border-radius: 120px; border: solid 3px #FFF;">
+                        {% else %}
+                            <img src="{% static 'image/profil-inicial.jpg' %}" alt="Photo de la clinique" style="height: 60px; width: 60px; border-radius: 120px; border: solid 5px #FFF;">
+                        {% endif %}
+                    </a>
                 </li>
+                
             </ul>
 
             <button id="menu-open-button" class="fas fa-bars" ></button>
         </nav>
         </div>
     </header>
-    <aside>
-        <div class="sidebar">
-            <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="active">
+    <aside style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+        <div class="sidebar" style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+            <a href="{% url 'clinics:clinic_dashboard' %}" class="{% if request.resolver_match.url_name == 'clinic_dashboard' %}active{% endif %}">
                 <span class="material-icons">dashboard</span>
                 <h3>Tableau de bord</h3>
-            </a>
-            
-            <a href="#">
+            </a>   
+            <a href="{% url 'clinics:mes_demandes' %}" class="{% if request.resolver_match.url_name == 'mes_demandes' %}active{% endif %}">
                 <span class="material-icons">calendar_month</span>
                 <h3>Mes rendez-vous</h3>
             </a>
-            <a href="{% url 'confirm_doctor' clinic_id=clinic.id %}">
+            <a href="{% url 'clinics:confirm_doctor' %}" class="{% if request.resolver_match.url_name == 'confirm_doctor' %}active{% endif %}">
                 <span class="material-icons">description</span>
-                <h3>Gérer Médecins</h3>
+                <h3>Docs à valider</h3>
             </a>
-            
-            <a href="#">
+            <a href="#" class="{% if 'messages' in request.path %}active{% endif %}">
                 <span class="material-icons">sms</span>
                 <h3>Messages</h3>
                 <!-- <span class="message-count">26</span> -->
             </a>
-            <a href="#">
+            
+            <a href="#" class="{% if 'teleconsultation' in request.path %}active{% endif %}">
                 <span class="material-icons">videocam</span>
                 <h3>Téléconsultation</h3>
             </a>
-            <a href="{% url 'manage_doctors' clinic_id=clinic.id %}">
-                <span class="material-icons">bar_chart</span> <!-- Icône Statistiques -->
-                <h3>Nos médecins</h3>
+            
+            <a href="{% url 'clinics:manage_doctors' %}" class="{% if request.resolver_match.url_name == 'manage_doctors' %}active{% endif %}">
+                <span class="material-icons">bar_chart</span>
+                <h3>Gérer Médecins</h3>
             </a>
-            <a href="{% url 'clinic_profile' clinic_id=clinic.id %}">
-                <span class="material-icons">person</span> <!-- Icône de profil -->
+            
+            <a href="{% url 'clinics:clinic_profile' %}" class="{% if request.resolver_match.url_name == 'clinic_profile' %}active{% endif %}">
+                <span class="material-icons">person</span>
                 <h3>Profil</h3> 
             </a>
-            <a href="{% url 'clinic_edit' clinic_id=clinic.id %}">
-                <span class="material-icons">edit</span> <!-- Icône de modification -->
+            
+            <a href="{% url 'clinics:clinic_edit' %}" class="{% if request.resolver_match.url_name == 'clinic_edit' %}active{% endif %}">
+                <span class="material-icons">edit</span>
                 <h3>Modifier Profil</h3> 
             </a> 
-
+    
             {% if clinic %}
-            <a href="{% url 'edit_horaires' clinic.id %}">
-                <span class="material-icons">schedule</span>
-                <h3>Modifier Horaires</h3>
-            </a>
-        {% else %}
-            <p>Aucune clinique sélectionnée.</p>
-        {% endif %} 
-        <a href="{% url 'clinic_settings' clinic.id %}">
-            <span class="material-icons">settings</span>
-            <h3>Paramètres</h3>
-        </a>
-        <br><br><br>
+                <a href="{% url 'clinics:edit_horaires' %}" class="{% if request.resolver_match.url_name == 'edit_horaires' %}active{% endif %}">
+                    <span class="material-icons">schedule</span>
+                    <h3>Modifier Horaires</h3>
+                </a>
+            {% else %}
+                <p class="no-clinic-message">Aucune clinique sélectionnée.</p>
+            {% endif %} 
             
-        <a href="#">
-            <span class="material-icons">logout</span>
-            <h3>Déconnexion</h3>
-        </a>
+            <a href="{% url 'clinics:clinic_settings' %}" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            
+            <div class="modal fade logout-modal" id="logoutModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-footer">
+                            
+                            <a href="#" id="confirmLogout" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                                <span class="material-icons">logout</span>
+                                <h3>Déconnexion</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <script>
+                    document.getElementById("confirmLogout").addEventListener("click", function() {
+                        window.location.href = "{% url 'accounts:login' %}";
+                    });
+                </script>
+                  <!-- Bootstrap JS Bundle avec Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+    <script>
+        // Optionnel: Animation supplémentaire
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatar = document.querySelector('.avatar-container');
+            
+            avatar.addEventListener('click', function() {
+                // Animation au clic (optionnel)
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Gestion personnalisée de la déconnexion (optionnel)
+            const confirmLogout = document.querySelector('.logout-btn.confirm');
+            confirmLogout.addEventListener('click', function() {
+                // Vous pouvez ajouter ici un préchargement ou animation
+                console.log('Déconnexion en cours...');
+            });
+        });
+    </script>
+            <button id="menu-open-button" class="fas fa-bars" ></button>
+
         </div>
     </aside>
-    <div class="container">
-        <h1>Modifier le Profil</h1>
-        <div class="form-container">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="input-box">
-                    {{ form.name }}
-                    <label>Nom</label>
-                    <i class="fas fa-user"></i>
-                </div>
+    <div class="settings-header" style="margin-top: 100px;">
+
+        <p class="settings-subtitle">Gérez les informations et préférences de votre clinique</p>
+    </div>
+<div class="clinic-settings-container">
+
     
-                <div class="input-box">
-                    {{ form.phone }}
-                    <label>Téléphone</label>
-                    <i class="fas fa-phone"></i>
-                </div>
-    
-                <div class="input-box">
-                    {{ form.adresse }}
-                    <label>Adresse</label>
-                    <i class="fas fa-map-marker-alt"></i>
-                </div>
-    
-                <div class="input-box">
-                    {{ form.location }}
-                    <label>Wilaya</label>
-                    <i class="fas fa-location-arrow"></i>
-                </div>
-    
-                <div class="input-box">
-                    {{ form.site_web }}
-                    <label>Site Web</label>
-                    <i class="fas fa-globe"></i>
-                </div>
-    
-                <div class="input-box">
-                    {{ form.email }}
-                    <label>Email</label>
-                    <i class="fas fa-envelope"></i>
-                </div>
-    
-                <div class="input-box">
-                    {{ form.description }}
-                    <label>Description</label>
-                    <i class="fas fa-file-alt"></i>
-                </div>
-    
-                <div class="input-box">
-                    <label>Horaires :</label>
-                    <input type="hidden" id="horaires_input" name="horaires" value='{{ clinic.horaires|safe }}'>
-                    <button type="button" onclick="openModal()">Modifier les horaires</button>
-                </div>
-                
-                <!-- Fenêtre modale -->
-                <div id="horaireModal" style="display:none;">
-                    <div class="modal-content">
-                        <h2>Modifier les horaires</h2>
-                        <div id="horairesContainer">
-                            {% for day, details in clinic.horaires.items %}
-                                <div>
-                                    <label>{{ day|capfirst }}</label>
-                                    <input type="time" id="open_{{ day }}" value="{{ details.ouverture }}">
-                                    <input type="time" id="close_{{ day }}" value="{{ details.fermeture }}">
-                                    <input type="checkbox" id="ferme_{{ day }}" {% if details.ferme %}checked{% endif %}> Fermé
+    <form method="post" enctype="multipart/form-data" class="clinic-settings-form">
+        {% csrf_token %}
+        
+        <!-- Messages système -->
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <span class="material-icons">
+                    {% if message.tags == 'success' %}check_circle{% else %}error{% endif %}
+                </span>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="settings-grid" style="max-width: 400px;">
+            <!-- Colonne gauche -->
+            <div class="settings-column"  style="width: 400px;">
+                <!-- Carte Logo -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <span class="material-icons">image</span>
+                        <h2>Identité Visuelle</h2>
+                    </div>
+                    
+                    <div class="logo-section">
+                        <div class="logo-preview-container">
+                            {% if form.instance.photos %}
+                                <img src="{{ form.instance.photos.url }}" alt="Logo actuel" class="logo-preview" id="logo-preview">
+                            {% else %}
+                                <div class="logo-placeholder">
+                                    <span class="material-icons">photo_camera</span>
                                 </div>
-                            {% endfor %}
+                            {% endif %}
                         </div>
-                        <button onclick="saveHoraires()">Enregistrer</button>
-                        <button onclick="closeModal()">Fermer</button>
+                        
+                        <div class="file-upload-wrapper">
+                            <label for="id_photos" class="file-upload-label">
+                                <span class="material-icons" >cloud_upload</span>
+                                <span>Choisir une image</span>
+                                {{ form.photos }}
+                            </label>
+                            <div class="file-requirements" ></div>
+                        </div>
                     </div>
                 </div>
                 
-                <script>
-                    function openModal() {
-                        document.getElementById("horaireModal").style.display = "block";
-                    }
-                
-                    function closeModal() {
-                        document.getElementById("horaireModal").style.display = "none";
-                    }
-                
-                    function saveHoraires() {
-                        let horaires = {};
-                        document.querySelectorAll("#horairesContainer div").forEach(div => {
-                            let day = div.querySelector("label").innerText.trim();
-                            let isClosed = div.querySelector(`#ferme_${day}`).checked;
-                            horaires[day] = isClosed ? {"ferme": true} : {
-                                "ouverture": div.querySelector(`#open_${day}`).value,
-                                "fermeture": div.querySelector(`#close_${day}`).value
-                            };
-                        });
-                
-                        document.getElementById("horaires_input").value = JSON.stringify(horaires);
-                        closeModal();
-                    }
-                </script>
-                
-    
-                <div class="input-box">
-                    {{ form.photos }}
-                    <label>Photo</label>
-                    <i class="fas fa-camera"></i>
+                <!-- Carte Contact -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <span class="material-icons">contact_mail</span>
+                        <h2>Coordonnées</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_phone">{{ form.phone.label }}</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="error-message">{{ form.phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group" >
+                        <label for="id_site_web">{{ form.site_web.label }}</label>
+                        {{ form.site_web }}
+                        {% if form.site_web.errors %}
+                            <div class="error-message">{{ form.site_web.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-    
-                <div class="btn-container">
-                    <button type="submit" class="btn">Enregistrer</button>
-                    <a href="{% url 'clinic_profile' clinic.id %}" class="btn cancel">Annuler</a>
+            </div>
+       <br>
+            <!-- Colonne droite -->
+            <div class="settings-column" style="width: 500px;">
+                <!-- Carte Informations -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <span class="material-icons">business</span>
+                        <h2>Informations Générales</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_name">{{ form.name.label }}</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="error-message">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_location">{{ form.location.label }}</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <div class="error-message">{{ form.location.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_adresse">{{ form.adresse.label }}</label>
+                        {{ form.adresse }}
+                        {% if form.adresse.errors %}
+                            <div class="error-message">{{ form.adresse.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
-            </form>
+                
+                <!-- Carte Description -->
+                <div class="settings-card">
+                    <div class="card-header">
+                        <span class="material-icons">description</span>
+                        <h2>Description</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_description" >{{ form.description.label }}</label>
+                        {{ form.description }}
+                        <div class="char-counter" ><span id="char-count">0</span>/255 caractères minimum</div>
+                        {% if form.description.errors %}
+                            <div class="error-message">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Bouton de soumission -->
+                <div class="form-actions">
+                    <button type="submit" class="save-button">
+                        <span class="material-icons">save</span>
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
+</div>
+<style>
+    /* Define color variables for consistent and professional theming */
+:root {
+    --primary: #1d4ed8;
+    --primary-dark: #1e3a8a;
+    --secondary: #059669;
+    --danger: #b91c1c;
+    --warning: #d97706;
+    --light: #f1f5f9;
+    --dark: #2d56a8;
+    --gray: #64748b;
+    --border: #cbd5e1;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.file-upload-label a {
+    display: none;
+}
+/* Main container styling for a clean and spacious layout */
+.clinic-settings-container {
+    max-width: 1600px;
+    margin: 0.5rem auto;
+    margin-left: 240px;
+    padding: 0 2rem;
+    font-family: 'Inter', sans-serif;
+    border-radius: 16px;
+}
+
+/* Header styling for a bold and centered title */
+.settings-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.settings-title {
+    font-size: 2.8rem;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.settings-subtitle {
+    color: var(--gray);
+    font-size: 1.15rem;
+    font-weight: 400;
+}
+
+/* Grid layout for compact horizontal organization */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(250px, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1400px) {
+    .settings-grid {
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .settings-grid {
+        grid-template-columns: repeat(2, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card styling for individual sections */
+.settings-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Card header styling */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+}
+
+.card-header h2 {
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Logo section styling for compact display */
+.logo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-preview-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid var(--border);
+}
+
+.logo-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-placeholder {
+    color: var(--gray);
+    font-size: 2rem;
+}
+
+/* File upload styling */
+.file-upload-wrapper {
+    text-align: center;
+}
+
+.file-upload-label {
+    gap: 0.5rem;
+    background: #fff;
+    color: #1961b0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+
+#id_photos {
+    display: none;
+}
+
+.file-requirements {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-top: 0.5rem;
+}
+
+/* Form group styling for compact inputs */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: var(--dark);
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+    background-color: #ffffff;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.char-counter {
+    font-size: 0.8rem;
+    color: var(--gray);
+    text-align: right;
+    margin-top: 0.3rem;
+}
+
+/* Error message styling */
+.error-message {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+/* Alert styling */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    grid-column: 1 / -1;
+}
+
+.alert-success {
+    background: rgba(5, 150, 105, 0.1);
+    color: #064e3b;
+    border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.alert-error {
+    background: rgba(185, 28, 28, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(185, 28, 28, 0.3);
+}
+
+/* Save button styling for a prominent action */
+.save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    justify-self: center;
+    grid-column: 1 / -1;
+}
+
+.save-button:hover {
+    background: linear-gradient(90deg, var(--primary-dark) 0%, #1e3a8a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    grid-column: 1 / -1;
+}
+</style>
+
+<script>
+// static/js/clinic_settings.js
+document.addEventListener('DOMContentLoaded', function() {
+    // Compteur de caractères pour la description
+    const descriptionField = document.getElementById('id_description');
+    const charCount = document.getElementById('char-count');
     
+    if (descriptionField && charCount) {
+        charCount.textContent = descriptionField.value.length;
+        
+        descriptionField.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+            
+            if (this.value.length <50) {
+                charCount.style.color = '#e63757';
+            } else {
+                charCount.style.color = '#00d97e';
+            }
+        });
+    }
     
+    // Prévisualisation du logo
+    const logoInput = document.getElementById('id_photos');
+    const logoPreview = document.getElementById('logo-preview');
+    
+    if (logoInput && logoPreview) {
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoPreview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
+
+
+
+
 </body>
 </html>
 

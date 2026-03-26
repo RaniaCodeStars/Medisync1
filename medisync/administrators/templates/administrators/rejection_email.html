@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Votre demande de compte médecin a été rejetée</title>
+</head>
+<body>
+    <p>Bonjour Dr. {{ doctor.nom }},</p>
+    
+    <p>Nous regrettons de vous informer que votre demande de compte médecin sur notre plateforme n'a pas pu être approuvée.</p>
+    
+    {% if message %}
+    <p>Message de l'administrateur :</p>
+    <blockquote>{{ message }}</blockquote>
+    {% endif %}
+    
+    <p>Vous pouvez nous contacter pour plus d'informations ou pour soumettre une nouvelle demande.</p>
+    
+    <p>Cordialement,<br>
+    L'équipe de gestion</p>
+</body>
+</html>

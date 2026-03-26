@@ -1,0 +1,420 @@
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medisync - Inscription Patient</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Ajoutez le style CSS ici -->
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --success-light: #6fd7f5;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+    }
+  
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+  
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+  
+    /* Logo style cohérent */
+    .logo {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+  
+    .logo h1 {
+      color: var(--primary);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0;
+      display: inline-block;
+      position: relative;
+    }
+  
+    .logo h1::after {
+      content: "";
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--success);
+      margin: 12px auto 0;
+      border-radius: 2px;
+    }
+  
+    .form-container {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+  
+    h2, h3 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 2.5rem;
+      font-size: 1.8rem;
+      position: relative;
+    }
+  
+    h2::after, h3::after {
+      content: "";
+      display: block;
+      width: 50px;
+      height: 3px;
+      background: var(--success);
+      margin: 15px auto 0;
+      border-radius: 2px;
+    }
+  
+    /* Sections mieux espacées */
+    .form-section {
+      margin-bottom: 3rem;
+      padding: 1.5rem;
+      background-color: #fdfdfd;
+      border-radius: 12px;
+      border: 1px solid var(--light-gray);
+    }
+  
+    .form-section:last-child {
+      margin-bottom: 1.5rem;
+    }
+  
+    .form-section h3 {
+      color: var(--primary);
+      border-bottom: 2px solid var(--light-gray);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.75rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: left;
+    }
+  
+    /* Rangées mieux espacées */
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.75rem;
+      margin-bottom: 1.75rem;
+    }
+  
+    /* Groupes de formulaire plus aérés */
+    .form-group {
+      flex: 1;
+      min-width: 250px;
+      margin-bottom: 0.5rem;
+    }
+  
+    .form-group label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+  
+    /* Champs plus espacés et mieux définis */
+    .form-control {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--light-gray);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background-color: white;
+      box-sizing: border-box;
+    }
+  
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+      outline: none;
+    }
+  
+    /* Conteneur mot de passe */
+    .password-container {
+      position: relative;
+    }
+  
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--gray);
+      transition: color 0.3s;
+      background: none;
+      border: none;
+      padding: 0.5rem;
+    }
+  
+    .toggle-password:hover {
+      color: var(--primary);
+    }
+  
+    /* Checkbox style */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+    }
+  
+    .checkbox-group input {
+      margin-right: 10px;
+      width: auto;
+      transform: scale(1.2);
+    }
+  
+    /* Bouton soumission */
+    .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 1.1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      background-color: var(--success);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 1.5rem;
+    }
+  
+    .btn-submit:hover {
+      background-color: var(--success-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+  
+    .btn-submit:active {
+      transform: translateY(1px);
+    }
+  
+    .btn-submit::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      opacity: 0;
+      transition: all 0.6s ease;
+    }
+  
+    .btn-submit:hover::after {
+      opacity: 1;
+      animation: shine 1.5s infinite;
+    }
+  
+    @keyframes shine {
+      0% { transform: rotate(30deg) translate(-30%, -30%); }
+      100% { transform: rotate(30deg) translate(30%, 30%); }
+    }
+  
+    .btn-submit i {
+      margin-right: 12px;
+      font-size: 1.1em;
+    }
+  
+    /* Messages d'erreur */
+    .error-message {
+      color: #e63946;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: block;
+      padding-left: 0.25rem;
+    }
+  
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  
+    .form-container {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+  
+    /* Icônes */
+    .fas {
+      font-size: 1.1em;
+    }
+  
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 1.5rem;
+      }
+      
+      .form-container {
+        padding: 1.75rem;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      
+      .form-section {
+        padding: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+   
+  <div class="container">
+    <div class="logo">
+      <h1>Medisync</h1>
+    </div>
+
+    <div class="form-container">
+      <h2>Inscription Patient</h2>
+
+      <form id="patientForm" method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Section Informations de compte -->
+        <div class="form-section">
+          <h3><i class="fas fa-user-circle"></i> Informations de compte</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.username.id_for_label }}">Nom d'utilisateur*</label>
+              {{ form.username|add_class:"form-control" }}
+              <div class="error-message">{{ form.username.errors }}</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.email.id_for_label }}">Email*</label>
+              {{ form.email|add_class:"form-control" }}
+              <div class="error-message">{{ form.email.errors }}</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.password1.id_for_label }}">Mot de passe*</label>
+              <div class="password-container">
+                {{ form.password1|add_class:"form-control" }}
+                <button type="button" class="toggle-password fas fa-eye" id="togglePassword"></button>
+              </div>
+              <div class="error-message">{{ form.password1.errors }}</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.password2.id_for_label }}">Confirmer mot de passe*</label>
+              <div class="password-container">
+                {{ form.password2|add_class:"form-control" }}
+                <button type="button" class="toggle-password fas fa-eye" id="toggleConfirmPassword"></button>
+              </div>
+              <div class="error-message">{{ form.password2.errors }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Informations personnelles -->
+        <div class="form-section">
+          <h3><i class="fas fa-user"></i> Informations personnelles</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.nom.id_for_label }}">Nom*</label>
+              {{ form.nom|add_class:"form-control" }}
+              <div class="error-message">{{ form.nom.errors }}</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.prenom.id_for_label }}">Prénom*</label>
+              {{ form.prenom|add_class:"form-control" }}
+              <div class="error-message">{{ form.prenom.errors }}</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.sex.id_for_label }}">Sexe*</label>
+              {{ form.sex|add_class:"form-control" }}
+              <div class="error-message">{{ form.sex.errors }}</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.blood_group.id_for_label }}">Groupe sanguin</label>
+              {{ form.blood_group|add_class:"form-control" }}
+              <div class="error-message">{{ form.blood_group.errors }}</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.allergies.id_for_label }}">Allergies</label>
+              {{ form.allergies|add_class:"form-control" }}
+              <div class="error-message">{{ form.allergies.errors }}</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.compte_RIP.id_for_label }}">Compte RIP</label>
+              {{ form.compte_RIP|add_class:"form-control" }}
+              <div class="error-message">{{ form.compte_RIP.errors }}</div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-user-plus"></i>
+          <span>Créer mon compte patient</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Script pour le toggle password
+    document.querySelectorAll('.toggle-password').forEach(button => {
+      button.addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+    });
+  </script>
+</body>
+</html>

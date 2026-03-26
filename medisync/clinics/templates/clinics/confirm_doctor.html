@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/headeraside.css' %}?v=1.1">
     <link rel="stylesheet" type="text/css" href="{% static 'css/confirm_doctor.css' %}?v=1.2">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>confirm_page</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav class="navbar section-content">
+    <header style="background-color: #375fa4; position: fixed;">
+        <nav class="navbar section-content" >
             <a href="#" class="nav-logo">
                 <h2 class="logo-text">Medisync</h2>
             </a>
@@ -43,95 +45,528 @@
         </nav>
         </div>
     </header>
-    <aside>
-        <div class="sidebar">
-            <a href="{% url 'clinic_dashboard' clinic_id=clinic.id %}" class="active">
+    <aside style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+        <div class="sidebar" style="background: linear-gradient(135deg, #375fa4, #2c3e50);">
+            <a href="{% url 'clinics:clinic_dashboard' %}" class="{% if request.resolver_match.url_name == 'clinic_dashboard' %}active{% endif %}">
                 <span class="material-icons">dashboard</span>
                 <h3>Tableau de bord</h3>
             </a>   
-            
-            <a href="#">
+            <a href="{% url 'clinics:mes_demandes' %}" class="{% if request.resolver_match.url_name == 'mes_demandes' %}active{% endif %}">
                 <span class="material-icons">calendar_month</span>
                 <h3>Mes rendez-vous</h3>
             </a>
-            <a href="#">
+            <a href="{% url 'clinics:confirm_doctor' %}" class="{% if request.resolver_match.url_name == 'confirm_doctor' %}active{% endif %}">
                 <span class="material-icons">description</span>
-                <h3>Gérer Médecins</h3>
+                <h3>Docs à valider</h3>
             </a>
             
-            <a href="#">
+            <a href="#" class="{% if 'messages' in request.path %}active{% endif %}">
                 <span class="material-icons">sms</span>
                 <h3>Messages</h3>
                 <!-- <span class="message-count">26</span> -->
             </a>
-            <a href="#">
+            
+            <a href="#" class="{% if 'teleconsultation' in request.path %}active{% endif %}">
                 <span class="material-icons">videocam</span>
                 <h3>Téléconsultation</h3>
             </a>
-            <a href="{% url 'manage_doctors' clinic_id=clinic.id %}">
-                <span class="material-icons">bar_chart</span> <!-- Icône Statistiques -->
-                <h3>Nos médecins</h3>
+            
+            <a href="{% url 'clinics:manage_doctors' %}" class="{% if request.resolver_match.url_name == 'manage_doctors' %}active{% endif %}">
+                <span class="material-icons">bar_chart</span>
+                <h3>Gérer Médecins</h3>
             </a>
-            <a href="{% url 'clinic_profile' clinic_id=clinic.id %}">
-                <span class="material-icons">person</span> <!-- Icône de profil -->
+            
+            <a href="{% url 'clinics:clinic_profile' %}" class="{% if request.resolver_match.url_name == 'clinic_profile' %}active{% endif %}">
+                <span class="material-icons">person</span>
                 <h3>Profil</h3> 
             </a>
-            <a href="{% url 'clinic_edit' clinic_id=clinic.id %}">
-                <span class="material-icons">edit</span> <!-- Icône de modification -->
+            
+            <a href="{% url 'clinics:clinic_edit' %}" class="{% if request.resolver_match.url_name == 'clinic_edit' %}active{% endif %}">
+                <span class="material-icons">edit</span>
                 <h3>Modifier Profil</h3> 
             </a> 
-
+    
             {% if clinic %}
-            <a href="{% url 'edit_horaires' clinic.id %}">
-                <span class="material-icons">schedule</span>
-                <h3>Modifier Horaires</h3>
-            </a>
-        {% else %}
-            <p>Aucune clinique sélectionnée.</p>
-        {% endif %} 
-        <a href="{% url 'clinic_settings' clinic.id %}">
-            <span class="material-icons">settings</span>
-            <h3>Paramètres</h3>
-        </a>
-        <br><br><br>
+                <a href="{% url 'clinics:edit_horaires' %}" class="{% if request.resolver_match.url_name == 'edit_horaires' %}active{% endif %}">
+                    <span class="material-icons">schedule</span>
+                    <h3>Modifier Horaires</h3>
+                </a>
+            {% else %}
+                <p class="no-clinic-message">Aucune clinique sélectionnée.</p>
+            {% endif %} 
             
-        <a href="#">
-            <span class="material-icons">logout</span>
-            <h3>Déconnexion</h3>
-        </a>
+            <a href="{% url 'clinics:clinic_settings' %}" class="{% if request.resolver_match.url_name == 'clinic_settings' %}active{% endif %}">
+                <span class="material-icons">settings</span>
+                <h3>Paramètres</h3>
+            </a>
+            
+            <br><br><br>
+            
+            <a href="#" class="{% if request.resolver_match.url_name == 'logout' %}active{% endif %}">
+                <span class="material-icons">logout</span>
+                <h3>Déconnexion</h3>
+            </a>
+        </div>
         </div>
     </aside>
-        <!-- fin de sidbar et navbar -->
-         <div class="container">
-            {% for demande in demandes %}
-            <div class="doctor-card">
-                
-                    {% if demande.profile_image %}
-                    <img src="{{ demande.profile_image.url }}" alt="Photo du médecin" >
-                    {% else %}
-                    <img src="{% static 'path/to/default-image.jpg' %}" alt="Photo par défaut" >
-                    {% endif %}
-                    <p><strong>Nom :</strong> {{ demande.doctor_name }}</p>
-                    <p><strong>Spécialité :</strong> {{ demande.speciality }}</p>
-                    <p><strong>Status :</strong> {{ demande.get_status_display }}</p>
-                    <p><strong>Date :</strong> {{ demande.request_date }}</p>
-
-                
-               
+<!-- fin de sidbar et navbar -->
+<div class="clinic-container" >
+    <header class="clinic-header">
+        <h2 >Inscription Soignant - {{ clinic.name }}</h2>
         
-                <form method="post" action="{% url 'confirmer_demande' clinic_id=clinic.id demande_id=demande.id %}">
-                    {% csrf_token %}
-                    <button type="submit" name="action" value="confirmer"> <span class="material-icons">check_circle</span> Confirmer</button>
-                    <button type="submit" name="action" value="refuser"><span class="material-icons">cancel</span> Refuser</button>
-                </form>
+        <!-- Barre de recherche -->
+
+    </header>
+
+    <div class="requests-list">
+                <div class="search-bar">
+            <form method="get" action="">
+                <div class="search-container">
+                    <span class="material-icons search-icon">search</span>
+                    <input type="text" name="q" placeholder="Rechercher un soignant..." value="{{ request.GET.q }}">
+                    <button type="submit" class="search-button">Rechercher</button>
+                </div>
+            </form>
+        </div>
+        {% for demande in demandes %}
+        <article class="request-card" style="--order: {{ forloop.counter0 }}">
+            <div class="request-image">
+                {% if demande.profile_image %}
+                <img src="{{ demande.profile_image.url }}" alt="Photo du Dr. {{ demande.doctor_name }}" loading="lazy">
+                {% else %}
+                <div class="image-placeholder">
+                    <span class="material-icons">person</span>
+                </div>
+                {% endif %}
             </div>
-            <hr>
+            <div class="request-details">
+                <h3 class="request-name" style="color: #046494;">{{ demande.doctor_name }}</h3>
+                <ul class="details-list">
+                    <li><span class="material-icons">medical_services</span> <strong style="font-weight: 600;">Spécialité :</strong> {{ demande.speciality }}</li>
+                    <li><span class="material-icons">info</span> <strong style="font-weight: 600;">Statut :</strong> 
+                        <span class="status-badge status-{{ demande.status|lower }}">{{ demande.get_status_display }}</span>
+                    </li>
+                    <li><span class="material-icons">event</span> <strong style="font-weight: 600;">Date :</strong> {{ demande.request_date }}</li>
+                </ul>
+            </div>
+            <form class="request-actions" method="post" action="{% url 'clinics:confirmer_demande_docteur' demande_id=demande.id %}">
+                {% csrf_token %}
+                <button type="submit" name="action" value="confirmer" class="action-btn btn-confirm" aria-label="Confirmer la demande">
+                    <span class="material-icons">check_circle</span> Confirmer
+                </button>
+                <button type="submit" name="action" value="refuser" class="action-btn btn-reject" aria-label="Refuser la demande">
+                    <span class="material-icons">cancel</span> Refuser
+                </button>
+            </form>
+        </article>
         {% endfor %}
+        {% if not demandes %}
+        <div class="empty-state">
+            <span class="material-icons empty-icon">sentiment_dissatisfied</span>
+            <h3>Aucune demande en attente</h3>
+            <p>Aucune demande d'inscription n'est actuellement enregistrée.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        const requestCards = document.querySelectorAll('.request-card');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
             
-         </div>
+            requestCards.forEach(card => {
+                const doctorName = card.querySelector('.request-name').textContent.toLowerCase();
+                const speciality = card.querySelector('.details-list li:nth-child(1)').textContent.toLowerCase();
+                
+                if (doctorName.includes(searchTerm) || speciality.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    </script>
+<style>
+    :root {
+    /* Couleurs */
+    --primary: #375fa4; /* Bleu principal */
+    --primary-dark: #2c3e50; /* Bleu foncé */
+    --secondary: #0284c7; /* Bleu ciel */
+    --success: #165fa3; /* Vert apaisant */
+    --danger: #dc2626; /* Rouge */
+    --warning: #d97706; /* Orange */
+    --neutral: #f8fafc; /* Fond clair */
+    --card-bg: #ffffff;
+    --text-primary: #1e293b; /* Texte sombre */
+    --text-secondary: #64748b; /* Texte gris */
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+    /* Espacements */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    
+    /* Rayons */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition: all 0.2s ease-in-out;
+}
 
- 
+/* Reset et base */
 
+
+/* Layout */
+.clinic-container {
+    margin-left: 200px;
+    margin-top: 80px;
+    padding: var(--space-lg);
+    min-height: calc(100vh - 80px);
+    max-width:1000px ;
+    margin-bottom: 90px;
+}
+
+
+/* Contenu principal */
+.clinic-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    box-shadow: var(--shadow-md);
+    max-width: 1000px;
+    
+}
+
+.clinic-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Barre de recherche */
+.search-bar {
+    margin-bottom: var(--space-lg);
+}
+
+.search-container {
+    width: 1000px;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: var(--radius-full);
+    padding: var(--space-xs) var(--space-sm);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+}
+
+.search-container:focus-within {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.search-icon {
+    color: var(--text-secondary);
+    margin-right: var(--space-xs);
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: var(--space-xs);
+    font-size: 0.9rem;
+}
+
+.search-button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.search-button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Cartes de demande */
+.requests-list {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.request-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-md);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-md);
+    align-items: center;
+    transition: var(--transition);
+}
+
+.request-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.request-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid white;
+    box-shadow: var(--shadow-sm);
+}
+
+.request-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--neutral);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.request-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.request-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.details-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.details-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.details-list .material-icons {
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-confirmed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Boutons d'action */
+.request-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.action-btn .material-icons {
+    font-size: 1.1rem;
+}
+
+.btn-confirm {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #124b7a;
+}
+
+.btn-reject {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-reject:hover {
+    background-color: #b91c1c;
+}
+
+/* État vide */
+.empty-state {
+    text-align: center;
+    padding: var(--space-xl);
+    background: var(--neutral);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .clinic-container {
+        margin-left: 0;
+        padding: var(--space-md);
+    }
+    
+    aside {
+        transform: translateX(-100%);
+        transition: var(--transition);
+    }
+    
+    aside.active {
+        transform: translateX(0);
+    }
+    
+    #menu-open-button {
+        display: block;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100vh;
+        background: white;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-xl) var(--space-lg);
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+    }
+    
+    .nav-menu.active {
+        right: 0;
+    }
+    
+    .nav-link2 {
+        color: var(--text-primary);
+        width: 100%;
+        padding: var(--space-sm);
+    }
+    
+    #menu-close-button {
+        display: block;
+        position: absolute;
+        top: var(--space-md);
+        right: var(--space-md);
+        color: var(--text-primary);
+    }
+}
+
+@media (max-width: 768px) {
+    .request-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .request-image {
+        margin: 0 auto;
+    }
+    
+    .request-actions {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+        border-radius: var(--radius-md);
+    }
+    
+    .search-button {
+        width: 100%;
+        border-radius: var(--radius-md);
+        margin-top: var(--space-xs);
+    }
+    
+    .request-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+}
+</style>
        
 </body>
 </html>
